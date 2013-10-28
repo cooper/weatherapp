@@ -7,8 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
 
-@interface WAAppDelegate : UIResponder <UIApplicationDelegate>
+@class WALocationManager;
+
+@interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
+    WALocationManager       *locationManager;
+    CLLocationManager       *coreLocationManager;
+    UIPageViewController    *pageViewController;
+    UIViewController        *mainViewController;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 
