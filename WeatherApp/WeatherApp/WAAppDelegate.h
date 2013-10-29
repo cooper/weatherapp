@@ -8,14 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#define WU_API_KEY @"ffd9e1544413efef"
+#define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
 
-@class WALocationManager;
+@class WALocationManager, WAWeatherVC, WALocation;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     WALocationManager       *locationManager;
     CLLocationManager       *coreLocationManager;
-    UIPageViewController    *pageViewController;
-    UIViewController        *mainViewController;
+    UIPageViewController    *pageVC;
+    WALocation              *currentLocation;
 }
 
 @property (strong, nonatomic) UIWindow *window;

@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+@class WALocation;
+
 @interface WALocationManager : NSObject <UIPageViewControllerDataSource>
+
+@property NSMutableArray *locations;
+
+- (WALocation *)createLocation;
 
 @end

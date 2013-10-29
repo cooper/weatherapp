@@ -7,8 +7,9 @@
 //
 
 #import "WAAppDelegate.h"
-#import "WAMainViewController.h"
 #import "WALocationManager.h"
+#import "WALocation.h"
+#import "WAWeatherVC.h"
 
 @implementation WAAppDelegate
 
@@ -20,17 +21,27 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor blackColor];
     
-    // create the location manager.
+    // create the location manager and current location view controller.
     locationManager = [[WALocationManager alloc] init];
-    mainViewController = [[WAMainViewController alloc] initWithNibName:@"WAMainViewController" bundle:nil];
+    currentLocation = [locationManager createLocation];
+    
+    // FIXME: TEMP
+    WALocation *ny = [locationManager createLocation];
+    ny.city = @"New York";
+    ny.stateShort = @"NY";
+    [ny fetchCurrentConditions];
+    WALocation *la = [locationManager createLocation];
+    la.city = @"Mumbai";
+    la.country = @"India";
+    [la fetchCurrentConditions];
     
     // create the page view controller.
-    self.window.rootViewController = pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationDirectionForward options:nil];
+    self.window.rootViewController = pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationDirectionForward options:nil];
     
     // set the data source to our location manager and set the current
     // view controller list to contain the initial view controller.
-    pageViewController.dataSource = locationManager;
-    [pageViewController setViewControllers:@[mainViewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    pageVC.dataSource = locationManager;
+    [pageVC setViewControllers:@[currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     
     [self.window makeKeyAndVisible];
@@ -58,19 +69,9 @@
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     
-    
-    
-    coreLocationManager = [[CLLocationManager alloc] init];
-    coreLocationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
-    coreLocationManager.delegate = self;
-    
-    if ([CLLocationManager locationServicesEnabled]) {
-        [coreLocationManager startUpdatingLocation];
-        NSLog(@"enabled!");
-    }
-    
-    NSLog(@"basically started");
-    
+    // look up the current location.
+
+    [self startLocating];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -78,19 +79,53 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+// starts our location service.
+- (void)startLocating {
+    if (!coreLocationManager) coreLocationManager = [[CLLocationManager alloc] init];
+    coreLocationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+    coreLocationManager.distanceFilter  = 100; // only notify when change is 100 meters or more
+    coreLocationManager.delegate        = self;
+    
+    // only start updating location if we're able to.
+    if ([CLLocationManager locationServicesEnabled]) {
+        [coreLocationManager startUpdatingLocation];
+        NSLog(@"enabled!");
+    }
+    
+    NSLog(@"basically started");
+    
+    // after 3 seconds, we hopefully have enough accuracy.
+    [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
+    
+}
+
+- (void)stopLocating {
+    NSLog(@"assuming accuracy is good enough");
+    [coreLocationManager stopUpdatingLocation];
+    
+    // fetch the current conditions.
+    [currentLocation fetchCurrentConditions];
+}
+
 #pragma mark - CLLocationManagerDelegate
 
+// got a location update. set our current location object's coordinates.
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     CLLocation *recentLocation = [locations lastObject];
-    NSLog(@"update: %@", recentLocation);
+    NSLog(@"updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
+    
+    // set our current location.
+    currentLocation.coordinate   = recentLocation.coordinate;
+    currentLocation.locationAsOf = [NSDate date];
+    
 }
 
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
-    NSLog(@"resumed");
+    NSLog(@"resumed location updates");
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
-    NSLog(@"error: %@", error);
+    NSLog(@"location error: %@", error);
 }
 
 @end

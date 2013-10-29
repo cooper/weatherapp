@@ -6,13 +6,15 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import "WAPageViewController.h"
+#import "WAPageVC.h"
 
-@interface WAPageViewController ()
+@interface WAPageVC ()
 
 @end
 
-@implementation WAPageViewController
+#pragma mark - UIPageViewController
+
+@implementation WAPageVC
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
