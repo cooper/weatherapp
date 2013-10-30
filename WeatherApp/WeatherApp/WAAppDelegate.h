@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#define DEFAULTS [NSUserDefaults standardUserDefaults]
 #define WU_API_KEY @"ffd9e1544413efef"
 #define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
 

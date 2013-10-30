@@ -23,17 +23,27 @@
     
     // create the location manager and current location view controller.
     locationManager = [[WALocationManager alloc] init];
-    currentLocation = [locationManager createLocation];
+    currentLocation = [locationManager createLocation]; // index always 0
+    currentLocation.isCurrentLocation = YES;
     
-    // FIXME: TEMP
-    WALocation *ny = [locationManager createLocation];
-    ny.city = @"New York";
-    ny.stateShort = @"NY";
-    [ny fetchCurrentConditions];
-    WALocation *la = [locationManager createLocation];
-    la.city = @"Mumbai";
-    la.country = @"India";
-    [la fetchCurrentConditions];
+    // FIXME: temporary hard-coded settings.
+    if (![DEFAULTS boolForKey:@"set_default_locations"]) {
+        [DEFAULTS setObject:@{
+            @"1": @{
+                @"city": @"New York",
+                @"stateShort": @"NY"
+            },
+            @"2": @{
+                @"city": @"Mumbai",
+                @"country": @"India"
+            }
+        } forKey:@"locations"];
+        [DEFAULTS setBool:YES forKey:@"set_default_locations"];
+    }
+    
+    // load locations from settings.
+    [locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
+    [locationManager fetchLocations];
     
     // create the page view controller.
     self.window.rootViewController = pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationDirectionForward options:nil];

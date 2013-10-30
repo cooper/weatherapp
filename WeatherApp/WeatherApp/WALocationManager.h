@@ -15,5 +15,7 @@
 @property NSMutableArray *locations;
 
 - (WALocation *)createLocation;
+- (void)loadLocations:(NSDictionary *)locationsDict;
+- (void)fetchLocations;
 
 @end
