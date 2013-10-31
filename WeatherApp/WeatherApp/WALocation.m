@@ -54,6 +54,10 @@
         // round temperatures to the nearest whole degree.
         self.degreesC = lroundf([(NSNumber *)data[@"current_observation"][@"temp_c"] floatValue]);
         self.degreesF = lroundf([(NSNumber *)data[@"current_observation"][@"temp_f"] floatValue]);
+        
+        self.conditions = data[@"current_observation"][@"weather"];
+        
+        // update time of last conditions check.
         self.conditionsAsOf = [NSDate date];
         
     }];
@@ -209,6 +213,12 @@
 - (void)setDegreesF:(float)degreesF {
     _degreesF = degreesF;
     [self.viewController updateTemperature:self.degreesC fahrenheit:degreesF];
+}
+
+- (void)setConditions:(NSString *)conditions {
+    if (![conditions length]) return;
+    _conditions = conditions;
+    [self.viewController updateConditions:conditions];
 }
 
 #pragma mark - Safe properties

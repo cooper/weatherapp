@@ -65,4 +65,7 @@
     self.coordinateLabel.text = FMT(@"%f,%f", coordinate.latitude, coordinate.longitude);
 }
 
+- (void)updateConditions:(NSString *)conditions {
+    self.conditionsLabel.text = conditions;
+}
 @end

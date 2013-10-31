@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#define APP_DELEGATE ((WAAppDelegate *)([UIApplication sharedApplication].delegate))
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 #define WU_API_KEY @"ffd9e1544413efef"
 #define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
+#define L(str) NSLocalizedString(str, nil)
 
-@class WALocationManager, WAWeatherVC, WALocation;
+@class WALocationManager, WAWeatherVC, WALocation, WANavigationController;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     WALocationManager       *locationManager;
@@ -22,5 +24,6 @@
 }
 
 @property (strong, nonatomic) UIWindow *window;
+@property WANavigationController *nc;
 
 @end

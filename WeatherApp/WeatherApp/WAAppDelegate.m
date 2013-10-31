@@ -10,6 +10,7 @@
 #import "WALocationManager.h"
 #import "WALocation.h"
 #import "WAWeatherVC.h"
+#import "WANavigationController.h"
 
 @implementation WAAppDelegate
 
@@ -54,6 +55,12 @@
     [pageVC setViewControllers:@[currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     
+    // create the navigation controller.
+    self.nc = [[WANavigationController alloc] initWithMyRootController];
+    
+    // start locating.
+    [self startLocating];
+
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -78,10 +85,6 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    
-    // look up the current location.
-
-    [self startLocating];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
@@ -89,11 +92,17 @@
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
+#pragma mark - Location service management
+
 // starts our location service.
 - (void)startLocating {
+    
+    // create core location manager if we haven't already.
     if (!coreLocationManager) coreLocationManager = [[CLLocationManager alloc] init];
+    
+    // set our desired accuracy.
     coreLocationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-    coreLocationManager.distanceFilter  = 100; // only notify when change is 100 meters or more
+    coreLocationManager.distanceFilter  = 1000; // only notify when change is 1000 meters or more
     coreLocationManager.delegate        = self;
     
     // only start updating location if we're able to.
@@ -111,10 +120,11 @@
 
 - (void)stopLocating {
     NSLog(@"assuming accuracy is good enough");
-    [coreLocationManager stopUpdatingLocation];
     
-    // fetch the current conditions.
-    [currentLocation fetchCurrentConditions];
+    // fetch the current conditions if location was found
+    // FIXME: what is latitude is 0? that's still valid...
+    if (currentLocation.coordinate.latitude) [currentLocation fetchCurrentConditions];
+    
 }
 
 #pragma mark - CLLocationManagerDelegate

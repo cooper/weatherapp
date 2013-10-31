@@ -17,6 +17,7 @@
 @property IBOutlet UILabel *temperature;
 @property IBOutlet UILabel *fullLocationLabel;
 @property IBOutlet UILabel *coordinateLabel;
+@property IBOutlet UILabel *conditionsLabel;
 @property (weak) WALocation *location;
 
 // these methods are for communication between the location object and
@@ -28,6 +29,7 @@
 - (void)updateLocationTitle:(NSString *)title;
 - (void)updateRegionTitle:(NSString *)title;
 - (void)updateFullTitle:(NSString *)title;
+- (void)updateConditions:(NSString *)conditions;
 - (void)updateCoordinate:(CLLocationCoordinate2D)coordinate;
 
 @end

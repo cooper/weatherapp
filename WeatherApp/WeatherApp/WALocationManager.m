@@ -9,6 +9,8 @@
 #import "WALocationManager.h"
 #import "WALocation.h"
 #import "WAWeatherVC.h"
+#import "WANavigationController.h"
+#import "WAAppDelegate.h"
 
 @implementation WALocationManager
 
@@ -42,7 +44,29 @@
 
 // delete our reference to this location so it can be disposed of.
 - (void)destroyLocation:(WALocation *)location {
+    // these references should be okay since one is weak,
+    // but we may as well destroy them since we know this
+    // location will be destroyed soon.
+    
+    location.viewController.location = nil;
+    location.viewController = nil;
     [self.locations removeObject:location];
+    
+}
+
+#pragma mark - Fetching weather data
+
+// fetches current conditions of all locations other than the current location.
+- (void)fetchLocations {
+    for (WALocation *location in self.locations) {
+        
+        // ignore the current location; it will be fetched
+        // later when the location is determined.
+        if (location.isCurrentLocation) continue;
+        
+        [location fetchCurrentConditions];
+        
+    }
 }
 
 #pragma mark - UIPageViewControllerSource
@@ -58,19 +82,7 @@
     else index = -1;
     
     // show settings.
-    if (index == 0) {
-        UIViewController *vc = [[UIViewController alloc] init];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:vc];
-        vc.view.backgroundColor = [UIColor blueColor];
-        double delayInSeconds = 5.0;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            UIViewController *vc2 = [[UIViewController alloc] init];
-            vc2.view.backgroundColor = [UIColor yellowColor];
-            [nc pushViewController:vc2 animated:YES];
-        });
-        return nc;
-    }
+    if (index == 0) return APP_DELEGATE.nc;
     
     // otherwise we cannot have a negative index.
     if (index - 1 < 0) return nil;
@@ -100,6 +112,8 @@
     
 }
 
+#pragma mark - User defaults
+
 - (void)loadLocations:(NSDictionary *)locationsDict {
     if (!locationsDict) return;
     for (NSString *index in locationsDict) {
@@ -107,18 +121,6 @@
         WALocation *location  = [self createLocation];
         NSArray *keys = @[@"city", @"state", @"country", @"stateShort", @"countryShort"];
         for (NSString *key in keys) [location setValue:l[key] forKey:key];
-    }
-}
-
-- (void)fetchLocations {
-    for (WALocation *location in self.locations) {
-        
-        // ignore the current location; it will be fetched
-        // later when the location is determined.
-        if (location.isCurrentLocation) continue;
-        
-        [location fetchCurrentConditions];
-        
     }
 }
 

@@ -54,6 +54,7 @@ typedef void(^WAGeolocationCallback)(void);
 @property NSDate *conditionsAsOf;               // date of last condition check
 @property (nonatomic) float degreesC;           // current temp (C)
 @property (nonatomic) float degreesF;           // current temp (F)
+@property (nonatomic) NSString *conditions;     // recent conditions; i.e. "Cloudy"
 
 #pragma mark - Fetching data
 
