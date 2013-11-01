@@ -10,9 +10,8 @@
 #import "WAAPPDelegate.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
-
-#define NUMBER_OF_SECTIONS ([APP_DELEGATE.locationManager.locations count] - 1 + newNumber)
-#define LAST_SECTION_INDEX (NUMBER_OF_SECTIONS - 1)
+#import "WANavigationController.h"
+#import "WANewLocationVC.h"
 
 @interface WATableViewController ()
 
@@ -25,7 +24,6 @@
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
-        newNumber = 0;
     }
 
     return self;
@@ -40,11 +38,10 @@
 {
     [super viewDidLoad];
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.title = L(@"Locations");
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonTapped)];
+    self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -57,106 +54,95 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // Return the number of sections.
-    return NUMBER_OF_SECTIONS; // don't include current location
-    // TODO: insertRowsAtIndexPath to insert a section/row when button clicked to add new location
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    // Return the number of rows in the section.
-    return 2;
+    if (section == 0) return 2;
+    return [APP_DELEGATE.locationManager.locations count] - 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"cell for row at path: %@", indexPath);
-    NSLog(@"%d is greater than %d?", indexPath.section + 1, [APP_DELEGATE.locationManager.locations count] - 1);
-    
-    UITableViewCell *cell;
-    
-    WALocation *location;
-    if (indexPath.section + 1 > [APP_DELEGATE.locationManager.locations count] - 1)
-        (void)nil; /// FIXME
-    else
-        location = APP_DELEGATE.locationManager.locations[indexPath.section + 1];
 
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"form"];
-        cell.selectionStyle  = UITableViewCellSelectionStyleNone;
-        cell.showsReorderControl = YES;
-        
-        UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
-        textField.adjustsFontSizeToFitWidth = YES;
-        textField.textColor = [UIColor blackColor];
-        
-
-            textField.returnKeyType = UIReturnKeyNext;
-            textField.placeholder = L(@"Required");
-            textField.keyboardType = UIKeyboardTypeDefault;
-
-        textField.backgroundColor = [UIColor whiteColor];
-        textField.autocorrectionType = UITextAutocorrectionTypeNo; // no auto correction support
-        textField.autocapitalizationType = UITextAutocapitalizationTypeNone; // no auto capitalization support
-        textField.textAlignment = NSTextAlignmentLeft;
-        textField.tag = 0;
-        //textField.delegate = self;
-        
-        textField.clearButtonMode = UITextFieldViewModeNever; // no clear 'x' button to the right
-        [textField setEnabled: YES];
-        
-        [cell.contentView addSubview:textField];
-        
-        if (indexPath.row == 0) {
-            cell.textLabel.text = @"City";
-            if (location) textField.text = location.city;
-        }
-        if (indexPath.row == 1) {
-            cell.textLabel.text = @"Region";
-            if (location) textField.text = location.stateShort ? location.stateShort : location.region;
-        }
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
     
-    // Configure the cell...
+    // current location section.
+    if (indexPath.section == 0) {
+        cell.showsReorderControl = NO;
+        if (indexPath.row == 1)
+            cell.textLabel.text = FMT(@"%f,%f", APP_DELEGATE.currentLocation.coordinate.latitude, APP_DELEGATE.currentLocation.coordinate.longitude);
+        else
+            cell.textLabel.text = APP_DELEGATE.currentLocation.fullName;
+        return cell;
+    }
+    
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
+    cell.textLabel.text = location.fullName;
+    cell.showsReorderControl = YES;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+
     
     return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    NSLog(@"Request title for %d", section);
-    if (section + 1 > [APP_DELEGATE.locationManager.locations count] - 1) {
-        NSLog(@"greater in title");
-        return L(@"New location");
-    }
-    WALocation *location = APP_DELEGATE.locationManager.locations[section + 1];
-    return location.fullName;
+    if (section == 0) return L(@"Current location");
+    return L(@"Custom locations");
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    
-    // FIXME: this really isn't right.
-    NSLog(@"Last index: %d, section: %d", LAST_SECTION_INDEX, section);
-    if (section + 1 > [APP_DELEGATE.locationManager.locations count] - 1) return L(@"In the United States, type the state initials in the region field. In any other nation, type the common name of the country.");
     return nil;
+}
+
+
+// prevent highlighting of current location cells.
+- (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) return NO;
+    return YES;
+}
+
+// prevent editing of current location cells.
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) return NO;
+    return YES;
+}
+
+// prevent moving of current location cells.
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 0) return NO;
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    // TODO: THIS IS HOW WE KNOW IF DELETE WAS PRESSED.
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    // can't select current location.
+    if (indexPath.section == 0) return;
+    
+    WANewLocationVC *vc = [[WANewLocationVC alloc] init];
+    vc.navigationItem.title = L(@"Edit");
+    [APP_DELEGATE.nc pushViewController:vc animated:YES];
 }
 
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    NSLog(@"moving stuff");
 }
 
 
 - (void)addButtonTapped {
     NSLog(@"Tapped!");
-    newNumber++;
-    NSInteger section = LAST_SECTION_INDEX;
-    [self.tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationBottom];
-}
-
-- (void)editButtonTapped {
-    NSLog(@"Tapped!");
-    [self.tableView setEditing:YES animated:YES];
-}
-
-- (void)doneButtonTapped {
-    [self.tableView setEditing:NO animated:YES];
+    
+    WANewLocationVC *vc = [[WANewLocationVC alloc] init];
+    vc.navigationItem.title = L(@"New");
+    [APP_DELEGATE.nc pushViewController:vc animated:YES];
 }
 
 /*

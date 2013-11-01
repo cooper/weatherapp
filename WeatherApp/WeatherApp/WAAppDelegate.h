@@ -19,11 +19,12 @@
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;
     UIPageViewController    *pageVC;
-    WALocation              *currentLocation;
 }
 
 @property (strong, nonatomic) UIWindow *window;
 @property WANavigationController *nc;
 @property WALocationManager *locationManager;
+@property WALocation *currentLocation;
+
 
 @end

@@ -8,12 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WATableViewController : UITableViewController {
-    NSUInteger newNumber;
-}
-
-- (void)addButtonTapped;
-- (void)editButtonTapped;
-- (void)doneButtonTapped;
+@interface WATableViewController : UITableViewController
 
 @end

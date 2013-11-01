@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   WeatherApp
 
@@ -9,3 +9,7 @@
 "Location settings" = "Locations";
 "Required" = "Required";
 "New location" = "New location";
+"Current location" = "Current location";
+"Custom locations" = "Custom locations";
+"New" = "New";
+"Edit" = "Edit";

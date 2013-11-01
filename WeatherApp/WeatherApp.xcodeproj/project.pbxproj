@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A70EE9C01823622B00F317A9 /* WANewLocationVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A70EE9BF1823622B00F317A9 /* WANewLocationVC.m */; };
 		A71C08DD181ED1B6003488ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DC181ED1B6003488ED /* Foundation.framework */; };
 		A71C08DF181ED1B6003488ED /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DE181ED1B6003488ED /* CoreGraphics.framework */; };
 		A71C08E1181ED1B6003488ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08E0181ED1B6003488ED /* UIKit.framework */; };
@@ -42,6 +43,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A70EE9BE1823622B00F317A9 /* WANewLocationVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WANewLocationVC.h; sourceTree = "<group>"; };
+		A70EE9BF1823622B00F317A9 /* WANewLocationVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WANewLocationVC.m; sourceTree = "<group>"; };
 		A71C08D9181ED1B6003488ED /* WeatherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A71C08DC181ED1B6003488ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A71C08DE181ED1B6003488ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -101,6 +104,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A70EE9C11823623100F317A9 /* New location table view controller */ = {
+			isa = PBXGroup;
+			children = (
+				A70EE9BE1823622B00F317A9 /* WANewLocationVC.h */,
+				A70EE9BF1823622B00F317A9 /* WANewLocationVC.m */,
+			);
+			name = "New location table view controller";
+			sourceTree = "<group>";
+		};
 		A71C08D0181ED1B6003488ED = {
 			isa = PBXGroup;
 			children = (
@@ -143,6 +155,7 @@
 				BCA93CD9181F031100516E7E /* Page view controller */,
 				BC136803182167D90090CAC5 /* Navigation controller */,
 				BC64C8C81822CF2800C59F00 /* Table view controller */,
+				A70EE9C11823623100F317A9 /* New location table view controller */,
 				BCA93CD3181EEB2F00516E7E /* Location view controller */,
 				A71C08EE181ED1B7003488ED /* Images.xcassets */,
 				A71C08E3181ED1B6003488ED /* Supporting Files */,
@@ -355,6 +368,7 @@
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,
 				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,
 				A71C08E9181ED1B6003488ED /* main.m in Sources */,
+				A70EE9C01823622B00F317A9 /* WANewLocationVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,8 +24,8 @@
     
     // create the location manager and current location view controller.
     self.locationManager = [[WALocationManager alloc] init];
-    currentLocation = [self.locationManager createLocation]; // index always 0
-    currentLocation.isCurrentLocation = YES;
+    self.currentLocation = [self.locationManager createLocation]; // index always 0
+    self.currentLocation.isCurrentLocation = YES;
     
     // FIXME: temporary hard-coded settings.
     if (![DEFAULTS boolForKey:@"set_default_locations"]) {
@@ -52,7 +52,7 @@
     // set the data source to our location manager and set the current
     // view controller list to contain the initial view controller.
     pageVC.dataSource = self.locationManager;
-    [pageVC setViewControllers:@[currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    [pageVC setViewControllers:@[self.currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     
     // create the navigation controller.
@@ -123,7 +123,7 @@
     
     // fetch the current conditions if location was found
     // FIXME: what is latitude is 0? that's still valid...
-    if (currentLocation.coordinate.latitude) [currentLocation fetchCurrentConditions];
+    if (self.currentLocation.coordinate.latitude) [self.currentLocation fetchCurrentConditions];
     
 }
 
@@ -135,8 +135,8 @@
     NSLog(@"updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
     
     // set our current location.
-    currentLocation.coordinate   = recentLocation.coordinate;
-    currentLocation.locationAsOf = [NSDate date];
+    self.currentLocation.coordinate   = recentLocation.coordinate;
+    self.currentLocation.locationAsOf = [NSDate date];
     
 }
 
