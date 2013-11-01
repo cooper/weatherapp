@@ -48,8 +48,6 @@
         self.stateShort   = loc[@"state"];
         self.country      = loc[@"country_name"];
         self.countryShort = loc[@"country"];
-        self.fullName     = loc[@"full"];
-
         
         // round temperatures to the nearest whole degree.
         self.degreesC = lroundf([(NSNumber *)data[@"current_observation"][@"temp_c"] floatValue]);
@@ -93,7 +91,6 @@
         self.state        = data[@"location"][@"state_name"];
         self.countryShort = data[@"location"][@"country"];
         self.country      = data[@"location"][@"country_name"];
-        self.fullName     = data[@"location"][@"full"];
         NSLog(@"Got city: %@, regionShort: %@", self.city, self.regionShort);
         inGeoLookup = NO;
         if (then) then();
@@ -184,13 +181,6 @@
     _countryShort = countryShort;
 }
 
-- (void)setFullName:(NSString *)fullName {
-    NSLog(@"full name: %@", fullName);
-    if (![fullName length]) return;
-    _fullName = fullName;
-    [self.viewController updateFullTitle:fullName];
-}
-
 #pragma mark - Automatic properties
 
 // automatic.
@@ -201,6 +191,11 @@
 
 - (NSString *)regionShort {
     return self.stateShort ? self.stateShort : self.countryShort;
+}
+
+- (NSString *)fullName {
+    if (!self.city || !self.region) return nil;
+    return FMT(@"%@, %@", self.city, self.region);
 }
 
 #pragma mark - Current condition properties

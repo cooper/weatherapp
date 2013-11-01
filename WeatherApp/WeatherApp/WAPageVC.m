@@ -12,9 +12,9 @@
 
 @end
 
-#pragma mark - UIPageViewController
-
 @implementation WAPageVC
+
+#pragma mark - Page view controller
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {

@@ -9,9 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface WANewLocationVC : UITableViewController <UITextFieldDelegate> {
-    NSMutableArray *results;
-    NSDate *lastTypeDate;
-    UITextField *textField;
+    NSMutableArray *results;    // array of search results
+    NSDate *lastTypeDate;       // time of last typing event (key press)
+    UITextField *textField;     // the search text field in the first row
+    BOOL selectedOne;           // true if the user selected a location result
 }
 
 @end

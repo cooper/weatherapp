@@ -30,7 +30,7 @@ typedef void(^WAGeolocationCallback)(void);
 @property (nonatomic) NSString *state;                  // state name; i.e. Indiana
 @property (nonatomic) NSString *stateShort;             // short name of state; i.e. IN
 @property (nonatomic) NSString *city;                   // city name; i.e. Chalmers
-@property (nonatomic) NSString *fullName;               // full name; i.e. Chalmers, Indiana
+@property (nonatomic, readonly) NSString *fullName;     // full name; i.e. Chalmers, Indiana
 
 #pragma mark - Automatic properties
 

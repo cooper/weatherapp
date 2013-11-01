@@ -14,7 +14,7 @@
 
 @implementation WAAppDelegate
 
-#pragma mark - UIApplicationDelegate
+#pragma mark - Application delegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -28,6 +28,7 @@
     self.currentLocation.isCurrentLocation = YES;
     
     // FIXME: temporary hard-coded settings.
+    // TODO: I should make a location object instance method that returns a dictionary for storing in defaults.
     if (![DEFAULTS boolForKey:@"set_default_locations"]) {
         [DEFAULTS setObject:@{
             @"1": @{
@@ -127,7 +128,7 @@
     
 }
 
-#pragma mark - CLLocationManagerDelegate
+#pragma mark - Core location manager delegate
 
 // got a location update. set our current location object's coordinates.
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {

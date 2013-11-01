@@ -15,6 +15,7 @@
 @property NSMutableArray *locations;
 
 - (WALocation *)createLocation;                         // creates a location and adds it to manager
+- (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary;
 - (void)destroyLocation:(WALocation *)location;         // destroys a location by removing from manager
 - (void)loadLocations:(NSDictionary *)locationsDict;    // creates locations from user defaults dictionary
 - (void)fetchLocations;                                 // fetches conditions of all locations but current

@@ -19,6 +19,8 @@
 
 @implementation WATableViewController
 
+#pragma  mark - Table view controller
+
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
@@ -28,6 +30,8 @@
 
     return self;
 }
+
+#pragma mark - View controller
 
 - (void)viewWillAppear:(BOOL)animated {
     NSLog(@"Loading data in table view");
@@ -111,6 +115,7 @@
 
 // prevent moving of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    // FIXME: this prevents current location rows from being moved, but it does not fix the issue where custom locations can be moved up into section 0.
     if (indexPath.section == 0) return NO;
     return YES;
 }
@@ -133,9 +138,10 @@
 
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSLog(@"moving stuff");
+    NSLog(@"moving %@ to %@", sourceIndexPath, destinationIndexPath);
 }
 
+#pragma mark - Interface actions
 
 - (void)addButtonTapped {
     NSLog(@"Tapped!");

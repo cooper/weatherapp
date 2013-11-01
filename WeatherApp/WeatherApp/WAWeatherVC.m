@@ -16,7 +16,7 @@
 
 @implementation WAWeatherVC
 
-#pragma mark - UIViewController
+#pragma mark - View controller
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {

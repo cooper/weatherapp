@@ -32,7 +32,7 @@
     WALocation *location = [[WALocation alloc] init];
     location.manager     = self; // weak
     [self.locations addObject:location];
-    location.index = [self.locations indexOfObject:location];
+    location.index = [self.locations count] - 1;
     
     // create a weather view controller for the location.
     WAWeatherVC *weatherVC  = [[WAWeatherVC alloc] initWithNibName:@"WAWeatherVC" bundle:nil];
@@ -40,6 +40,18 @@
     weatherVC.location      = location; // weak
     
     NSLog(@"Created location %lu: %@", (unsigned long)[self.locations indexOfObject:location], location);
+    return location;
+}
+
+// create a location from a dictionary of properties.
+- (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary {
+    WALocation *location = [self createLocation];
+    for (NSString *key in dictionary) {
+        NSLog(@"checking %@", key);
+        if (![location respondsToSelector:NSSelectorFromString(key)]) continue;
+        NSLog(@"settings %@", key);
+        [location setValue:dictionary[key] forKey:key];
+    }
     return location;
 }
 
@@ -70,7 +82,7 @@
     }
 }
 
-#pragma mark - UIPageViewControllerSource
+#pragma mark - Page view controller source
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
     

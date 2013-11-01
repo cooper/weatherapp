@@ -22,7 +22,7 @@
     return self;
 }
 
-#pragma mark - UIViewController
+#pragma mark - View controller
 
 - (void)viewDidLoad
 {

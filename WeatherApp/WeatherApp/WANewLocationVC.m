@@ -9,9 +9,12 @@
 #import "WANewLocationVC.h"
 #import "WAAppDelegate.h"
 #import "WANavigationController.h"
+#import "WALocationManager.h"
+#import "WALocation.h"
 
 @implementation WANewLocationVC
 
+#pragma mark - Table view controller
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -24,6 +27,8 @@
     return self;
 }
 
+#pragma  mark - View controller
+
 - (void)viewWillAppear:(BOOL)animated {
     //NSLog(@"Loading data in new location table view");
     //[self.tableView reloadData];
@@ -32,7 +37,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonTapped)];
 }
 
 - (void)didReceiveMemoryWarning
@@ -78,8 +82,8 @@
         textField.adjustsFontSizeToFitWidth = YES;
         textField.textColor = [UIColor blackColor];
 
-            textField.keyboardType = UIKeyboardTypeDefault;
-            textField.returnKeyType = UIReturnKeyDefault;
+        textField.keyboardType = UIKeyboardTypeDefault;
+        textField.returnKeyType = UIReturnKeyDefault;
         textField.placeholder = L(@"Type to look up a location");
 
         textField.backgroundColor = [UIColor whiteColor];
@@ -95,12 +99,12 @@
         
         [cell.contentView addSubview:textField];
         cell.textLabel.text = @"Search";
-        
         return cell;
     }
     
-    cell.textLabel.text = results[indexPath.row];
-    
+    cell.textLabel.text = results[indexPath.row][@"longName"];
+    cell.textLabel.adjustsFontSizeToFitWidth = YES;
+
     return cell;
 }
 
@@ -130,54 +134,97 @@
     return NO;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    // TODO: THIS IS HOW WE KNOW IF DELETE WAS PRESSED.
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-    }
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"selected: %@", indexPath);
+    NSLog(@"selected: %@", results[indexPath.row]);
+    WALocation *location = [APP_DELEGATE.locationManager createLocationFromDictionary:results[indexPath.row]];
+    [location fetchCurrentConditions];
+    [APP_DELEGATE.nc popToRootViewControllerAnimated:YES];
 }
 
-// move
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSLog(@"moving stuff");
-}
-
-
-- (void)doneButtonTapped {
-    NSLog(@"Tapped!");
-}
+#pragma mark - Suggestion lookups
 
 - (void)lookupSuggestion:(NSString *)firstPart {
-    NSLog(@"Looking up suggestions for %@", firstPart);
-    NSString *str     = FMT(@"http://api.geonames.org/postalCodeSearchJSON?placename_startsWith=%@&maxRows=10&username=" GEO_LOOKUP_USERNAME, [firstPart stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
-    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        // TODO: handle errors here...
-        NSError *error;
-        NSDictionary *result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        NSArray *arrayOfDicts = result[@"postalCodes"];
+
+    // empty. just clear it.
+    if (![firstPart length]) {
         [results removeAllObjects];
-        for (NSDictionary *place in arrayOfDicts) {
-            NSMutableString *name = [place[@"placeName"] mutableCopy];
-            if (place[@"adminName2"])  [name appendString:FMT(@", %@", place[@"adminName2"])];
-            if (place[@"adminName1"])  [name appendString:FMT(@", %@", place[@"adminName1"])];
-            if (place[@"countryCode"]) [name appendString:FMT(@", %@", place[@"countryCode"])];
-            [results addObject:name];
-        }
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+        return;
+    }
+    
+    NSLog(@"Looking up suggestions for %@", firstPart);
+    
+    // figure the API URL and create a request.
+    NSString *str = FMT(@"http://api.geonames.org/searchJSON?name_startsWith=%@&maxRows=10&username=" GEO_LOOKUP_USERNAME, [firstPart stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+    
+    // send the request asynchronously.
+    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    
+        // the user already selected something, so just forget about this request.
+        if (selectedOne) return;
+        
+        // a connection error occurred.
+        if (connectionError) {
+            NSLog(@"Location lookup connection error: %@", connectionError);
+            return;
+        }
+        
+        // decode the JSON.
+        NSError *jsonError;
+        NSDictionary *obj = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+        
+        // a JSON error occured.
+        if (jsonError) {
+            NSLog(@"JSON error: %@", jsonError);
+            return;
+        }
+        
+        // clear the results from the last request.
+        [results removeAllObjects];
+        
+        // add the new results.
+        for (NSDictionary *place in obj[@"geonames"]) {
+            NSMutableString *name = [place[@"name"] mutableCopy];
+            
+            // determine the long name of this place.
+            for (NSString *key in @[@"adminName3", @"adminName2", @"adminName1", @"countryName"]) {
+                if (!place[key]) continue;
+                if (![place[key] length]) continue;
+                NSLog(@"%@: %@", key, place[key]);
+                [name appendString:FMT(@", %@", place[key])];
+            }
+            
+            NSMutableDictionary *loc = [@{
+                @"longName":        name,
+                @"city":            place[@"name"],
+                @"country":         place[@"countryName"],
+                @"countryShort":    place[@"countryCode"]
+            } mutableCopy];
+            
+            // if this is in the United States, adminName1 is the state's full name,
+            // and adminCode1 is the state's initials. in any other country, we don't care.
+            if ([place[@"countryCode"] isEqualToString:@"US"]) {
+                loc[@"state"]      = place[@"adminName1"];
+                loc[@"stateShort"] = place[@"adminCode1"];
+            }
+            
+            [results addObject:loc];
+        }
+        
+        // reload section 1 of the table.
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
     }];
+    
 }
 
-#pragma mark - UITextFieldDelegate
+#pragma mark - Text field delegate
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     lastTypeDate = [NSDate date];
     NSLog(@"Should change characters");
-    [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:1.5];
+    [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:1];
     return YES;
 }
 
@@ -186,7 +233,7 @@
     // user has typed since.
     if ([date laterDate:lastTypeDate] == lastTypeDate) return;
     
-    NSLog(@"User hasn't typed for 1.5 seconds; looking up %@", textField.text);
+    NSLog(@"User hasn't typed for 1 seconds; looking up %@", textField.text);
     [self lookupSuggestion:textField.text];
 }
 
