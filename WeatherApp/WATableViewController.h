@@ -13,5 +13,7 @@
 }
 
 - (void)addButtonTapped;
+- (void)editButtonTapped;
+- (void)doneButtonTapped;
 
 @end

@@ -27,6 +27,7 @@
         // Custom initialization
         newNumber = 0;
     }
+
     return self;
 }
 
@@ -57,30 +58,32 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return [APP_DELEGATE.locationManager.locations count] - 1; // don't include current location
+    return NUMBER_OF_SECTIONS; // don't include current location
     // TODO: insertRowsAtIndexPath to insert a section/row when button clicked to add new location
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    NSLog(@"yeah: %d", 2+newNumber);
-    return 2 + newNumber;
+    return 2;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"cell for row at path: %@", indexPath);
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.section + 1];
+    NSLog(@"%d is greater than %d?", indexPath.section + 1, [APP_DELEGATE.locationManager.locations count] - 1);
     
-    if (!location) {
-        return [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"yep"];
-    }
+    UITableViewCell *cell;
     
-    NSString *cellIdentifier = FMT(@"%lu-%d", (unsigned long)location.index, indexPath.row);
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    WALocation *location;
+    if (indexPath.section + 1 > [APP_DELEGATE.locationManager.locations count] - 1)
+        (void)nil; /// FIXME
+    else
+        location = APP_DELEGATE.locationManager.locations[indexPath.section + 1];
+
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"form"];
+        cell.selectionStyle  = UITableViewCellSelectionStyleNone;
+        cell.showsReorderControl = YES;
         
         UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
         textField.adjustsFontSizeToFitWidth = YES;
@@ -105,14 +108,12 @@
         
         if (indexPath.row == 0) {
             cell.textLabel.text = @"City";
-            textField.text      = location.city;
+            if (location) textField.text = location.city;
         }
         if (indexPath.row == 1) {
             cell.textLabel.text = @"Region";
-            textField.text      = location.stateShort ? location.stateShort : location.region;
+            if (location) textField.text = location.stateShort ? location.stateShort : location.region;
         }
-
-    }
     
     // Configure the cell...
     
@@ -120,6 +121,11 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    NSLog(@"Request title for %d", section);
+    if (section + 1 > [APP_DELEGATE.locationManager.locations count] - 1) {
+        NSLog(@"greater in title");
+        return L(@"New location");
+    }
     WALocation *location = APP_DELEGATE.locationManager.locations[section + 1];
     return location.fullName;
 }
@@ -128,8 +134,12 @@
     
     // FIXME: this really isn't right.
     NSLog(@"Last index: %d, section: %d", LAST_SECTION_INDEX, section);
-    if (section != LAST_SECTION_INDEX) return nil;
-    return L(@"In the United States, type the state initials in the region field. In any other nation, type the common name of the country.");
+    if (section + 1 > [APP_DELEGATE.locationManager.locations count] - 1) return L(@"In the United States, type the state initials in the region field. In any other nation, type the common name of the country.");
+    return nil;
+}
+
+// move
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 }
 
 
@@ -137,12 +147,16 @@
     NSLog(@"Tapped!");
     newNumber++;
     NSInteger section = LAST_SECTION_INDEX;
-    [self.tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [self.tableView insertRowsAtIndexPaths:@[
-        [NSIndexPath indexPathForRow:0 inSection:section],
-        [NSIndexPath indexPathForRow:1 inSection:section],
-        [NSIndexPath indexPathForRow:2 inSection:section]
-    ] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView insertSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationBottom];
+}
+
+- (void)editButtonTapped {
+    NSLog(@"Tapped!");
+    [self.tableView setEditing:YES animated:YES];
+}
+
+- (void)doneButtonTapped {
+    [self.tableView setEditing:NO animated:YES];
 }
 
 /*

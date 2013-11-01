@@ -23,7 +23,19 @@
     // controller and do something like: http://blog.teamtreehouse.com/introduction-to-the-ios-uitableviewcontroller
     self.navigationBar.topItem.title = L(@"Locations");
     self.navigationBar.topItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:tvc action:@selector(addButtonTapped)];
+    self.navigationBar.topItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonTapped)];
     return self;
+}
+
+- (void)editButtonTapped {
+    [tvc editButtonTapped];
+    self.navigationBar.topItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonTapped)];
+
+}
+
+- (void)doneButtonTapped {
+    [tvc doneButtonTapped];
+    self.navigationBar.topItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonTapped)];
 }
 
 #pragma mark - UIViewController
