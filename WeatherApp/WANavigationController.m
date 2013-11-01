@@ -8,6 +8,7 @@
 
 #import "WANavigationController.h"
 #import "WAAppDelegate.h"
+#import "WATableViewController.h"
 
 @interface WANavigationController ()
 
@@ -16,13 +17,16 @@
 @implementation WANavigationController
 
 - (id)initWithMyRootController {
-    UIViewController *tvc = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    tvc = [[WATableViewController alloc] initWithNibName:@"WATableViewController" bundle:nil];
     self = [super initWithRootViewController:tvc];
     // TODO: perhaps I should subclass UITableViewController for the root view
     // controller and do something like: http://blog.teamtreehouse.com/introduction-to-the-ios-uitableviewcontroller
-    self.navigationBar.topItem.title = L(@"Location settings");
+    self.navigationBar.topItem.title = L(@"Locations");
+    self.navigationBar.topItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:tvc action:@selector(addButtonTapped)];
     return self;
 }
+
+#pragma mark - UIViewController
 
 - (void)viewDidLoad
 {
@@ -35,5 +39,6 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 @end

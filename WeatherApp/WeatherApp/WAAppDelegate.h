@@ -17,7 +17,6 @@
 @class WALocationManager, WAWeatherVC, WALocation, WANavigationController;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
-    WALocationManager       *locationManager;
     CLLocationManager       *coreLocationManager;
     UIPageViewController    *pageVC;
     WALocation              *currentLocation;
@@ -25,5 +24,6 @@
 
 @property (strong, nonatomic) UIWindow *window;
 @property WANavigationController *nc;
+@property WALocationManager *locationManager;
 
 @end

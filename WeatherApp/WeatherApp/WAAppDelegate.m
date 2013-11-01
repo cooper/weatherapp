@@ -23,8 +23,8 @@
     self.window.backgroundColor = [UIColor blackColor];
     
     // create the location manager and current location view controller.
-    locationManager = [[WALocationManager alloc] init];
-    currentLocation = [locationManager createLocation]; // index always 0
+    self.locationManager = [[WALocationManager alloc] init];
+    currentLocation = [self.locationManager createLocation]; // index always 0
     currentLocation.isCurrentLocation = YES;
     
     // FIXME: temporary hard-coded settings.
@@ -43,15 +43,15 @@
     }
     
     // load locations from settings.
-    [locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
-    [locationManager fetchLocations];
+    [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
+    [self.locationManager fetchLocations];
     
     // create the page view controller.
     self.window.rootViewController = pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationDirectionForward options:nil];
     
     // set the data source to our location manager and set the current
     // view controller list to contain the initial view controller.
-    pageVC.dataSource = locationManager;
+    pageVC.dataSource = self.locationManager;
     [pageVC setViewControllers:@[currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     

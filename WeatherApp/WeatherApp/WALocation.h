@@ -21,6 +21,7 @@ typedef void(^WAGeolocationCallback)(void);
 
 @property (weak) WALocationManager *manager;
 @property WAWeatherVC *viewController;          // the associated view controller
+@property NSUInteger index;
 
 #pragma mark - Location information
 

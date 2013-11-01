@@ -32,6 +32,7 @@
     WALocation *location = [[WALocation alloc] init];
     location.manager     = self; // weak
     [self.locations addObject:location];
+    location.index = [self.locations indexOfObject:location];
     
     // create a weather view controller for the location.
     WAWeatherVC *weatherVC  = [[WAWeatherVC alloc] initWithNibName:@"WAWeatherVC" bundle:nil];

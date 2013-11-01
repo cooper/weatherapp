@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WANavigationController : UINavigationController
+@class WATableViewController;
+
+@interface WANavigationController : UINavigationController {
+    WATableViewController *tvc;
+}
 
 
 - (id)initWithMyRootController;
