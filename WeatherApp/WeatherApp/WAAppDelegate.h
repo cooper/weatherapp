@@ -11,6 +11,7 @@
 #define APP_DELEGATE ((WAAppDelegate *)([UIApplication sharedApplication].delegate))
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 #define WU_API_KEY @"ffd9e1544413efef"
+#define GEO_LOOKUP_USERNAME @"cooper"
 #define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
 #define L(str) NSLocalizedString(str, nil)
 

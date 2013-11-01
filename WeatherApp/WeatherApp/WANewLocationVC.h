@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WANewLocationVC : UITableViewController
+@interface WANewLocationVC : UITableViewController <UITextFieldDelegate> {
+    NSMutableArray *results;
+    NSDate *lastTypeDate;
+    UITextField *textField;
+}
 
 @end

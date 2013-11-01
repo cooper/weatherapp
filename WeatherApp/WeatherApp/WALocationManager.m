@@ -39,7 +39,7 @@
     location.viewController = weatherVC;
     weatherVC.location      = location; // weak
     
-    NSLog(@"Created location %d: %@", [self.locations indexOfObject:location], location);
+    NSLog(@"Created location %lu: %@", (unsigned long)[self.locations indexOfObject:location], location);
     return location;
 }
 

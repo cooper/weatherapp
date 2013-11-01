@@ -126,7 +126,7 @@
     // can't select current location.
     if (indexPath.section == 0) return;
     
-    WANewLocationVC *vc = [[WANewLocationVC alloc] init];
+    WANewLocationVC *vc = [[WANewLocationVC alloc] initWithStyle:UITableViewStyleGrouped];
     vc.navigationItem.title = L(@"Edit");
     [APP_DELEGATE.nc pushViewController:vc animated:YES];
 }
@@ -140,7 +140,7 @@
 - (void)addButtonTapped {
     NSLog(@"Tapped!");
     
-    WANewLocationVC *vc = [[WANewLocationVC alloc] init];
+    WANewLocationVC *vc = [[WANewLocationVC alloc] initWithStyle:UITableViewStyleGrouped];
     vc.navigationItem.title = L(@"New");
     [APP_DELEGATE.nc pushViewController:vc animated:YES];
 }
