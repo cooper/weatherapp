@@ -11,6 +11,7 @@
 #import "WALocation.h"
 #import "WAWeatherVC.h"
 #import "WANavigationController.h"
+#import "WATableViewController.h"
 
 @implementation WAAppDelegate
 
@@ -106,6 +107,7 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    [self saveLocationsInDatabase];
 }
 
 #pragma mark - Location service management
@@ -147,8 +149,14 @@
     
 }
 
+#pragma mark - For use anywhere
+
 - (void)saveLocationsInDatabase {
     [DEFAULTS setObject:[self.locationManager locationsArrayForSaving] forKey:@"locations"];
+}
+
+- (void)locationsChanged {
+    if (self.nc && self.nc.tvc) [self.nc.tvc updateLocations ];
 }
 
 #pragma mark - Core location manager delegate

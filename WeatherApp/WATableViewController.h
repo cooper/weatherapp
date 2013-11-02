@@ -10,4 +10,6 @@
 
 @interface WATableViewController : UITableViewController
 
+- (void)updateLocations;
+
 @end

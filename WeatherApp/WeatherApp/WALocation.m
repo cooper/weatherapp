@@ -47,29 +47,63 @@
         // note: the setters ignore any lengthless value.
         //  the setters call the interface methods to make changes.
         NSDictionary *loc = data[@"current_observation"][@"display_location"];
+        
         self.city         = loc[@"city"];
-        self.state        = loc[@"state_name"];
-        self.stateShort   = loc[@"state"];
-        self.country      = loc[@"country_name"];
         self.countryShort = loc[@"country"];
+        
+        // In the United States, use states.
+        if ([self.country isEqualToString:@"US"]) {
+            self.state        = loc[@"state_name"];
+            self.stateShort   = loc[@"state"];
+        }
+        
+        NSDictionary *ob = data[@"current_observation"];
+        // I really don't like when Wunderground shortens formal names to short
+        // names. For example, I don't wanted United Arab Emirates shortened to UAE.
+        
+        // I also don't like how it pointlessly says that Beijing and Shanghai are
+        // countries. They, quite frankly, are actually cities. I would understand
+        // why Hong Kong and Macau may be classified as countries, but Shanghai and
+        // Beijing most definitely should not. (update: it was actually saying state)
+        
+        // Because of these annoyances, I'm only setting country from Wunderground if
+        // it has not been determined by the lookup/suggestion service.
+        
+        // This should not be an issue anyway, since Wunderground obviously
+        // understands what I mean anyway when it "corrects" my "mistakes."
+        
+        if (!self.country) self.country = loc[@"country_name"];
         
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
         if (!self.isCurrentLocation) {
-            self.latitude     = [loc[@"latitude"] floatValue];
+            self.latitude     = [loc[@"latitude"]  floatValue];
             self.longitude    = [loc[@"longitude"] floatValue];
         }
         
         // round temperatures to the nearest whole degree.
-        self.degreesC = lroundf([(NSNumber *)data[@"current_observation"][@"temp_c"] floatValue]);
-        self.degreesF = lroundf([(NSNumber *)data[@"current_observation"][@"temp_f"] floatValue]);
+        self.degreesC = lroundf([(NSNumber *)ob[@"temp_c"] floatValue]);
+        self.degreesF = lroundf([(NSNumber *)ob[@"temp_f"] floatValue]);
         
-        self.conditions = data[@"current_observation"][@"weather"];
+        self.conditions = ob[@"weather"];
+        
+        
+        // if an icon is included in the response, download it.
+        if (ob[@"icon_url"]) {
+            NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
+            [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                if (!data) return;
+                self.conditionsImage = [UIImage imageWithData:data];
+                [APP_DELEGATE locationsChanged];
+            }];
+        }
         
         // update time of last conditions check.
         self.conditionsAsOf = [NSDate date];
-        
+
+        [APP_DELEGATE locationsChanged];
         if (then) then();
+        
     }];
     
 }
@@ -219,11 +253,11 @@
 // automatic.
 
 - (NSString *)region {
-    return self.state ? self.state : self.country;
+    return OR(self.state, self.country);
 }
 
 - (NSString *)regionShort {
-    return self.stateShort ? self.stateShort : self.countryShort;
+    return OR(self.stateShort, self.countryShort);
 }
 
 - (NSString *)fullName {

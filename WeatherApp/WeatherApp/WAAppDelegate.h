@@ -18,7 +18,7 @@
 #define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
 #define L(str) NSLocalizedString(str, nil)
 #define URL_ESC(str) [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-
+#define OR(this, otherwise) (this ? this : otherwise)
 typedef void(^WACallback)(void);
 
 @class WALocationManager, WAWeatherVC, WALocation, WANavigationController;
@@ -33,6 +33,7 @@ typedef void(^WACallback)(void);
 @property (readonly) WALocation *currentLocation;
 @property UIPageViewController *pageVC;
 
-- (void)saveLocationsInDatabase;
+- (void)saveLocationsInDatabase;    // updates user defaults database
+- (void)locationsChanged;           // updates table view if it exists
 
 @end

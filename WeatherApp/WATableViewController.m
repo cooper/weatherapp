@@ -26,6 +26,7 @@
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
+        self.tableView.rowHeight = 60;
     }
 
     return self;
@@ -63,45 +64,62 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0) return 2;
+    if (section == 0) return 1;
     return [APP_DELEGATE.locationManager.locations count] - 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    // TODO: make custom cells.
+    // I should eventually make custom subclasses of UITableViewCell
+    // that have the city name, brief description of conditions, temperature, etc.
+    // and increase the height of them. However, I must keep the delete and move things in mind.
     
-    // current location section.
-    if (indexPath.section == 0) {
-        cell.showsReorderControl = NO;
-        if (indexPath.row == 1)
-            cell.textLabel.text = FMT(@"%f,%f", APP_DELEGATE.currentLocation.coordinate.latitude, APP_DELEGATE.currentLocation.coordinate.longitude);
-        else {
-            cell.textLabel.text = APP_DELEGATE.currentLocation.fullName;
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        }
-        return cell;
-    }
-    
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
-    cell.textLabel.text = location.fullName;
-    cell.showsReorderControl = YES;
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
+    //cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+    cell.accessoryType    = UITableViewCellAccessoryDisclosureIndicator;
+    //cell.textLabel.adjustsFontSizeToFitWidth = YES;
 
+    // current location cell can't be moved.
+    BOOL isCurrentLocation   = indexPath.section == 0;
+    cell.showsReorderControl = !isCurrentLocation;
+
+    // find the location object.
+    NSUInteger index     = isCurrentLocation ? 0 : indexPath.row + 1;
+    WALocation *location = APP_DELEGATE.locationManager.locations[index];
+    
+    // make the city name bold.
+    NSString *cityRegion = FMT(@"%@ %@", location.city, location.region);
+    NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:cityRegion attributes:nil];
+    [name setAttributes:@{
+        NSFontAttributeName: [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize]
+    } range:NSMakeRange(0, [location.city length])];
+    
+    // make the region name smaller.
+    [name setAttributes:@{
+        NSFontAttributeName: [UIFont systemFontOfSize:(cell.textLabel.font.pointSize - 5)]
+    } range:NSMakeRange([location.city length] + 1, [location.region length])];
+    
+    // set weather info.
+    cell.textLabel.attributedText = name;
+    cell.imageView.image = location.conditionsImage;
+    
+    // FIXME: take metric into account if it's preferred.
+    NSString *degrees = location.degreesF ? FMT(@"%.fº ", location.degreesF) : @"";
+    cell.detailTextLabel.text = FMT(@"%@%@", degrees, OR(location.conditions, @""));
     
     return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == 0) return L(@"Current location");
-    return L(@"Custom locations");
+    return L(@"Favorite locations");
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     return nil;
 }
-
 
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -131,7 +149,7 @@
         [APP_DELEGATE.locationManager destroyLocation:location];
     }
     
-    //[self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView setEditing:NO animated:NO];
     [self.tableView reloadData];
     
 }
@@ -159,7 +177,12 @@
 
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSLog(@"moving %d to %d", sourceIndexPath.row, destinationIndexPath.row);
+    if (destinationIndexPath.section != 1) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"pls dont" message:@"can u not put that there pls thx" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"0k", nil];
+        [alert show];
+        return;
+    }
+    NSLog(@"moving %ld to %ld", (long)sourceIndexPath.row, (long)destinationIndexPath.row);
     
     // switch the locations.
     NSUInteger from = sourceIndexPath.row + 1;
@@ -169,6 +192,11 @@
     APP_DELEGATE.locationManager.locations[to]   = loc1;
     APP_DELEGATE.locationManager.locations[from] = loc2;
     
+}
+
+- (void)updateLocations {
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 #pragma mark - Interface actions

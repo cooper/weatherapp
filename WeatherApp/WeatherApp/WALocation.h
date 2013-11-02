@@ -57,6 +57,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (nonatomic) float degreesC;           // current temp (C)
 @property (nonatomic) float degreesF;           // current temp (F)
 @property (nonatomic) NSString *conditions;     // recent conditions; i.e. "Cloudy"
+@property UIImage *conditionsImage;
 
 #pragma mark - Fetching data
 

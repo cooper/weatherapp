@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A70EE9C01823622B00F317A9 /* WANewLocationVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A70EE9BF1823622B00F317A9 /* WANewLocationVC.m */; };
 		A70EE9C2182442E300F317A9 /* WANewLocationVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A70EE9BF1823622B00F317A9 /* WANewLocationVC.m */; };
+		A70EE9CE1825708800F317A9 /* smiley.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A70EE9CD1825708800F317A9 /* smiley.jpg */; };
 		A71C08DD181ED1B6003488ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DC181ED1B6003488ED /* Foundation.framework */; };
 		A71C08DF181ED1B6003488ED /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DE181ED1B6003488ED /* CoreGraphics.framework */; };
 		A71C08E1181ED1B6003488ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08E0181ED1B6003488ED /* UIKit.framework */; };
@@ -46,6 +47,7 @@
 /* Begin PBXFileReference section */
 		A70EE9BE1823622B00F317A9 /* WANewLocationVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WANewLocationVC.h; sourceTree = "<group>"; };
 		A70EE9BF1823622B00F317A9 /* WANewLocationVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WANewLocationVC.m; sourceTree = "<group>"; };
+		A70EE9CD1825708800F317A9 /* smiley.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = smiley.jpg; sourceTree = "<group>"; };
 		A71C08D9181ED1B6003488ED /* WeatherApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A71C08DC181ED1B6003488ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A71C08DE181ED1B6003488ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -150,6 +152,7 @@
 			children = (
 				BC8C143D18216A1E003BA98D /* Localizable.strings */,
 				BC1367FA182162920090CAC5 /* UserDefaults.txt */,
+				A70EE9CD1825708800F317A9 /* smiley.jpg */,
 				BC1367F9182091CC0090CAC5 /* Application delegate */,
 				BCA93CDD181F048D00516E7E /* Location manager */,
 				BCA93CE1181F0A9500516E7E /* Location */,
@@ -341,6 +344,7 @@
 				BC8C143B18216A1E003BA98D /* Localizable.strings in Resources */,
 				BCA93CD2181EEB2B00516E7E /* WAWeatherVC.xib in Resources */,
 				A71C08E7181ED1B6003488ED /* InfoPlist.strings in Resources */,
+				A70EE9CE1825708800F317A9 /* smiley.jpg in Resources */,
 				A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */,
 				BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */,
 			);
@@ -504,6 +508,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "WeatherApp/WeatherApp-Prefix.pch";
 				INFOPLIST_FILE = "WeatherApp/WeatherApp-Info.plist";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

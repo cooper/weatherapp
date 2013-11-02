@@ -149,11 +149,8 @@
     WALocation *location = [APP_DELEGATE.locationManager createLocationFromDictionary:results[indexPath.row]];
     
     // fetch the conditions. then, update the sections if something changed.
-    NSString *before = results[indexPath.row][@"longName"];
-    [location fetchCurrentConditionsThen:^{
-        if (APP_DELEGATE.nc && APP_DELEGATE.nc.tvc && ![before isEqualToString:location.fullName])
-            [APP_DELEGATE.nc.tvc.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationFade];
-    }];
+    //NSString *before = results[indexPath.row][@"longName"];
+    [location fetchCurrentConditions];
     [APP_DELEGATE.nc popToRootViewControllerAnimated:YES];
 }
 
@@ -222,11 +219,20 @@
             if (skipPlace) continue;
             
             // determine the long name of this place.
+            NSString *previous = place[@"name"];
             for (NSString *key in @[@"adminName3", @"adminName2", @"adminName1", @"countryName"]) {
-                if (!place[key]) continue;
-                if (![place[key] length]) continue;
+            
+                // no such thing.
+                if (!place[key] || ![place[key] length]) continue;
+                
+                // same as the previous name.
+                if ([place[key] isEqualToString:previous]) continue;
+                
+                // it's essential.
                 NSLog(@"%@: %@", key, place[key]);
                 [name appendString:FMT(@", %@", place[key])];
+                previous = place[key];
+                
             }
             
             // used for all types of cities.
