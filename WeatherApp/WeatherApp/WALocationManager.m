@@ -64,7 +64,6 @@
     location.viewController.location = nil;
     location.viewController = nil;
     [self.locations removeObject:location];
-    
 }
 
 #pragma mark - Fetching weather data
@@ -99,6 +98,7 @@
     
     // found it.
     WALocation *before  = self.locations[index - 1];
+    [DEFAULTS setInteger:(index - 1) forKey:@"focused_location_index"];
     return before.viewController;
     
 }
@@ -117,7 +117,8 @@
     if (index + 1 >= [self.locations count]) return nil;
     
     // found it.
-    WALocation *after   = self.locations[index + 1];
+    WALocation *after = self.locations[index + 1];
+    [DEFAULTS setInteger:(index + 1) forKey:@"focused_location_index"];
     return after.viewController;
     
 }
@@ -145,6 +146,8 @@
     // set the view controllers to this one only.
     [APP_DELEGATE.pageVC setViewControllers:@[location.viewController] direction:UIPageViewControllerNavigationDirectionReverse animated:NO completion:nil];
     
+    [DEFAULTS setInteger:index forKey:@"focused_location_index"];
+    
 }
 
 #pragma mark - User defaults
@@ -153,6 +156,12 @@
     if (!locationsArray) return;
     //unsigned int i = 0;
     for (NSDictionary *l in locationsArray) [self createLocationFromDictionary:l];
+}
+
+- (NSArray *)locationsArrayForSaving {
+    NSMutableArray *locs = [NSMutableArray array];
+    for (WALocation *location in self.locations) [locs addObject:location.userDefaultsDict];
+    return locs;
 }
 
 @end

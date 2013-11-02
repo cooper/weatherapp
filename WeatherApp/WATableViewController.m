@@ -127,7 +127,13 @@
 
     // TODO: THIS IS HOW WE KNOW IF DELETE WAS PRESSED.
     if (editingStyle == UITableViewCellEditingStyleDelete) {
+        WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
+        [APP_DELEGATE.locationManager destroyLocation:location];
     }
+    
+    //[self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableView reloadData];
+    
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -145,6 +151,9 @@
     // set current page to this location, and dismiss the nc.
     [APP_DELEGATE.locationManager focusLocationAtIndex:index];
     [APP_DELEGATE.pageVC dismissViewControllerAnimated:YES completion:nil];
+    
+    // update database for reorder and deletion.
+    [APP_DELEGATE saveLocationsInDatabase];
 
 }
 

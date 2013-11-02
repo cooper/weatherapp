@@ -11,6 +11,7 @@
 #import "WANavigationController.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
+#import "WATableViewController.h"
 
 @implementation WANewLocationVC
 
@@ -146,7 +147,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSLog(@"selected: %@", results[indexPath.row]);
     WALocation *location = [APP_DELEGATE.locationManager createLocationFromDictionary:results[indexPath.row]];
-    [location fetchCurrentConditions];
+    
+    // fetch the conditions. then, update the sections if something changed.
+    NSString *before = results[indexPath.row][@"longName"];
+    [location fetchCurrentConditionsThen:^{
+        if (APP_DELEGATE.nc && APP_DELEGATE.nc.tvc && ![before isEqualToString:location.fullName])
+            [APP_DELEGATE.nc.tvc.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationFade];
+    }];
     [APP_DELEGATE.nc popToRootViewControllerAnimated:YES];
 }
 

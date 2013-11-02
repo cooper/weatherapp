@@ -14,8 +14,12 @@
 
 #pragma mark - Fetching data
 
-// fetches and updates the current weather conditions of the location.
 - (void)fetchCurrentConditions {
+    [self fetchCurrentConditionsThen:nil];
+}
+
+// fetches and updates the current weather conditions of the location.
+- (void)fetchCurrentConditionsThen:(WACallback)then {
 
     // determine how we will look up this location.
     NSString *q;
@@ -58,6 +62,7 @@
         // update time of last conditions check.
         self.conditionsAsOf = [NSDate date];
         
+        if (then) then();
     }];
     
 }
@@ -67,7 +72,7 @@
 
 
 // find the city and state based on coordinates.
-- (void)fetchGeolocation:(WAGeolocationCallback)then {
+- (void)fetchGeolocation:(WACallback)then {
     
     // if this location has no coordinates, we cannot continue.
     if (!self.coordinate.latitude) {
@@ -132,6 +137,9 @@
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
+        
+        // update the database.
+        [APP_DELEGATE saveLocationsInDatabase];
         
     }];
 }
@@ -235,6 +243,25 @@
 - (NSString *)lookupRegion {
     if (self.stateShort) return URL_ESC(self.stateShort);
     return self.country ? URL_ESC(self.country) : URL_ESC(self.regionShort);
+}
+
+#pragma mark - User defaults
+
+- (NSDictionary *)userDefaultsDict {
+    NSArray * const keys = @[
+        @"city",
+        @"state", @"stateShort",
+        @"country", @"countryShort",
+        @"isCurrentLocation", @"locationAsOf",
+        @"conditions", @"conditionsAsOf",
+        @"degreesC", @"degreesF"
+    ];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    
+    for (NSString *key in keys)
+        if ([self valueForKey:key]) dict[key] = [self valueForKey:key];
+    
+    return dict;
 }
 
 @end

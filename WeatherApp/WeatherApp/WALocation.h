@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import "WAAppDelegate.h"
 
 typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSError *err);
-typedef void(^WAGeolocationCallback)(void);
 
 @class WAWeatherVC, WALocationManager;
 
@@ -60,6 +60,11 @@ typedef void(^WAGeolocationCallback)(void);
 #pragma mark - Fetching data
 
 - (void)fetchCurrentConditions;
+- (void)fetchCurrentConditionsThen:(WACallback)then;
 - (void)fetchThreeDayForecast;
+
+#pragma mark - User defaults
+
+- (NSDictionary *)userDefaultsDict;
 
 @end

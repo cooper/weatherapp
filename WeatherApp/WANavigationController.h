@@ -10,11 +10,10 @@
 
 @class WATableViewController;
 
-@interface WANavigationController : UINavigationController {
-    WATableViewController *tvc;
-}
-
+@interface WANavigationController : UINavigationController
 
 - (id)initWithMyRootController;
+
+@property WATableViewController *tvc;
 
 @end

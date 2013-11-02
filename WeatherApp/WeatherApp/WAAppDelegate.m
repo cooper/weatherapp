@@ -27,22 +27,22 @@
     
     // FIXME: temporary hard-coded settings.
     // TODO: I should make a location object instance method that returns a dictionary for storing in defaults.
-    if (![DEFAULTS boolForKey:@"set_default_locations_2"]) {
+    if (![DEFAULTS boolForKey:@"set_default_locations_4"]) {
         [DEFAULTS setObject:@[
             @{
                 @"isCurrentLocation":   @YES
             },
             @{
-                @"city":        @"New York",
-                @"stateShort":  @"NY",
-                @"state":       @"New York"
+                @"city":        @"Los Angeles",
+                @"stateShort":  @"CA",
+                @"state":       @"California"
             },
             @{
                 @"city":        @"Abu Dhabi",
                 @"country":     @"United Arab Emirates"
             }
         ] forKey:@"locations"];
-        [DEFAULTS setBool:YES forKey:@"set_default_locations_2"];
+        [DEFAULTS setBool:YES forKey:@"set_default_locations_4"];
     }
     
     // load locations from settings.
@@ -59,6 +59,10 @@
     UIPageControl *pageControl = [UIPageControl appearance];
     pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
     pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
+    
+    // if there is a saved starting point, use it.
+    if ([DEFAULTS integerForKey:@"focused_location_index"])
+        [self.locationManager focusLocationAtIndex:[DEFAULTS integerForKey:@"focused_location_index"]];
     
     // create the settings button.
     UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -141,6 +145,10 @@
     // FIXME: what is latitude is 0? that's still valid...
     if (self.currentLocation.coordinate.latitude) [self.currentLocation fetchCurrentConditions];
     
+}
+
+- (void)saveLocationsInDatabase {
+    [DEFAULTS setObject:[self.locationManager locationsArrayForSaving] forKey:@"locations"];
 }
 
 #pragma mark - Core location manager delegate

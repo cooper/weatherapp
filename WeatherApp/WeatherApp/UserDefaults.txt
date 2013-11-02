@@ -1,4 +1,4 @@
-locations [
+locations = [
 
     an array of dictionaries containing information about locations.
 
@@ -19,3 +19,4 @@ locations [
 ]
 
 set_default_locations = boolean for whether we've set hardcoded locations (TEMPORARY)
+focused_location_index = the index of the last-focused location (used at startup to show same one)

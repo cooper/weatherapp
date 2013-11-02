@@ -19,6 +19,7 @@
 - (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary;
 - (void)destroyLocation:(WALocation *)location;         // destroys a location by removing from manager
 - (void)loadLocations:(NSArray *)locationsArray;        // creates locations from user defaults array
+- (NSArray *)locationsArrayForSaving;
 - (void)fetchLocations;                                 // fetches conditions of all locations but current
 - (void)focusLocationAtIndex:(NSUInteger)index;         // focuses the location at given index in the page VC
 @end
