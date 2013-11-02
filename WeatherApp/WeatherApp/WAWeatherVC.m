@@ -62,8 +62,8 @@
     self.fullLocationLabel.text = title;
 }
 
-- (void)updateCoordinate:(CLLocationCoordinate2D)coordinate {
-    self.coordinateLabel.text = FMT(@"%f,%f", coordinate.latitude, coordinate.longitude);
+- (void)updateLatitude:(float)latitude longitude:(float)longitude {
+    self.coordinateLabel.text = FMT(@"%f,%f", latitude, longitude);
 }
 
 - (void)updateConditions:(NSString *)conditions {

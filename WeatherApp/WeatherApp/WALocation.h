@@ -15,7 +15,6 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @class WAWeatherVC, WALocationManager;
 
 @interface WALocation : NSObject <NSURLConnectionDataDelegate> {
-    CLLocationCoordinate2D _coordinate;         // coordinate property instance variable
     BOOL inGeoLookup;                           // whether a geolookup is being done now
 }
 
@@ -49,6 +48,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property BOOL isCurrentLocation;               // true if this is current location object
 @property NSDate *locationAsOf;                 // date of last location check
 @property CLLocationCoordinate2D coordinate;    // lat/lon coordinates
+@property (nonatomic) float latitude;                       // set automatically when coordinate set
+@property (nonatomic) float longitude;                      // set automatically when coordinate set
 
 #pragma mark - Recent weather conditions
 

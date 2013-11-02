@@ -25,7 +25,7 @@
     NSString *q;
     
     // use our coordinates.
-    if (self.coordinate.latitude) {
+    if (self.isCurrentLocation) {
         NSLog(@"Looking up with %f,%f", self.coordinate.latitude, self.coordinate.longitude);
         q = FMT(@"conditions/q/%f,%f.json", self.coordinate.latitude, self.coordinate.longitude);
     }
@@ -52,6 +52,13 @@
         self.stateShort   = loc[@"state"];
         self.country      = loc[@"country_name"];
         self.countryShort = loc[@"country"];
+        
+        // don't use wunderground's coordinates if this is the current location,
+        // because those reported by location services are far more accurate.
+        if (!self.isCurrentLocation) {
+            self.latitude     = [loc[@"latitude"] floatValue];
+            self.longitude    = [loc[@"longitude"] floatValue];
+        }
         
         // round temperatures to the nearest whole degree.
         self.degreesC = lroundf([(NSNumber *)data[@"current_observation"][@"temp_c"] floatValue]);
@@ -137,6 +144,7 @@
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
+        //NSLog(@"json: %@", jsonData);
         
         // update the database.
         [APP_DELEGATE saveLocationsInDatabase];
@@ -151,27 +159,44 @@
 // it becomes necessary for them to be atomic, enable these getters.
 
 // coordinate property setter allows us to update the coordinate.
+
+
+
+#pragma mark - City/region/country properties
+
 - (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
-    _coordinate = coordinate;
-    [self.viewController updateCoordinate:coordinate];
+    self.latitude  = coordinate.latitude;
+    self.longitude = coordinate.longitude;
+    [self.viewController updateLatitude:coordinate.latitude longitude:coordinate.longitude];
 }
 
 // coordinate getter.
 - (CLLocationCoordinate2D)coordinate {
-    return _coordinate;
+    return CLLocationCoordinate2DMake(self.latitude, self.longitude);
 }
 
-#pragma mark - City/region/country properties
+- (void)setLatitude:(float)latitude {
+    _latitude = latitude;
+    [self.viewController updateLatitude:latitude longitude:self.longitude];
+}
+
+- (void)setLongitude:(float)longitude {
+    _longitude = longitude;
+    [self.viewController updateLatitude:self.latitude longitude:longitude];
+}
 
 - (void)setCity:(NSString *)city {
     if (![city length]) return;
     _city = city;
     [self.viewController updateLocationTitle:self.city];
+    [self.viewController updateFullTitle:self.fullName];
 }
 
 - (void)setState:(NSString *)state {
     if (![state length]) return;
     _state = state;
+    [self.viewController updateRegionTitle:self.region];
+    [self.viewController updateFullTitle:self.fullName];
 }
 
 - (void)setStateShort:(NSString *)stateShort {
@@ -253,6 +278,7 @@
         @"state", @"stateShort",
         @"country", @"countryShort",
         @"isCurrentLocation", @"locationAsOf",
+        @"latitude", @"longitude",
         @"conditions", @"conditionsAsOf",
         @"degreesC", @"degreesF"
     ];

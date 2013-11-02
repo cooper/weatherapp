@@ -159,8 +159,16 @@
 
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSLog(@"moving %@ to %@", sourceIndexPath, destinationIndexPath);
-    // TODO: make this do something
+    NSLog(@"moving %d to %d", sourceIndexPath.row, destinationIndexPath.row);
+    
+    // switch the locations.
+    NSUInteger from = sourceIndexPath.row + 1;
+    NSUInteger to    = destinationIndexPath.row + 1;
+    WALocation *loc1 = APP_DELEGATE.locationManager.locations[from];
+    WALocation *loc2 = APP_DELEGATE.locationManager.locations[to];
+    APP_DELEGATE.locationManager.locations[to]   = loc1;
+    APP_DELEGATE.locationManager.locations[from] = loc2;
+    
 }
 
 #pragma mark - Interface actions

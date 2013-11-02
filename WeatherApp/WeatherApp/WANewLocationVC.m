@@ -237,6 +237,10 @@
                 @"countryShort":    place[@"countryCode"]
             } mutableCopy];
             
+            // if coordinates are available, store them as well.
+            if (place[@"lat"]) loc[@"latitude"]  = [NSNumber numberWithFloat:[place[@"lat"] floatValue]];
+            if (place[@"lng"]) loc[@"longitude"] = [NSNumber numberWithFloat:[place[@"lng"] floatValue]];
+            
             // if this is in the United States, adminName1 is the state's full name,
             // and adminCode1 is the state's initials. in any other country, we don't care.
             if ([place[@"countryCode"] isEqualToString:@"US"]) {

@@ -30,6 +30,6 @@
 - (void)updateRegionTitle:(NSString *)title;
 - (void)updateFullTitle:(NSString *)title;
 - (void)updateConditions:(NSString *)conditions;
-- (void)updateCoordinate:(CLLocationCoordinate2D)coordinate;
+- (void)updateLatitude:(float)latitude longitude:(float)longitude;
 
 @end
