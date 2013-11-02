@@ -218,21 +218,23 @@
 
 #pragma mark - Safe properties
 
+// TODO: I honestly think all of these can be removed.
+
 - (NSString *)safeCity {
-    return [self.city stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    return URL_ESC(self.city);
 }
 
 - (NSString *)safeRegion {
-    return [self.region stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    return URL_ESC(self.region);
 }
 
 - (NSString *)safeRegionShort {
-    return [self.regionShort stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    return URL_ESC(self.regionShort);
 }
 
 - (NSString *)lookupRegion {
-    if (self.stateShort) return self.stateShort;
-    return self.country ? self.country : self.regionShort;
+    if (self.stateShort) return URL_ESC(self.stateShort);
+    return self.country ? URL_ESC(self.country) : URL_ESC(self.regionShort);
 }
 
 @end

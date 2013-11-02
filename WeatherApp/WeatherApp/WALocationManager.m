@@ -94,9 +94,6 @@
     }
     else index = -1;
     
-    // show settings.
-    if (index == 0) return APP_DELEGATE.nc;
-    
     // otherwise we cannot have a negative index.
     if (index - 1 < 0) return nil;
     
@@ -114,7 +111,7 @@
         WAWeatherVC *vc = (WAWeatherVC *)viewController;
         index           = [self.locations indexOfObject:vc.location];
     }
-    else index = -1;
+    else index = INFINITY;
     
     // after index exceeds our number of locations.
     if (index + 1 >= [self.locations count]) return nil;
@@ -125,16 +122,37 @@
     
 }
 
+- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController {
+    return [self.locations count];
+}
+
+- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController {
+    return self.index ? self.index : 0;
+}
+
+#pragma mark - Page VC management
+
+// bring the location at given index to front of page view.
+- (void)focusLocationAtIndex:(NSUInteger)index {
+
+    // ensure this location exists.
+    WALocation *location = self.locations[index];
+    if (!location) return;
+    
+    // used for page indicator.
+    self.index = index;
+    
+    // set the view controllers to this one only.
+    [APP_DELEGATE.pageVC setViewControllers:@[location.viewController] direction:UIPageViewControllerNavigationDirectionReverse animated:NO completion:nil];
+    
+}
+
 #pragma mark - User defaults
 
-- (void)loadLocations:(NSDictionary *)locationsDict {
-    if (!locationsDict) return;
-    for (NSString *index in locationsDict) {
-        NSDictionary *l = locationsDict[index];
-        WALocation *location  = [self createLocation];
-        NSArray *keys = @[@"city", @"state", @"country", @"stateShort", @"countryShort"];
-        for (NSString *key in keys) [location setValue:l[key] forKey:key];
-    }
+- (void)loadLocations:(NSArray *)locationsArray {
+    if (!locationsArray) return;
+    //unsigned int i = 0;
+    for (NSDictionary *l in locationsArray) [self createLocationFromDictionary:l];
 }
 
 @end

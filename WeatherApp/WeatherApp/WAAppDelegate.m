@@ -20,27 +20,29 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor blackColor];
+    self.window.backgroundColor = [UIColor whiteColor];
     
     // create the location manager and current location view controller.
     self.locationManager = [[WALocationManager alloc] init];
-    self.currentLocation = [self.locationManager createLocation]; // index always 0
-    self.currentLocation.isCurrentLocation = YES;
     
     // FIXME: temporary hard-coded settings.
     // TODO: I should make a location object instance method that returns a dictionary for storing in defaults.
-    if (![DEFAULTS boolForKey:@"set_default_locations"]) {
-        [DEFAULTS setObject:@{
-            @"1": @{
-                @"city": @"New York",
-                @"stateShort": @"NY"
+    if (![DEFAULTS boolForKey:@"set_default_locations_2"]) {
+        [DEFAULTS setObject:@[
+            @{
+                @"isCurrentLocation":   @YES
             },
-            @"2": @{
-                @"city": @"Mumbai",
-                @"country": @"India"
+            @{
+                @"city":        @"New York",
+                @"stateShort":  @"NY",
+                @"state":       @"New York"
+            },
+            @{
+                @"city":        @"Abu Dhabi",
+                @"country":     @"United Arab Emirates"
             }
-        } forKey:@"locations"];
-        [DEFAULTS setBool:YES forKey:@"set_default_locations"];
+        ] forKey:@"locations"];
+        [DEFAULTS setBool:YES forKey:@"set_default_locations_2"];
     }
     
     // load locations from settings.
@@ -48,13 +50,22 @@
     [self.locationManager fetchLocations];
     
     // create the page view controller.
-    self.window.rootViewController = pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationDirectionForward options:nil];
+    self.window.rootViewController = self.pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
     
     // set the data source to our location manager and set the current
     // view controller list to contain the initial view controller.
-    pageVC.dataSource = self.locationManager;
-    [pageVC setViewControllers:@[self.currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    self.pageVC.dataSource = self.locationManager;
+    [self.pageVC setViewControllers:@[self.currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
+    UIPageControl *pageControl = [UIPageControl appearance];
+    pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
+    pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
     
+    // create the settings button.
+    UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    settingsButton.frame = CGRectMake(self.pageVC.view.frame.size.width - 50, self.pageVC.view.frame.size.height - 50, 50, 50);
+    settingsButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
+    [settingsButton addTarget:self action:@selector(settingsButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    [self.pageVC.view addSubview:settingsButton];
     
     // create the navigation controller.
     self.nc = [[WANavigationController alloc] initWithMyRootController];
@@ -94,6 +105,10 @@
 }
 
 #pragma mark - Location service management
+
+- (WALocation *)currentLocation {
+    return self.locationManager.locations[0];
+}
 
 // starts our location service.
 - (void)startLocating {
@@ -147,6 +162,12 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     NSLog(@"location error: %@", error);
+}
+
+#pragma mark - Interface actions
+
+- (void)settingsButtonTapped {
+    [self.pageVC presentViewController:self.nc animated:YES completion:nil];
 }
 
 @end

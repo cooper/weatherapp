@@ -17,7 +17,7 @@
 @implementation WANavigationController
 
 - (id)initWithMyRootController {
-    tvc  = [[WATableViewController alloc] initWithNibName:@"WATableViewController" bundle:nil];
+    tvc  = [[WATableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     self = [super initWithRootViewController:tvc];
     return self;
 }

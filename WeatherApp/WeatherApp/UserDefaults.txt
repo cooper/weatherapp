@@ -1,9 +1,13 @@
-locations {
+locations [
 
-    a dictionary with NSString numerical keys for index of location
-    location 0 currently is not stored in user defaults database (current location)
+    an array of dictionaries containing information about locations.
 
-    @"1": {
+    {
+        current location one is the first.
+        this could contain the most recent coordinates from the last run.
+    },
+
+    {
         an example of a dictionary containing information about a location
         @"city":
         @"stateShort":
@@ -12,6 +16,6 @@ locations {
         @"country":         any of these properties can be stored in this dictionary
     }
 
-}
+]
 
 set_default_locations = boolean for whether we've set hardcoded locations (TEMPORARY)

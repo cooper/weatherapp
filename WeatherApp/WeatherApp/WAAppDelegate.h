@@ -14,18 +14,20 @@
 #define GEO_LOOKUP_USERNAME @"cooper"
 #define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
 #define L(str) NSLocalizedString(str, nil)
+#define URL_ESC(str) [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 
 @class WALocationManager, WAWeatherVC, WALocation, WANavigationController;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;
-    UIPageViewController    *pageVC;
 }
 
 @property (strong, nonatomic) UIWindow *window;
 @property WANavigationController *nc;
 @property WALocationManager *locationManager;
-@property WALocation *currentLocation;
+@property (readonly) WALocation *currentLocation;
+@property UIPageViewController *pageVC;
+
 
 
 @end

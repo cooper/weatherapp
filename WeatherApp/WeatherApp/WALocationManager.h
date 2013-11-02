@@ -13,11 +13,12 @@
 @interface WALocationManager : NSObject <UIPageViewControllerDataSource>
 
 @property NSMutableArray *locations;
+@property NSInteger index;
 
 - (WALocation *)createLocation;                         // creates a location and adds it to manager
 - (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary;
 - (void)destroyLocation:(WALocation *)location;         // destroys a location by removing from manager
-- (void)loadLocations:(NSDictionary *)locationsDict;    // creates locations from user defaults dictionary
+- (void)loadLocations:(NSArray *)locationsArray;        // creates locations from user defaults array
 - (void)fetchLocations;                                 // fetches conditions of all locations but current
-
+- (void)focusLocationAtIndex:(NSUInteger)index;         // focuses the location at given index in the page VC
 @end

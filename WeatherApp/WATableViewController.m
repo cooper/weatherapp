@@ -77,8 +77,10 @@
         cell.showsReorderControl = NO;
         if (indexPath.row == 1)
             cell.textLabel.text = FMT(@"%f,%f", APP_DELEGATE.currentLocation.coordinate.latitude, APP_DELEGATE.currentLocation.coordinate.longitude);
-        else
+        else {
             cell.textLabel.text = APP_DELEGATE.currentLocation.fullName;
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        }
         return cell;
     }
     
@@ -103,7 +105,7 @@
 
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 0) return NO;
+    if (indexPath.section == 0 && indexPath.row != 0) return NO;
     return YES;
 }
 
@@ -115,7 +117,8 @@
 
 // prevent moving of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // FIXME: this prevents current location rows from being moved, but it does not fix the issue where custom locations can be moved up into section 0.
+    // FIXME: this prevents current location rows from being moved,
+    // but it does not fix the issue where custom locations can be moved up into section 0.
     if (indexPath.section == 0) return NO;
     return YES;
 }
@@ -128,17 +131,27 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    // can't select current location.
-    if (indexPath.section == 0) return;
+    NSUInteger index;
     
-    WANewLocationVC *vc = [[WANewLocationVC alloc] initWithStyle:UITableViewStyleGrouped];
-    vc.navigationItem.title = L(@"Edit");
-    [APP_DELEGATE.nc pushViewController:vc animated:YES];
+    // current location.
+    if (indexPath.section == 0) {
+        if (indexPath.row != 0) return;
+        index = 0;
+    }
+    
+    // other location.
+    else index = indexPath.row + 1;
+    
+    // set current page to this location, and dismiss the nc.
+    [APP_DELEGATE.locationManager focusLocationAtIndex:index];
+    [APP_DELEGATE.pageVC dismissViewControllerAnimated:YES completion:nil];
+
 }
 
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     NSLog(@"moving %@ to %@", sourceIndexPath, destinationIndexPath);
+    // TODO: make this do something
 }
 
 #pragma mark - Interface actions

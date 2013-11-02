@@ -65,7 +65,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (section == 0) return 1;
-    return [results count];
+    return [results count] == 0 ? 1 : [results count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -78,7 +78,11 @@
     // input section.
     if (indexPath.section == 0) {
         
-        textField = [[UITextField alloc] initWithFrame:CGRectMake(110, 10, 185, 30)];
+        if (!textField) {
+            textField = [[UITextField alloc] initWithFrame:CGRectMake(15, 10, 280, 30)];
+            [textField becomeFirstResponder];
+        }
+        
         textField.adjustsFontSizeToFitWidth = YES;
         textField.textColor = [UIColor blackColor];
 
@@ -98,18 +102,22 @@
         [textField setEnabled: YES];
         
         [cell.contentView addSubview:textField];
-        cell.textLabel.text = @"Search";
+
         return cell;
     }
     
-    cell.textLabel.text = results[indexPath.row][@"longName"];
+    if ([results count] == 0) {
+        cell.textLabel.text = L(@"No locations found");
+    }
+    else cell.textLabel.text = results[indexPath.row][@"longName"];
+    
     cell.textLabel.adjustsFontSizeToFitWidth = YES;
 
     return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 0) return nil;
+    if (section == 0) return L(@"Search");
     return L(@"Results");
 }
 
@@ -121,6 +129,7 @@
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) return NO;
+    if ([results count] == 0)   return NO;
     return YES;
 }
 
@@ -155,14 +164,17 @@
     NSLog(@"Looking up suggestions for %@", firstPart);
     
     // figure the API URL and create a request.
-    NSString *str = FMT(@"http://api.geonames.org/searchJSON?name_startsWith=%@&maxRows=10&username=" GEO_LOOKUP_USERNAME, [firstPart stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
+    NSString *str = FMT(@"http://api.geonames.org/searchJSON?name_startsWith=%@&maxRows=10&username=" GEO_LOOKUP_USERNAME, URL_ESC(firstPart));
     NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
     
     // send the request asynchronously.
+    NSDate *date = [NSDate date];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
     
         // the user already selected something, so just forget about this request.
-        if (selectedOne) return;
+        // or if the user has typed since this request started, forget it.
+        if (selectedOne || [lastTypeDate laterDate:date] == lastTypeDate) return;
         
         // a connection error occurred.
         if (connectionError) {
@@ -187,6 +199,21 @@
         for (NSDictionary *place in obj[@"geonames"]) {
             NSMutableString *name = [place[@"name"] mutableCopy];
             
+            // this must be a city.
+            BOOL skipPlace = NO;
+            if ([place[@"fclName"] rangeOfString:@"city"].location == NSNotFound) {
+                NSLog(@"%@ (%@) appears to not be a city; skipping", name, place[@"fclName"]);
+                skipPlace = YES;
+            }
+            
+            // ensure that this place has the information we need.
+            for (NSString *key in @[@"name", @"countryName", @"countryCode"]) {
+                if (place[key]) continue;
+                NSLog(@"No %@ found for %@; skipping", key, name);
+                skipPlace = YES;
+            }
+            if (skipPlace) continue;
+            
             // determine the long name of this place.
             for (NSString *key in @[@"adminName3", @"adminName2", @"adminName1", @"countryName"]) {
                 if (!place[key]) continue;
@@ -195,6 +222,7 @@
                 [name appendString:FMT(@", %@", place[key])];
             }
             
+            // used for all types of cities.
             NSMutableDictionary *loc = [@{
                 @"longName":        name,
                 @"city":            place[@"name"],
@@ -214,6 +242,8 @@
         
         // reload section 1 of the table.
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
     }];
     
