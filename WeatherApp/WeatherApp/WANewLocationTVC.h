@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WANewLocationVC : UITableViewController <UITextFieldDelegate> {
+@interface WANewLocationTVC : UITableViewController <UITextFieldDelegate> {
     NSMutableArray *results;    // array of search results
     NSDate *lastTypeDate;       // time of last typing event (key press)
     UITextField *textField;     // the search text field in the first row

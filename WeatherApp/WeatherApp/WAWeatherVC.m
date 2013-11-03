@@ -23,7 +23,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        self.view.backgroundColor = [UIColor clearColor];
     }
     return self;
 }
@@ -32,6 +31,8 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    self.view.backgroundColor = [UIColor whiteColor];
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -40,10 +41,15 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (NSUInteger)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskPortrait;
+}
+
 #pragma mark - Updates from WALocation
 
 // update the current location (city) title.
 - (void)updateLocationTitle:(NSString *)title {
+    self.navigationItem.title =
     self.locationTitle.text = title;
 }
 

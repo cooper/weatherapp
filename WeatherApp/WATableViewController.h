@@ -10,6 +10,6 @@
 
 @interface WATableViewController : UITableViewController
 
-- (void)updateLocations;
+- (void)updateLocationAtIndex:(NSUInteger)index;
 
 @end

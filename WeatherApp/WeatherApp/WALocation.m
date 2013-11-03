@@ -9,6 +9,7 @@
 #import "WALocation.h"
 #import "WAAppDelegate.h"
 #import "WAWeatherVC.h"
+#import "WALocationManager.h"
 
 @implementation WALocation
 
@@ -52,7 +53,7 @@
         self.countryShort = loc[@"country"];
         
         // In the United States, use states.
-        if ([self.country isEqualToString:@"US"]) {
+        if ([loc[@"country"] isEqualToString:@"US"]) {
             self.state        = loc[@"state_name"];
             self.stateShort   = loc[@"state"];
         }
@@ -72,7 +73,8 @@
         // This should not be an issue anyway, since Wunderground obviously
         // understands what I mean anyway when it "corrects" my "mistakes."
         
-        if (!self.country) self.country = loc[@"country_name"];
+        if (!self.country || self.isCurrentLocation)
+            self.country = loc[@"country_name"];
         
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
@@ -88,20 +90,21 @@
         self.conditions = ob[@"weather"];
         
         
-        // if an icon is included in the response, download it.
-        if (ob[@"icon_url"]) {
+        // if an icon is included in the response, use it.
+        if (ob[@"icon"]) self.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@", ob[@"icon"])];
+        if (ob[@"icon_url"] && !self.conditionsImage) {
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
             [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                 if (!data) return;
                 self.conditionsImage = [UIImage imageWithData:data];
-                [APP_DELEGATE locationsChanged];
+                [APP_DELEGATE changedLocationAtIndex:self.index];
             }];
         }
         
         // update time of last conditions check.
         self.conditionsAsOf = [NSDate date];
 
-        [APP_DELEGATE locationsChanged];
+        [APP_DELEGATE changedLocationAtIndex:self.index];
         if (then) then();
         
     }];
@@ -263,6 +266,10 @@
 - (NSString *)fullName {
     if (!self.city || !self.region) return nil;
     return FMT(@"%@, %@", self.city, self.region);
+}
+
+- (NSUInteger)index {
+    return [self.manager.locations indexOfObject:self];
 }
 
 #pragma mark - Current condition properties

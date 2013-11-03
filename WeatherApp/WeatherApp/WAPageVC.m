@@ -7,6 +7,9 @@
 //
 
 #import "WAPageVC.h"
+#import "WAAppDelegate.h"
+#import "WALocation.h"
+#import "WANewLocationTVC.h"
 
 @interface WAPageVC ()
 
@@ -29,6 +32,15 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    self.edgesForExtendedLayout = UIRectEdgeNone;
+    
+    UIPageControl *pageControl = [UIPageControl appearance];
+    pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
+    pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
 }
 
 - (void)didReceiveMemoryWarning

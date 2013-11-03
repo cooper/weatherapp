@@ -6,14 +6,14 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import "WANewLocationVC.h"
+#import "WANewLocationTVC.h"
 #import "WAAppDelegate.h"
 #import "WANavigationController.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
 #import "WATableViewController.h"
 
-@implementation WANewLocationVC
+@implementation WANewLocationTVC
 
 #pragma mark - Table view controller
 
@@ -40,11 +40,16 @@
     [super viewDidLoad];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [textField becomeFirstResponder];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 /*
 - (void)later {
     [results addObject:@"another one"];
@@ -81,7 +86,6 @@
         
         if (!textField) {
             textField = [[UITextField alloc] initWithFrame:CGRectMake(15, 10, 280, 30)];
-            [textField becomeFirstResponder];
         }
         
         textField.adjustsFontSizeToFitWidth = YES;

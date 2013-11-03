@@ -15,6 +15,12 @@
 #define WU_API_KEY @"ffd9e1544413efef"
 #define GEO_LOOKUP_USERNAME @"cooper"
 
+#define LLLL_BLUE_COLOR [UIColor colorWithRed:20.0f/255.0f green:200.0f/255.0f blue:255.0f/255.0f alpha:1.0f]
+#define LLL_BLUE_COLOR  [UIColor colorWithRed:0.0f/255.0f green:180.0f/255.0f blue:255.0f/255.0f alpha:1.0f]
+#define LL_BLUE_COLOR   [UIColor colorWithRed:0.0f/255.0f green:170.0f/255.0f blue:255.0f/255.0f alpha:1.0f]
+#define L_BLUE_COLOR    [UIColor colorWithRed:0.0f/255.0f green:160.0f/255.0f blue:255.0f/255.0f alpha:1.0f]
+#define BLUE_COLOR      [UIColor colorWithRed:0.0f/255.0f green:150.0f/255.0f blue:255.0f/255.0f alpha:1.0f]
+
 #define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
 #define L(str) NSLocalizedString(str, nil)
 #define URL_ESC(str) [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
@@ -31,9 +37,9 @@ typedef void(^WACallback)(void);
 @property WANavigationController *nc;
 @property WALocationManager *locationManager;
 @property (readonly) WALocation *currentLocation;
-@property UIPageViewController *pageVC;
+//@property UIPageViewController *pageVC;
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
-- (void)locationsChanged;           // updates table view if it exists
+- (void)changedLocationAtIndex:(NSUInteger)index; //updates table view
 
 @end

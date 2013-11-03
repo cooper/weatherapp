@@ -32,7 +32,6 @@
     WALocation *location = [[WALocation alloc] init];
     location.manager     = self; // weak
     [self.locations addObject:location];
-    location.index = [self.locations count] - 1;
     
     // create a weather view controller for the location.
     WAWeatherVC *weatherVC  = [[WAWeatherVC alloc] initWithNibName:@"WAWeatherVC" bundle:nil];
@@ -144,7 +143,7 @@
     self.index = index;
     
     // set the view controllers to this one only.
-    [APP_DELEGATE.pageVC setViewControllers:@[location.viewController] direction:UIPageViewControllerNavigationDirectionReverse animated:NO completion:nil];
+    //[APP_DELEGATE.pageVC setViewControllers:@[location.viewController] direction:UIPageViewControllerNavigationDirectionReverse animated:NO completion:nil];
     
     [DEFAULTS setInteger:index forKey:@"focused_location_index"];
     

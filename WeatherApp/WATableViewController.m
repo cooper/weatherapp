@@ -11,7 +11,9 @@
 #import "WALocationManager.h"
 #import "WALocation.h"
 #import "WANavigationController.h"
-#import "WANewLocationVC.h"
+#import "WANewLocationTVC.h"
+#import "WAWeatherVC.h"
+#import "WASettingsTVC.h"
 
 @interface WATableViewController ()
 
@@ -26,7 +28,6 @@
     self = [super initWithStyle:style];
     if (self) {
         // Custom initialization
-        self.tableView.rowHeight = 60;
     }
 
     return self;
@@ -44,9 +45,10 @@
     [super viewDidLoad];
 
     self.navigationItem.title = L(@"Locations");
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonTapped)];
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
-    
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
+    //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];
+    self.tableView.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:255./255. alpha:1];
 }
 
 - (void)didReceiveMemoryWarning
@@ -57,14 +59,20 @@
 
 #pragma mark - Table view data source
 
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 2) return 45;
+    return 60;
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0) return 1;
+    if (section != 1) return 1;
     return [APP_DELEGATE.locationManager.locations count] - 1;
 }
 
@@ -79,30 +87,40 @@
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
     //cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
     cell.accessoryType    = UITableViewCellAccessoryDisclosureIndicator;
+    cell.backgroundColor  = [UIColor whiteColor];
+    
     //cell.textLabel.adjustsFontSizeToFitWidth = YES;
 
+    // this is the "new" section.
+    if (indexPath.section == 2) {
+        cell.textLabel.text = @"Settings";
+        return cell;
+    }
+
     // current location cell can't be moved.
-    BOOL isCurrentLocation   = indexPath.section == 0;
-    cell.showsReorderControl = !isCurrentLocation;
+    cell.showsReorderControl = indexPath.section == 0;
 
     // find the location object.
-    NSUInteger index     = isCurrentLocation ? 0 : indexPath.row + 1;
+    NSUInteger index     = indexPath.row + indexPath.section;
     WALocation *location = APP_DELEGATE.locationManager.locations[index];
     
     // make the city name bold.
     NSString *cityRegion = FMT(@"%@ %@", location.city, location.region);
     NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:cityRegion attributes:nil];
     [name setAttributes:@{
-        NSFontAttributeName: [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize]
+        NSFontAttributeName:    [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize]
     } range:NSMakeRange(0, [location.city length])];
     
     // make the region name smaller.
     [name setAttributes:@{
-        NSFontAttributeName: [UIFont systemFontOfSize:(cell.textLabel.font.pointSize - 5)]
+        NSFontAttributeName:            [UIFont systemFontOfSize:(cell.textLabel.font.pointSize - 5)],
+        NSForegroundColorAttributeName: [UIColor grayColor]
+
     } range:NSMakeRange([location.city length] + 1, [location.region length])];
     
     // set weather info.
     cell.textLabel.attributedText = name;
+    cell.detailTextLabel.textColor = BLUE_COLOR;
     cell.imageView.image = location.conditionsImage;
     
     // FIXME: take metric into account if it's preferred.
@@ -114,7 +132,8 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == 0) return L(@"Current location");
-    return L(@"Favorite locations");
+    if (section == 1) return L(@"Favorite locations");
+    return nil;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
@@ -129,7 +148,7 @@
 
 // prevent editing of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 0) return NO;
+    if (indexPath.section != 1) return NO;
     return YES;
 }
 
@@ -137,8 +156,15 @@
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     // FIXME: this prevents current location rows from being moved,
     // but it does not fix the issue where custom locations can be moved up into section 0.
-    if (indexPath.section == 0) return NO;
+    if (indexPath.section != 1) return NO;
     return YES;
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    //if (editing) [self.navigationItem setRightBarButtonItem:nil        animated:YES];
+    //else         [self.navigationItem setRightBarButtonItem:doneButton animated:YES];
+    
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -163,16 +189,31 @@
         index = 0;
     }
     
+    // settings.
+    else if (indexPath.section == 2) {
+        WASettingsTVC *settingsTVC = [[WASettingsTVC alloc] initWithStyle:UITableViewStyleGrouped];
+        [self.navigationController pushViewController:settingsTVC animated:YES];
+        return;
+    }
+    
     // other location.
     else index = indexPath.row + 1;
     
     // set current page to this location, and dismiss the nc.
-    [APP_DELEGATE.locationManager focusLocationAtIndex:index];
-    [APP_DELEGATE.pageVC dismissViewControllerAnimated:YES completion:nil];
+    //[APP_DELEGATE.locationManager focusLocationAtIndex:index];
+    WALocation *location = APP_DELEGATE.locationManager.locations[index];
+    [self.navigationController pushViewController:location.viewController animated:YES];
+    //[APP_DELEGATE.pageVC view];
     
     // update database for reorder and deletion.
     [APP_DELEGATE saveLocationsInDatabase];
 
+}
+
+- (void)goToNew {
+    WANewLocationTVC *vc = [[WANewLocationTVC alloc] initWithStyle:UITableViewStyleGrouped];
+    vc.navigationItem.title = L(@"New");
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 // move
@@ -194,19 +235,17 @@
     
 }
 
-- (void)updateLocations {
-    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+// do not allow weather cells to be moved out of section 1.
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+    if (proposedDestinationIndexPath.section != sourceIndexPath.section) return sourceIndexPath;
+    return proposedDestinationIndexPath;
 }
 
-#pragma mark - Interface actions
-
-- (void)addButtonTapped {
-    NSLog(@"Tapped!");
-    
-    WANewLocationVC *vc = [[WANewLocationVC alloc] initWithStyle:UITableViewStyleGrouped];
-    vc.navigationItem.title = L(@"New");
-    [APP_DELEGATE.nc pushViewController:vc animated:YES];
+- (void)updateLocationAtIndex:(NSUInteger)index {
+    NSUInteger section = index == 0 ? 0 : 1;
+    if (index) index--;
+    NSArray *rows = @[[NSIndexPath indexPathForRow:index inSection:section]];
+    [self.tableView reloadRowsAtIndexPaths:rows withRowAnimation:UITableViewRowAnimationFade];
 }
 
 /*

@@ -20,7 +20,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 
 @property (weak) WALocationManager *manager;
 @property WAWeatherVC *viewController;          // the associated view controller
-@property NSUInteger index;
+@property (readonly) NSUInteger index;
 
 #pragma mark - Location information
 

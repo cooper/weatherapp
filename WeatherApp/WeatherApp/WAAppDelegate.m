@@ -28,22 +28,24 @@
     
     // FIXME: temporary hard-coded settings.
     // TODO: I should make a location object instance method that returns a dictionary for storing in defaults.
-    if (![DEFAULTS boolForKey:@"set_default_locations_4"]) {
+    if (![DEFAULTS boolForKey:@"set_default_locations_5"]) {
         [DEFAULTS setObject:@[
             @{
-                @"isCurrentLocation":   @YES
+                @"isCurrentLocation":   @YES,
+                @"city":                @"Current Location",
+                @"country":             @"Locating..."
+            },
+            @{
+                @"city":        @"Tokyo",
+                @"country":     @"Japan"
             },
             @{
                 @"city":        @"Los Angeles",
                 @"stateShort":  @"CA",
                 @"state":       @"California"
-            },
-            @{
-                @"city":        @"Abu Dhabi",
-                @"country":     @"United Arab Emirates"
             }
         ] forKey:@"locations"];
-        [DEFAULTS setBool:YES forKey:@"set_default_locations_4"];
+        [DEFAULTS setBool:YES forKey:@"set_default_locations_5"];
     }
     
     // load locations from settings.
@@ -51,29 +53,18 @@
     [self.locationManager fetchLocations];
     
     // create the page view controller.
-    self.window.rootViewController = self.pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
+    //self.pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:nil];
     
     // set the data source to our location manager and set the current
     // view controller list to contain the initial view controller.
-    self.pageVC.dataSource = self.locationManager;
-    [self.pageVC setViewControllers:@[self.currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
-    UIPageControl *pageControl = [UIPageControl appearance];
-    pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
-    pageControl.currentPageIndicatorTintColor = [UIColor blackColor];
+    //self.pageVC.dataSource = self.locationManager;
     
     // if there is a saved starting point, use it.
     if ([DEFAULTS integerForKey:@"focused_location_index"])
         [self.locationManager focusLocationAtIndex:[DEFAULTS integerForKey:@"focused_location_index"]];
     
-    // create the settings button.
-    UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    settingsButton.frame = CGRectMake(self.pageVC.view.frame.size.width - 50, self.pageVC.view.frame.size.height - 50, 50, 50);
-    settingsButton.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
-    [settingsButton addTarget:self action:@selector(settingsButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [self.pageVC.view addSubview:settingsButton];
-    
     // create the navigation controller.
-    self.nc = [[WANavigationController alloc] initWithMyRootController];
+    self.window.rootViewController = self.nc = [[WANavigationController alloc] initWithMyRootController];
     
     // start locating.
     [self startLocating];
@@ -126,22 +117,18 @@
     coreLocationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
     coreLocationManager.distanceFilter  = 1000; // only notify when change is 1000 meters or more
     coreLocationManager.delegate        = self;
-    
-    // only start updating location if we're able to.
-    if ([CLLocationManager locationServicesEnabled]) {
-        [coreLocationManager startUpdatingLocation];
-        NSLog(@"enabled!");
-    }
-    
+    [coreLocationManager startUpdatingLocation];
+
     NSLog(@"basically started");
-    
-    // after 3 seconds, we hopefully have enough accuracy.
-    [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
     
 }
 
 - (void)stopLocating {
     NSLog(@"assuming accuracy is good enough");
+    
+    // FIXME: this currently just stops locating.
+    // maybe I should implement refreshing eventually.
+    [coreLocationManager stopUpdatingLocation];
     
     // fetch the current conditions if location was found
     // FIXME: what is latitude is 0? that's still valid...
@@ -155,8 +142,8 @@
     [DEFAULTS setObject:[self.locationManager locationsArrayForSaving] forKey:@"locations"];
 }
 
-- (void)locationsChanged {
-    if (self.nc && self.nc.tvc) [self.nc.tvc updateLocations ];
+- (void)changedLocationAtIndex:(NSUInteger)index {
+    if (self.nc && self.nc.tvc) [self.nc.tvc updateLocationAtIndex:index];
 }
 
 #pragma mark - Core location manager delegate
@@ -180,10 +167,20 @@
     NSLog(@"location error: %@", error);
 }
 
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    if (status != kCLAuthorizationStatusAuthorized) return;
+    // only start updating location if we're able to.
+    if ([CLLocationManager locationServicesEnabled]) {
+        [coreLocationManager startUpdatingLocation];
+        [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
+        NSLog(@"enabled!");
+    }
+}
+
 #pragma mark - Interface actions
 
-- (void)settingsButtonTapped {
-    [self.pageVC presentViewController:self.nc animated:YES completion:nil];
+- (void)backButtonTapped {
+    [self.nc popToRootViewControllerAnimated:YES];
 }
 
 @end
