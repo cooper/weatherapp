@@ -12,6 +12,10 @@
 #define APP_DELEGATE ((WAAppDelegate *)([UIApplication sharedApplication].delegate))
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 
+#define IS_IPHONE   ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+#define IS_IPAD     ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+
+
 #define WU_API_KEY @"ffd9e1544413efef"
 #define GEO_LOOKUP_USERNAME @"cooper"
 

@@ -38,6 +38,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     NSLog(@"Loading data in table view");
     [self.tableView reloadData];
+    
+    //self.navigationController.navigationBar.tintColor    = [UIColor whiteColor];
+    //self.navigationController.navigationBar.barTintColor = BLUE_COLOR;
+    
 }
 
 - (void)viewDidLoad
@@ -62,7 +66,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 2) return 45;
-    return 60;
+    return IS_IPAD ? 120 : 60;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -104,24 +108,32 @@
     NSUInteger index     = indexPath.row + indexPath.section;
     WALocation *location = APP_DELEGATE.locationManager.locations[index];
     
+    // on iPad, double the font sizes.
+    CGFloat size       = cell.textLabel.font.pointSize;
+    CGFloat detailSize = cell.detailTextLabel.font.pointSize;
+    if (IS_IPAD) {
+        size       *= 2;
+        detailSize *= 2;
+    }
+
     // make the city name bold.
     NSString *cityRegion = FMT(@"%@ %@", location.city, location.region);
     NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:cityRegion attributes:nil];
     [name setAttributes:@{
-        NSFontAttributeName:    [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize]
+        NSFontAttributeName:    [UIFont boldSystemFontOfSize:size]
     } range:NSMakeRange(0, [location.city length])];
     
     // make the region name smaller.
     [name setAttributes:@{
-        NSFontAttributeName:            [UIFont systemFontOfSize:(cell.textLabel.font.pointSize - 5)],
+        NSFontAttributeName:            [UIFont systemFontOfSize:(size - (IS_IPAD ? 10 : 5))],
         NSForegroundColorAttributeName: [UIColor grayColor]
-
     } range:NSMakeRange([location.city length] + 1, [location.region length])];
     
     // set weather info.
-    cell.textLabel.attributedText = name;
-    cell.detailTextLabel.textColor = BLUE_COLOR;
-    cell.imageView.image = location.conditionsImage;
+    cell.textLabel.attributedText   = name;
+    cell.detailTextLabel.textColor  = BLUE_COLOR;
+    cell.detailTextLabel.font       = [UIFont systemFontOfSize:detailSize];
+    cell.imageView.image            = location.conditionsImage;
     
     // FIXME: take metric into account if it's preferred.
     NSString *degrees = location.degreesF ? FMT(@"%.fº ", location.degreesF) : @"";

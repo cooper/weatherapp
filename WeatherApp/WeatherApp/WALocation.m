@@ -91,7 +91,12 @@
         
         
         // if an icon is included in the response, use it.
-        if (ob[@"icon"]) self.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@", ob[@"icon"])];
+        if (ob[@"icon"]) {
+            NSString *image      = IS_IPAD ? FMT(@"%@-ipad", ob[@"icon"]) : ob[@"icon"];
+            self.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@", image]);
+        }
+        
+        // if we don't have that icon, download wunderground's.
         if (ob[@"icon_url"] && !self.conditionsImage) {
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
             [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
@@ -204,7 +209,6 @@
 - (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
     self.latitude  = coordinate.latitude;
     self.longitude = coordinate.longitude;
-    [self.viewController updateLatitude:coordinate.latitude longitude:coordinate.longitude];
 }
 
 // coordinate getter.
