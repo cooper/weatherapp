@@ -163,7 +163,7 @@
         },
         @{
             @"city":        @"Los Angeles",
-            @"region":      @"CA",
+            @"region":      @"California",
             @"country3166": @"US",
             @"countryCode": @"US"
         }

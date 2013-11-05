@@ -163,6 +163,12 @@
     [self.viewController updateFullTitle:self.fullName];
 }
 
+- (void)setRegion:(NSString *)region {
+    if (![region length]) return;
+    _region = region;
+    [self.viewController updateRegionTitle:region];
+    [self.viewController updateFullTitle:self.fullName];
+}
 
 #pragma mark - Automatic properties
 
