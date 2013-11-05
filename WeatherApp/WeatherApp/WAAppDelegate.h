@@ -21,8 +21,8 @@
 
 // API settings.
 
-#define WU_API_KEY @"ffd9e1544413efef"
-#define GEO_LOOKUP_USERNAME @"cooper"
+#define WU_API_KEY              @"ffd9e1544413efef"
+#define GEO_LOOKUP_USERNAME     @"cooper"
 
 // Colors.
 

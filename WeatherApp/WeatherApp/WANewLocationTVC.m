@@ -168,11 +168,6 @@
     }
     
     NSLog(@"Looking up suggestions for %@", firstPart);
-    [self lookupSuggestionWunderground:firstPart];
-    
-}
-
-- (void)lookupSuggestionWunderground:(NSString *)firstPart {
     
     // figure the API URL and create a request.
     NSString *str     = FMT(@"http://autocomplete.wunderground.com/aq?query=%@&h=1&ski=1&features=1", URL_ESC(firstPart));
@@ -247,106 +242,6 @@
         
     }];
     
-}
-
-- (void)lookupSuggestionGeonames:(NSString *)firstPart {
-
-    // figure the API URL and create a request.
-    NSString *str = FMT(@"http://api.geonames.org/searchJSON?name_startsWith=%@&maxRows=10&username=" GEO_LOOKUP_USERNAME, URL_ESC(firstPart));
-    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
-    
-    // send the request asynchronously.
-    NSDate *date = [NSDate date];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-    
-        // the user already selected something, so just forget about this request.
-        // or if the user has typed since this request started, forget it.
-        if (selectedOne || [lastTypeDate laterDate:date] == lastTypeDate) return;
-        
-        // a connection error occurred.
-        if (connectionError) {
-            NSLog(@"Location lookup connection error: %@", connectionError);
-            return;
-        }
-        
-        // decode the JSON.
-        NSError *jsonError;
-        NSDictionary *obj = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-        
-        // a JSON error occured.
-        if (jsonError) {
-            NSLog(@"JSON error: %@", jsonError);
-            return;
-        }
-        
-        // clear the results from the last request.
-        [results removeAllObjects];
-        
-        // add the new results.
-        for (NSDictionary *place in obj[@"geonames"]) {
-            NSMutableString *name = [place[@"name"] mutableCopy];
-            
-            // this must be a city.
-            BOOL skipPlace = NO;
-            if ([place[@"fclName"] rangeOfString:@"city"].location == NSNotFound) {
-                NSLog(@"%@ (%@) appears to not be a city; skipping", name, place[@"fclName"]);
-                skipPlace = YES;
-            }
-            
-            // ensure that this place has the information we need.
-            for (NSString *key in @[@"name", @"countryName", @"countryCode"]) {
-                if (place[key]) continue;
-                NSLog(@"No %@ found for %@; skipping", key, name);
-                skipPlace = YES;
-            }
-            if (skipPlace) continue;
-            
-            // determine the long name of this place.
-            NSString *previous = place[@"name"];
-            for (NSString *key in @[@"adminName3", @"adminName2", @"adminName1", @"countryName"]) {
-            
-                // no such thing.
-                if (!place[key] || ![place[key] length]) continue;
-                
-                // same as the previous name.
-                if ([place[key] isEqualToString:previous]) continue;
-                
-                // it's essential.
-                NSLog(@"%@: %@", key, place[key]);
-                [name appendString:FMT(@", %@", place[key])];
-                previous = place[key];
-                
-            }
-            
-            // used for all types of cities.
-            NSMutableDictionary *loc = [@{
-                @"longName":        name,
-                @"city":            place[@"name"],
-                @"country":         place[@"countryName"],
-                @"countryShort":    place[@"countryCode"]
-            } mutableCopy];
-            
-            // if coordinates are available, store them as well.
-            if (place[@"lat"]) loc[@"latitude"]  = [NSNumber numberWithFloat:[place[@"lat"] floatValue]];
-            if (place[@"lng"]) loc[@"longitude"] = [NSNumber numberWithFloat:[place[@"lng"] floatValue]];
-            
-            // if this is in the United States, adminName1 is the state's full name,
-            // and adminCode1 is the state's initials. in any other country, we don't care.
-            if ([place[@"countryCode"] isEqualToString:@"US"]) {
-                loc[@"state"]      = place[@"adminName1"];
-                loc[@"stateShort"] = place[@"adminCode1"];
-            }
-            
-            [results addObject:loc];
-        }
-        
-        // reload section 1 of the table.
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
-        
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        
-    }];
 }
 
 #pragma mark - Text field delegate

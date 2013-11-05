@@ -20,46 +20,17 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+    self.window.backgroundColor = TABLE_COLOR;
     
     // create the location manager and current location view controller.
     self.locationManager = [[WALocationManager alloc] init];
-    
-    // FIXME: temporary hard-coded settings.
-    // TODO: I should make a location object instance method that returns a dictionary for storing in defaults.
-    if (![DEFAULTS boolForKey:@"set_default_locations_5"]) {
-        [DEFAULTS setObject:@[
-            @{
-                @"isCurrentLocation":   @YES
-            },
-            @{
-                @"city":        @"Tokyo",
-                @"country":     @"Japan"
-            },
-            @{
-                @"city":        @"Los Angeles",
-                @"stateShort":  @"CA",
-                @"state":       @"California"
-            }
-        ] forKey:@"locations"];
-        [DEFAULTS setBool:YES forKey:@"set_default_locations_5"];
-    }
+
+    // set default options if we haven't already.
+    [self setDefaults];
     
     // load locations from settings.
     [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
     [self.locationManager fetchLocations];
-    
-    // create the page view controller.
-    //self.pageVC = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:nil];
-    
-    // set the data source to our location manager and set the current
-    // view controller list to contain the initial view controller.
-    //self.pageVC.dataSource = self.locationManager;
-    
-    // if there is a saved starting point, use it.
-    if ([DEFAULTS integerForKey:@"focused_location_index"])
-        [self.locationManager focusLocationAtIndex:[DEFAULTS integerForKey:@"focused_location_index"]];
     
     // create the navigation controller.
     self.window.rootViewController = self.nc = [[WANavigationController alloc] initWithMyRootController];
@@ -130,7 +101,7 @@
     
     // fetch the current conditions if location was found
     // FIXME: what is latitude is 0? that's still valid...
-    if (self.currentLocation.coordinate.latitude) [self.currentLocation fetchCurrentConditions];
+    if (self.currentLocation.latitude) [self.currentLocation fetchCurrentConditions];
     
 }
 
@@ -152,7 +123,8 @@
     NSLog(@"updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
     
     // set our current location.
-    self.currentLocation.coordinate   = recentLocation.coordinate;
+    self.currentLocation.latitude     = recentLocation.coordinate.latitude;
+    self.currentLocation.longitude    = recentLocation.coordinate.longitude;
     self.currentLocation.locationAsOf = [NSDate date];
     
 }
@@ -175,10 +147,28 @@
     }
 }
 
-#pragma mark - Interface actions
+#pragma mark - App management
 
-- (void)backButtonTapped {
-    [self.nc popToRootViewControllerAnimated:YES];
+- (void)setDefaults {
+    if ([DEFAULTS boolForKey:@"set_default_options"]) return;
+    [DEFAULTS setObject:@[
+        @{
+            @"isCurrentLocation":   @YES
+        },
+        @{
+            @"city":        @"Tokyo",
+            @"region":    : @"Japan",
+            @"country3166": @"JP",
+            @"countryCode": @"JP"
+        },
+        @{
+            @"city":        @"Los Angeles",
+            @"region":      @"CA",
+            @"country3166": @"US",
+            @"countryCode": @"US"
+        }
+    ] forKey:@"locations"];
+    [DEFAULTS setBool:YES forKey:@"set_default_options"];
 }
 
 @end

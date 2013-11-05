@@ -27,8 +27,8 @@
     
     // use our coordinates.
     if (self.isCurrentLocation) {
-        NSLog(@"Looking up with %f,%f",     self.coordinate.latitude, self.coordinate.longitude);
-        q = FMT(@"conditions/q/%f,%f.json", self.coordinate.latitude, self.coordinate.longitude);
+        NSLog(@"Looking up with %f,%f",     self.latitude, self.longitude);
+        q = FMT(@"conditions/q/%f,%f.json", self.latitude, self.longitude);
     }
     
     // use wunderground ID.
@@ -39,8 +39,8 @@
     
     // use the preferred region and city name.
     else {
-        NSLog(@"Looking up with %@, %@", self.safeCity, self.lookupRegion);
-        q = FMT(@"conditions/q/%@/%@.json", self.lookupRegion, self.safeCity);
+        NSLog(@"Looking up with %@", self.fullName);
+        q = FMT(@"conditions/q/%@/%@.json", URL_ESC(self.region), URL_ESC(self.city));
     }
     
     // fetch the conditions.
@@ -52,35 +52,14 @@
         
         // set our city/region information.
         // note: the setters ignore any lengthless value.
-        //  the setters call the interface methods to make changes.
+        // the setters call the interface methods to make changes.
         NSDictionary *loc = data[@"current_observation"][@"display_location"];
-        
         self.city         = loc[@"city"];
-        self.countryShort = loc[@"country"];
-        
-        // In the United States, use states.
-        if ([loc[@"country"] isEqualToString:@"US"]) {
-            self.state        = loc[@"state_name"];
-            self.stateShort   = loc[@"state"];
-        }
-        
+        self.countryCode  = loc[@"country"];
+        self.country3166  = loc[@"country_iso3166"];
+        self.region       = OR(loc[@"state_name"], loc[@"country"]);
+
         NSDictionary *ob = data[@"current_observation"];
-        // I really don't like when Wunderground shortens formal names to short
-        // names. For example, I don't wanted United Arab Emirates shortened to UAE.
-        
-        // I also don't like how it pointlessly says that Beijing and Shanghai are
-        // countries. They, quite frankly, are actually cities. I would understand
-        // why Hong Kong and Macau may be classified as countries, but Shanghai and
-        // Beijing most definitely should not. (update: it was actually saying state)
-        
-        // Because of these annoyances, I'm only setting country from Wunderground if
-        // it has not been determined by the lookup/suggestion service.
-        
-        // This should not be an issue anyway, since Wunderground obviously
-        // understands what I mean anyway when it "corrects" my "mistakes."
-        
-        if (![self.country length] || self.isCurrentLocation)
-            self.country = OR(loc[@"country_name"], OR(loc[@"state_name"], loc[@"country"]));
         
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
@@ -124,40 +103,6 @@
 - (void)fetchThreeDayForecast {
 }
 
-
-// find the city and state based on coordinates.
-- (void)fetchGeolocation:(WACallback)then {
-    
-    // if this location has no coordinates, we cannot continue.
-    if (!self.coordinate.latitude) {
-        NSLog(@"Fetching geolocation before coordinates available");
-        return;
-    }
-    
-    // already looking it up.
-    if (inGeoLookup) {
-        NSLog(@"Ignoring geolookup request because we're doing one already");
-        return;
-    }
-    
-    inGeoLookup = YES;
-    
-    NSString *q = FMT(@"geolookup/q/%f,%f.json", self.coordinate.latitude, self.coordinate.longitude);
-    [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        // TODO: what if nothing is found? is that possible?
-        self.city         = data[@"location"][@"city"];
-        self.stateShort   = data[@"location"][@"state"];
-        self.state        = data[@"location"][@"state_name"];
-        self.countryShort = data[@"location"][@"country"];
-        self.country      = data[@"location"][@"country_name"];
-        NSLog(@"Got city: %@, regionShort: %@", self.city, self.regionShort);
-        inGeoLookup = NO;
-        if (then) then();
-
-    }];
-    
-}
-
 // send a request to the API. runs asynchronously, decodes JSON,
 // and then executes the callback with an dictionary argument in main queue.
 - (void)fetch:(NSString *)page then:(WALocationCallback)callback {
@@ -199,27 +144,7 @@
     }];
 }
 
-#pragma mark - Current location properties
-
-// NOTE: these getters are disabled because they are synthesized.
-// currently, the properties are nonatomic. if for some reason
-// it becomes necessary for them to be atomic, enable these getters.
-
-// coordinate property setter allows us to update the coordinate.
-
-
-
-#pragma mark - City/region/country properties
-
-- (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
-    self.latitude  = coordinate.latitude;
-    self.longitude = coordinate.longitude;
-}
-
-// coordinate getter.
-- (CLLocationCoordinate2D)coordinate {
-    return CLLocationCoordinate2DMake(self.latitude, self.longitude);
-}
+#pragma mark - Location properties
 
 - (void)setLatitude:(float)latitude {
     _latitude = latitude;
@@ -238,39 +163,8 @@
     [self.viewController updateFullTitle:self.fullName];
 }
 
-- (void)setState:(NSString *)state {
-    if (![state length]) return;
-    _state = state;
-    [self.viewController updateRegionTitle:self.region];
-    [self.viewController updateFullTitle:self.fullName];
-}
-
-- (void)setStateShort:(NSString *)stateShort {
-    if (![stateShort length]) return;
-    _stateShort = stateShort;
-}
-
-- (void)setCountry:(NSString *)country {
-    if (![country length]) return;
-    _country = country;
-}
-
-- (void)setCountryShort:(NSString *)countryShort {
-    if (![countryShort length]) return;
-    _countryShort = countryShort;
-}
 
 #pragma mark - Automatic properties
-
-// automatic.
-
-- (NSString *)region {
-    return OR(self.state, self.country);
-}
-
-- (NSString *)regionShort {
-    return OR(self.stateShort, self.countryShort);
-}
 
 - (NSString *)fullName {
     if (!self.city || !self.region) return nil;
@@ -299,34 +193,12 @@
     [self.viewController updateConditions:conditions];
 }
 
-#pragma mark - Safe properties
-
-// TODO: I honestly think all of these can be removed.
-
-- (NSString *)safeCity {
-    return URL_ESC(self.city);
-}
-
-- (NSString *)safeRegion {
-    return URL_ESC(self.region);
-}
-
-- (NSString *)safeRegionShort {
-    return URL_ESC(self.regionShort);
-}
-
-- (NSString *)lookupRegion {
-    if (self.stateShort) return URL_ESC(self.stateShort);
-    return self.country ? URL_ESC(self.country) : URL_ESC(self.regionShort);
-}
-
 #pragma mark - User defaults
 
 - (NSDictionary *)userDefaultsDict {
     NSArray * const keys = @[
         @"city", @"l",
-        @"state", @"stateShort",
-        @"country", @"countryShort",
+        @"countryCode", @"country3166",
         @"isCurrentLocation", @"locationAsOf",
         @"latitude", @"longitude",
         @"conditions", @"conditionsAsOf",

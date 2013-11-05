@@ -30,7 +30,6 @@
 		BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */ = {isa = PBXBuildFile; fileRef = BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */; };
 		BCA93CD2181EEB2B00516E7E /* WAWeatherVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */; };
 		BCA93CD5181EEC6D00516E7E /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCA93CD4181EEC6D00516E7E /* CoreLocation.framework */; };
-		BCA93CD8181F030C00516E7E /* WAPageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = BCA93CD7181F030C00516E7E /* WAPageVC.m */; };
 		BCA93CDC181F048400516E7E /* WALocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BCA93CDB181F048400516E7E /* WALocationManager.m */; };
 		BCA93CE0181F0A9100516E7E /* WALocation.m in Sources */ = {isa = PBXBuildFile; fileRef = BCA93CDF181F0A9100516E7E /* WALocation.m */; };
 /* End PBXBuildFile section */
@@ -77,8 +76,6 @@
 		BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAWeatherVC.m; sourceTree = "<group>"; };
 		BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WAWeatherVC.xib; sourceTree = "<group>"; };
 		BCA93CD4181EEC6D00516E7E /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
-		BCA93CD6181F030C00516E7E /* WAPageVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAPageVC.h; sourceTree = "<group>"; };
-		BCA93CD7181F030C00516E7E /* WAPageVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAPageVC.m; sourceTree = "<group>"; };
 		BCA93CDA181F048400516E7E /* WALocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WALocationManager.h; sourceTree = "<group>"; };
 		BCA93CDB181F048400516E7E /* WALocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WALocationManager.m; sourceTree = "<group>"; };
 		BCA93CDE181F0A9100516E7E /* WALocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WALocation.h; sourceTree = "<group>"; };
@@ -168,7 +165,6 @@
 				BC1367F9182091CC0090CAC5 /* Application delegate */,
 				BCA93CDD181F048D00516E7E /* Location manager */,
 				BCA93CE1181F0A9500516E7E /* Location */,
-				BCA93CD9181F031100516E7E /* Page view controller */,
 				BC136803182167D90090CAC5 /* Navigation controller */,
 				BC64C8C81822CF2800C59F00 /* Table view controller */,
 				A70EE9C11823623100F317A9 /* New location table view controller */,
@@ -246,15 +242,6 @@
 				BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */,
 			);
 			name = "Location view controller";
-			sourceTree = "<group>";
-		};
-		BCA93CD9181F031100516E7E /* Page view controller */ = {
-			isa = PBXGroup;
-			children = (
-				BCA93CD6181F030C00516E7E /* WAPageVC.h */,
-				BCA93CD7181F030C00516E7E /* WAPageVC.m */,
-			);
-			name = "Page view controller";
 			sourceTree = "<group>";
 		};
 		BCA93CDD181F048D00516E7E /* Location manager */ = {
@@ -382,7 +369,6 @@
 				BC136802182167D20090CAC5 /* WANavigationController.m in Sources */,
 				BC64C8C61822CDEC00C59F00 /* WATableViewController.m in Sources */,
 				BCA93CDC181F048400516E7E /* WALocationManager.m in Sources */,
-				BCA93CD8181F030C00516E7E /* WAPageVC.m in Sources */,
 				BCA93CE0181F0A9100516E7E /* WALocation.m in Sources */,
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,
 				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,

@@ -7,58 +7,44 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
 #import "WAAppDelegate.h"
 
 typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSError *err);
 
 @class WAWeatherVC, WALocationManager;
 
-@interface WALocation : NSObject <NSURLConnectionDataDelegate> {
-    BOOL inGeoLookup;                           // whether a geolookup is being done now
-}
+@interface WALocation : NSObject <NSURLConnectionDataDelegate>
 
-@property (weak) WALocationManager *manager;
+#pragma mark - General properties
+
+@property (weak) WALocationManager *manager;    // the manager
 @property WAWeatherVC *viewController;          // the associated view controller
-@property (readonly) NSUInteger index;
+@property BOOL isCurrentLocation;               // true if this is current location object
+@property (readonly) NSUInteger index;          // index in the manager
 
 #pragma mark - Location information
 
-@property (nonatomic) NSString *country;                // country name; i.e. South Africa
-@property (nonatomic) NSString *countryShort;           // short country name; i.e. ZA (South Africa)
-@property (nonatomic) NSString *state;                  // state name; i.e. Indiana
-@property (nonatomic) NSString *stateShort;             // short name of state; i.e. IN
-@property (nonatomic) NSString *city;                   // city name; i.e. Chalmers
-@property (nonatomic, readonly) NSString *fullName;     // full name; i.e. Chalmers, Indiana
-@property NSString *l;
+@property (nonatomic) NSString *countryCode;            // common country code
+@property (nonatomic) NSString *country3166;            // ISO 3166 country code
+@property (nonatomic) NSString *region;                 // state, province, country, etc.
+@property (nonatomic) NSString *regionCode;             // state, province, country, etc. code
+@property (nonatomic) NSString *city;                   // full name of city
+@property (nonatomic, readonly) NSString *fullName;     // city and region separated by comma
+@property NSString *l;                                  // wunderground location query identifier
 
-#pragma mark - Automatic properties
+#pragma mark - Global position
 
-@property (nonatomic, readonly) NSString *region;       // state or country; i.e. South Africa
-@property (nonatomic, readonly) NSString *regionShort;  // short name of region; i.e. ZA (South Africa)
-
-#pragma mark - Safe properties
-
-@property (readonly) NSString *safeCity;            // safe properties are URL-encoded
-@property (readonly) NSString *safeRegion;
-@property (readonly) NSString *safeRegionShort;
-@property (readonly) NSString *lookupRegion;
-
-#pragma mark - Current location
-
-@property BOOL isCurrentLocation;               // true if this is current location object
 @property NSDate *locationAsOf;                 // date of last location check
-@property CLLocationCoordinate2D coordinate;    // lat/lon coordinates
-@property (nonatomic) float latitude;                       // set automatically when coordinate set
-@property (nonatomic) float longitude;                      // set automatically when coordinate set
+@property (nonatomic) float latitude;           // set automatically when coordinate set
+@property (nonatomic) float longitude;          // set automatically when coordinate set
 
-#pragma mark - Recent weather conditions
+#pragma mark - Weather conditions
 
 @property NSDate *conditionsAsOf;               // date of last condition check
+@property UIImage *conditionsImage;             // icon image of conditions
 @property (nonatomic) float degreesC;           // current temp (C)
 @property (nonatomic) float degreesF;           // current temp (F)
 @property (nonatomic) NSString *conditions;     // recent conditions; i.e. "Cloudy"
-@property UIImage *conditionsImage;
 
 #pragma mark - Fetching data
 
