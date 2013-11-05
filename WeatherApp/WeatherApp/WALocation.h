@@ -30,6 +30,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (nonatomic) NSString *stateShort;             // short name of state; i.e. IN
 @property (nonatomic) NSString *city;                   // city name; i.e. Chalmers
 @property (nonatomic, readonly) NSString *fullName;     // full name; i.e. Chalmers, Indiana
+@property NSString *l;
 
 #pragma mark - Automatic properties
 

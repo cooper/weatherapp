@@ -38,6 +38,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.tableView.backgroundColor = TABLE_COLOR;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -71,7 +72,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (section == 0) return 1;
-    return [results count] == 0 ? 1 : [results count];
+    return [results count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -111,10 +112,7 @@
         return cell;
     }
     
-    if ([results count] == 0) {
-        cell.textLabel.text = L(@"No locations found");
-    }
-    else cell.textLabel.text = results[indexPath.row][@"longName"];
+    cell.textLabel.text = results[indexPath.row][@"longName"];
     
     cell.textLabel.adjustsFontSizeToFitWidth = YES;
 
@@ -123,7 +121,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == 0) return L(@"Search");
-    return L(@"Results");
+    return nil;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
@@ -170,7 +168,89 @@
     }
     
     NSLog(@"Looking up suggestions for %@", firstPart);
+    [self lookupSuggestionWunderground:firstPart];
     
+}
+
+- (void)lookupSuggestionWunderground:(NSString *)firstPart {
+    
+    // figure the API URL and create a request.
+    NSString *str     = FMT(@"http://autocomplete.wunderground.com/aq?query=%@&h=1&ski=1&features=1", URL_ESC(firstPart));
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
+    
+    // send the request asynchronously.
+    NSDate *date = [NSDate date];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    
+    
+        // the user already selected something, so just forget about this request.
+        // or if the user has typed since this request started, forget it.
+        if (selectedOne || [lastTypeDate laterDate:date] == lastTypeDate) return;
+        
+        // a connection error occurred.
+        if (connectionError) {
+            NSLog(@"Location lookup connection error: %@", connectionError);
+            return;
+        }
+        
+
+        // decode the JSON.
+        NSError *jsonError;
+        NSDictionary *obj = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+        
+        // a JSON error occured.
+        if (jsonError) {
+            NSLog(@"JSON error: %@", jsonError);
+            return;
+        }
+        
+        // clear the results from the last request.
+        [results removeAllObjects];
+
+        // add the new results.
+        for (NSDictionary *place in obj[@"RESULTS"]) {
+            // name type city c zmw tz tzs l(/q)
+            // this must be a city.
+
+            BOOL skipPlace = NO;
+            
+            // ensure that this place has the information we need.
+            for (NSString *key in @[@"c", @"l", @"name"]) {
+                if (place[key]) continue;
+                NSLog(@"No %@ found for %@; skipping", key, place[@"name"]);
+                skipPlace = YES;
+            }
+            
+            if (![place[@"type"] isEqualToString:@"city"]) {
+                NSLog(@"%@ (%@) appears to not be a city; skipping", place[@"name"], place[@"fclName"]);
+                skipPlace = YES;
+            }
+            
+            if (skipPlace) continue;
+
+            // used for all types of cities.
+            NSMutableDictionary *loc = [@{
+                @"longName":        place[@"name"],
+                @"l":               place[@"l"],
+                @"countryShort":    place[@"c"]
+            } mutableCopy];
+
+            [results addObject:loc];
+            
+        }
+        
+        // reload section 1 of the table.
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+    }];
+    
+}
+
+- (void)lookupSuggestionGeonames:(NSString *)firstPart {
+
     // figure the API URL and create a request.
     NSString *str = FMT(@"http://api.geonames.org/searchJSON?name_startsWith=%@&maxRows=10&username=" GEO_LOOKUP_USERNAME, URL_ESC(firstPart));
     NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:str]];
@@ -267,7 +347,6 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
     }];
-    
 }
 
 #pragma mark - Text field delegate
@@ -275,7 +354,7 @@
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     lastTypeDate = [NSDate date];
     NSLog(@"Should change characters");
-    [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:1];
+    [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:0.5];
     return YES;
 }
 
@@ -284,7 +363,7 @@
     // user has typed since.
     if ([date laterDate:lastTypeDate] == lastTypeDate) return;
     
-    NSLog(@"User hasn't typed for 1 seconds; looking up %@", textField.text);
+    NSLog(@"User hasn't typed for 0.5 seconds; looking up %@", textField.text);
     [self lookupSuggestion:textField.text];
 }
 

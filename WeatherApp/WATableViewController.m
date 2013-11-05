@@ -52,7 +52,7 @@
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];
-    self.tableView.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:255./255. alpha:1];
+    self.tableView.backgroundColor = TABLE_COLOR;
 }
 
 - (void)didReceiveMemoryWarning
@@ -97,7 +97,7 @@
 
     // this is the "new" section.
     if (indexPath.section == 2) {
-        cell.textLabel.text = @"Settings";
+        cell.textLabel.text = L(@"Settings");
         return cell;
     }
 
@@ -116,18 +116,21 @@
         detailSize *= 2;
     }
 
+    NSString *city   = [location.city   length] ? location.city   : L(@"Loading");
+    NSString *region = [location.region length] ? location.region : @"...";
+    NSString *both   = FMT(@"%@ %@", city, region);
+
     // make the city name bold.
-    NSString *cityRegion = FMT(@"%@ %@", location.city, location.region);
-    NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:cityRegion attributes:nil];
+    NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:both attributes:nil];
     [name setAttributes:@{
         NSFontAttributeName:    [UIFont boldSystemFontOfSize:size]
-    } range:NSMakeRange(0, [location.city length])];
+    } range:NSMakeRange(0, [city length])];
     
     // make the region name smaller.
     [name setAttributes:@{
         NSFontAttributeName:            [UIFont systemFontOfSize:(size - (IS_IPAD ? 10 : 5))],
         NSForegroundColorAttributeName: [UIColor grayColor]
-    } range:NSMakeRange([location.city length] + 1, [location.region length])];
+    } range:NSMakeRange([city length] + 1, [region length])];
     
     // set weather info.
     cell.textLabel.attributedText   = name;
@@ -181,7 +184,6 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    // TODO: THIS IS HOW WE KNOW IF DELETE WAS PRESSED.
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
         [APP_DELEGATE.locationManager destroyLocation:location];
@@ -230,13 +232,7 @@
 
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    if (destinationIndexPath.section != 1) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"pls dont" message:@"can u not put that there pls thx" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"0k", nil];
-        [alert show];
-        return;
-    }
-    NSLog(@"moving %ld to %ld", (long)sourceIndexPath.row, (long)destinationIndexPath.row);
-    
+
     // switch the locations.
     NSUInteger from = sourceIndexPath.row + 1;
     NSUInteger to    = destinationIndexPath.row + 1;

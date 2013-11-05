@@ -27,8 +27,14 @@
     
     // use our coordinates.
     if (self.isCurrentLocation) {
-        NSLog(@"Looking up with %f,%f", self.coordinate.latitude, self.coordinate.longitude);
+        NSLog(@"Looking up with %f,%f",     self.coordinate.latitude, self.coordinate.longitude);
         q = FMT(@"conditions/q/%f,%f.json", self.coordinate.latitude, self.coordinate.longitude);
+    }
+    
+    // use wunderground ID.
+    else if ([self.l length]) {
+        NSLog(@"Looking up with %@", self.l);
+        q = FMT(@"conditions/%@.json", self.l);
     }
     
     // use the preferred region and city name.
@@ -73,8 +79,8 @@
         // This should not be an issue anyway, since Wunderground obviously
         // understands what I mean anyway when it "corrects" my "mistakes."
         
-        if (!self.country || self.isCurrentLocation)
-            self.country = loc[@"country_name"];
+        if (![self.country length] || self.isCurrentLocation)
+            self.country = OR(loc[@"country_name"], OR(loc[@"state_name"], loc[@"country"]));
         
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
@@ -88,7 +94,6 @@
         self.degreesF = lroundf([(NSNumber *)ob[@"temp_f"] floatValue]);
         
         self.conditions = ob[@"weather"];
-        
         
         // if an icon is included in the response, use it.
         if (ob[@"icon"]) {
@@ -186,7 +191,7 @@
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
-        //NSLog(@"json: %@", jsonData);
+        NSLog(@"json: %@", jsonData);
         
         // update the database.
         [APP_DELEGATE saveLocationsInDatabase];
@@ -319,7 +324,7 @@
 
 - (NSDictionary *)userDefaultsDict {
     NSArray * const keys = @[
-        @"city",
+        @"city", @"l",
         @"state", @"stateShort",
         @"country", @"countryShort",
         @"isCurrentLocation", @"locationAsOf",

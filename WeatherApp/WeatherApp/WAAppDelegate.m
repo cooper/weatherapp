@@ -31,9 +31,7 @@
     if (![DEFAULTS boolForKey:@"set_default_locations_5"]) {
         [DEFAULTS setObject:@[
             @{
-                @"isCurrentLocation":   @YES,
-                @"city":                @"Current Location",
-                @"country":             @"Locating..."
+                @"isCurrentLocation":   @YES
             },
             @{
                 @"city":        @"Tokyo",
