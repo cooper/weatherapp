@@ -11,7 +11,7 @@
 #import "WALocation.h"
 #import "WAWeatherVC.h"
 #import "WANavigationController.h"
-#import "WATableViewController.h"
+#import "WALocationListTVC.h"
 
 @implementation WAAppDelegate
 
@@ -157,7 +157,7 @@
         },
         @{
             @"city":        @"Tokyo",
-            @"region":    : @"Japan",
+            @"region":      @"Japan",
             @"country3166": @"JP",
             @"countryCode": @"JP"
         },

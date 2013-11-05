@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@class WATableViewController;
+@class WALocationListTVC;
 
 @interface WANavigationController : UINavigationController
 
 - (id)initWithMyRootController;
 
-@property WATableViewController *tvc;
+@property WALocationListTVC *tvc;
 
 @end

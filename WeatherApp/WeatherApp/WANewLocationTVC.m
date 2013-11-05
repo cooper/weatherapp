@@ -11,7 +11,7 @@
 #import "WANavigationController.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
-#import "WATableViewController.h"
+#import "WALocationListTVC.h"
 
 @implementation WANewLocationTVC
 

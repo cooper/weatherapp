@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import "WATableViewController.h"
+#import "WALocationListTVC.h"
 #import "WAAPPDelegate.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
@@ -15,11 +15,11 @@
 #import "WAWeatherVC.h"
 #import "WASettingsTVC.h"
 
-@interface WATableViewController ()
+@interface WALocationListTVC ()
 
 @end
 
-@implementation WATableViewController
+@implementation WALocationListTVC
 
 #pragma  mark - Table view controller
 

@@ -8,7 +8,7 @@
 
 #import "WANavigationController.h"
 #import "WAAppDelegate.h"
-#import "WATableViewController.h"
+#import "WALocationListTVC.h"
 
 @interface WANavigationController ()
 
@@ -17,7 +17,7 @@
 @implementation WANavigationController
 
 - (id)initWithMyRootController {
-    self.tvc  = [[WATableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    self.tvc  = [[WALocationListTVC alloc] initWithStyle:UITableViewStyleGrouped];
     self      = [super initWithRootViewController:self.tvc];
     self.navigationBar.barTintColor = BLUE_COLOR;
     self.navigationBar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
