@@ -45,7 +45,10 @@
     
     // fetch the conditions.
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        NSLog(@"Got conditions for %@", data[@"current_observation"][@"display_location"][@"city"]);
+        NSDictionary *ob  = data[@"current_observation"];
+        NSDictionary *loc = ob[@"display_location"];
+
+        NSLog(@"Got conditions for %@", loc[@"city"]);
         
         // force the view to load if it hasn't already.
         [self.viewController view];
@@ -53,13 +56,10 @@
         // set our city/region information.
         // note: the setters ignore any lengthless value.
         // the setters call the interface methods to make changes.
-        NSDictionary *loc = data[@"current_observation"][@"display_location"];
         self.city         = loc[@"city"];
         self.countryCode  = loc[@"country"];
         self.country3166  = loc[@"country_iso3166"];
         self.region       = OR(loc[@"state_name"], loc[@"country"]);
-
-        NSDictionary *ob = data[@"current_observation"];
         
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
@@ -99,7 +99,7 @@
     }];
     
 }
-
+        
 - (void)fetchThreeDayForecast {
 }
 
@@ -203,12 +203,13 @@
 
 - (NSDictionary *)userDefaultsDict {
     NSArray * const keys = @[
-        @"city", @"l",
-        @"countryCode", @"country3166",
-        @"isCurrentLocation", @"locationAsOf",
-        @"latitude", @"longitude",
-        @"conditions", @"conditionsAsOf",
-        @"degreesC", @"degreesF"
+        @"city",                @"l",
+        @"countryCode",         @"country3166",
+        @"regionCode",          @"region",
+        @"isCurrentLocation",   @"locationAsOf",
+        @"latitude",            @"longitude",
+        @"conditions",          @"conditionsAsOf",
+        @"degreesC",            @"degreesF"
     ];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     
