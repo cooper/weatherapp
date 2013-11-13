@@ -68,9 +68,10 @@
             self.longitude    = [loc[@"longitude"] floatValue];
         }
         
+        
         // round temperatures to the nearest whole degree.
-        self.degreesC = lroundf([(NSNumber *)ob[@"temp_c"] floatValue]);
-        self.degreesF = lroundf([(NSNumber *)ob[@"temp_f"] floatValue]);
+        self.degreesC = lroundf([ob[@"temp_c"] floatValue]);
+        self.degreesF = lroundf([ob[@"temp_f"] floatValue]);
         
         self.conditions = ob[@"weather"];
         
