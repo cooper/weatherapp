@@ -60,5 +60,6 @@ typedef void(^WACallback)(void);
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
 - (void)changedLocationAtIndex:(NSUInteger)index; //updates table view
+- (void)changedAllLocations;
 
 @end

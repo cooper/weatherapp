@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface WASettingsTVC : UITableViewController
+@interface WASettingsTVC : UITableViewController {
+    NSArray *settings;
+}
 
 @end

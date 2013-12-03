@@ -113,6 +113,17 @@
 
 - (void)changedLocationAtIndex:(NSUInteger)index {
     if (self.nc && self.nc.tvc) [self.nc.tvc updateLocationAtIndex:index];
+    
+    // update the temperature in case setting changed.
+    WALocation *location = self.locationManager.locations[index];
+    [location.viewController updateTemperature:location.degreesC fahrenheit:location.degreesF];
+    
+}
+
+- (void)changedAllLocations {
+    if (!self.nc || !self.nc.tvc) return;
+    for (unsigned int i = 0; i <= [self.locationManager.locations count]; i++)
+        [self changedLocationAtIndex:i];
 }
 
 #pragma mark - Core location manager delegate
@@ -168,6 +179,9 @@
             @"countryCode": @"US"
         }
     ] forKey:@"locations"];
+    [DEFAULTS setObject:@"Fahrenheit"   forKey:@"Temperature scale"];
+    [DEFAULTS setObject:@"Miles"        forKey:@"Measure of distance"];
+    [DEFAULTS setObject:@"Inches"       forKey:@"Measure of percipitation"];
     [DEFAULTS setBool:YES forKey:@"set_default_options"];
 }
 

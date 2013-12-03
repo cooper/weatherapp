@@ -65,8 +65,12 @@
 
 // update the current temperature.
 - (void)updateTemperature:(float)metric fahrenheit:(float)fahrenheit {
-    // TODO: make an option for displaying temperatures in centigrade.
-    self.temperature.text = [NSString stringWithFormat:@"%.f", fahrenheit];
+    if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Fahrenheit"])
+        self.temperature.text = [NSString stringWithFormat:@"%.f", fahrenheit];
+    else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Celsius"])
+        self.temperature.text = [NSString stringWithFormat:@"%.f", metric];
+    else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
+        self.temperature.text = [NSString stringWithFormat:@"%.f", metric + 273.15];
 }
 
 - (void)updateFullTitle:(NSString *)title {
