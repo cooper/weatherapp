@@ -83,19 +83,11 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
 
-    // TODO: make custom cells.
-    // I should eventually make custom subclasses of UITableViewCell
-    // that have the city name, brief description of conditions, temperature, etc.
-    // and increase the height of them. However, I must keep the delete and move things in mind.
-    
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
-    //cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
     cell.accessoryType    = UITableViewCellAccessoryDisclosureIndicator;
     cell.backgroundColor  = [UIColor whiteColor];
     
-    //cell.textLabel.adjustsFontSizeToFitWidth = YES;
-
-    // this is the "new" section.
+    // this is the "settings" section.
     if (indexPath.section == 2) {
         cell.textLabel.text = L(@"Settings");
         return cell;
@@ -116,8 +108,8 @@
         detailSize *= 2;
     }
 
-    NSString *city   = [location.city   length] ? location.city   : L(@"Loading");
-    NSString *region = [location.region length] ? location.region : @"...";
+    NSString *city   = [location.city   length] ? location.city   : @"";
+    NSString *region = [location.region length] ? location.region : ([location.longName length] ? location.longName : L(@"Locating..."));
     NSString *both   = FMT(@"%@ %@", city, region);
 
     // make the city name bold.
@@ -132,15 +124,47 @@
         NSForegroundColorAttributeName: [UIColor grayColor]
     } range:NSMakeRange([city length] + 1, [region length])];
     
+    // load the image if we haven't already.
+    // this is so an image from the former run shows before the location is updated.
+    if (location.conditionsImageName && !location.conditionsImage)
+        location.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@", location.conditionsImageName)];
+    
+    // if there is still no image at this point, use a dummy (clear) filler.
+    if (!location.conditionsImage)
+        location.conditionsImage = [UIImage imageNamed:@"icons/dummy"];
+    
+    // if the location is loading, add an activity indicator.
+    if (location.loading) {
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        indicator.frame = CGRectMake(25, 25, 0, 0);
+        indicator.color = [UIColor blueColor];
+        [cell.imageView addSubview:indicator];
+        [indicator startAnimating];
+    }
+    
     // set weather info.
     cell.textLabel.attributedText   = name;
     cell.detailTextLabel.textColor  = BLUE_COLOR;
     cell.detailTextLabel.font       = [UIFont systemFontOfSize:detailSize];
     cell.imageView.image            = location.conditionsImage;
     
-    // FIXME: take metric into account if it's preferred.
-    NSString *degrees = location.degreesF ? FMT(@"%.fº ", location.degreesF) : @"";
-    cell.detailTextLabel.text = FMT(@"%@%@", degrees, OR(location.conditions, @""));
+    // make the temperature part of the sublabel bold.
+    NSString *tempUnit = SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin) ? @"K" : @"º";
+    NSRange tempRange  = NSMakeRange(0, [location.temperature length] + 1);
+    
+    // if we have no conditions, leave the sublabel blank.
+    if (!location.conditionsAsOf) {
+    
+    }
+    
+    else {
+        NSString *tempAndConditions = FMT(@"%@%@ %@", location.temperature, tempUnit, OR(location.conditions, @""));
+        
+        // make the temperature part of the sublabel bold.
+        NSMutableAttributedString *sublabel = [[NSMutableAttributedString alloc] initWithString:tempAndConditions];
+        [sublabel addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:cell.detailTextLabel.font.pointSize + 4] range:tempRange];
+        cell.detailTextLabel.attributedText = sublabel;
+    }
     
     return cell;
 }
@@ -169,8 +193,6 @@
 
 // prevent moving of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // FIXME: this prevents current location rows from being moved,
-    // but it does not fix the issue where custom locations can be moved up into section 0.
     if (indexPath.section != 1) return NO;
     return YES;
 }
@@ -189,7 +211,7 @@
         [APP_DELEGATE.locationManager destroyLocation:location];
     }
     
-    [self.tableView setEditing:NO animated:NO];
+    [self.tableView setEditing:NO animated:NO]; // FIXME: this is what screws stuff up.
     [self.tableView reloadData];
     
 }

@@ -44,7 +44,12 @@
     }
     
     // fetch the conditions.
+    [APP_DELEGATE beginActivity];
+    self.loading = YES;
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
+        [APP_DELEGATE endActivity];
+        self.loading = NO;
+        
         NSDictionary *ob  = data[@"current_observation"];
         NSDictionary *loc = ob[@"display_location"];
 
@@ -78,20 +83,28 @@
         // if an icon is included in the response, use it.
         // if the weather API icon contains "/nt", use a nighttime icon.
         if (ob[@"icon"]) {
-            BOOL nightTime       = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
-            NSString *image      = IS_IPAD ? FMT(@"%@-ipad", ob[@"icon"]) : ob[@"icon"];
-            self.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@%@", nightTime ? @"nt_" : @"", image]);
-                                    
+            BOOL nightTime           = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
+            NSString *imageName      = IS_IPAD ? FMT(@"%@-ipad", ob[@"icon"]) : ob[@"icon"];
+            NSString *imageNameNite  = FMT(@"%@%@", nightTime ? @"nt_" : @"", imageName);
+            self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/%@", imageNameNite)];
+            self.conditionsImageName = imageNameNite;
+
             // if it's nighttime and the image does not exist, fall back to a daytime image.
-            if (nightTime && !self.conditionsImage)
-                self.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@", image)];
-                                    
+            if (nightTime && !self.conditionsImage) {
+                self.conditionsImageName = imageName;
+                self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/%@", imageName)];
+            }
+                
         }
         
         // if we don't have that icon, download wunderground's.
         if (ob[@"icon_url"] && !self.conditionsImage) {
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
+            [APP_DELEGATE beginActivity];
+            self.loading = YES;
             [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                [APP_DELEGATE endActivity];
+                self.loading = NO;
                 if (!data) return;
                 self.conditionsImage = [UIImage imageWithData:data];
                 [APP_DELEGATE changedLocationAtIndex:self.index];
@@ -201,6 +214,26 @@
     [self.viewController updateTemperature:self.degreesC fahrenheit:degreesF];
 }
 
+- (NSString *)temperature {
+    float t;
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        t = self.degreesF;
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        t = self.degreesC + 273.15;
+    else
+        t = self.degreesC;
+    
+    return [NSString stringWithFormat:@"%.f", t];
+}
+
+- (NSString *)tempUnit {
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        return @"ºF";
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        return @"K";
+    else return @"ºC";
+}
+
 - (void)setConditions:(NSString *)conditions {
     if (![conditions length]) return;
     _conditions = conditions;
@@ -211,12 +244,12 @@
 
 - (NSDictionary *)userDefaultsDict {
     NSArray * const keys = @[
-        @"city",                @"l",
+        @"city",                @"l",               @"longName",
         @"countryCode",         @"country3166",
         @"regionCode",          @"region",
         @"isCurrentLocation",   @"locationAsOf",
         @"latitude",            @"longitude",
-        @"conditions",          @"conditionsAsOf",
+        @"conditions",          @"conditionsAsOf",  @"conditionsImageName",
         @"degreesC",            @"degreesF"
     ];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];

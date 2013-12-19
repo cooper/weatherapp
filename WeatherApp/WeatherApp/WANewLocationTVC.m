@@ -39,6 +39,8 @@
 {
     [super viewDidLoad];
     self.tableView.backgroundColor = TABLE_COLOR;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -260,6 +262,48 @@
     
     NSLog(@"User hasn't typed for 0.5 seconds; looking up %@", textField.text);
     [self lookupSuggestion:textField.text];
+}
+
+#pragma mark - Keyboard notifications
+
+- (void)keyboardWasShown:(NSNotification*)aNotification {
+    NSDictionary* info = [aNotification userInfo];
+    CGSize kbSize      = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    // adjust the scrollview insets.
+    UIEdgeInsets currentInsets           = self.tableView.contentInset;
+    self.tableView.contentInset          =
+    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(
+        0.0             + currentInsets.top,
+        0.0             + currentInsets.left,
+        kbSize.height   + currentInsets.bottom,
+        0.0             + currentInsets.right
+    );
+
+    // make sure the text input field is visible.
+    CGRect aRect = self.view.frame;
+    aRect.size.height -= kbSize.height;
+    if (!CGRectContainsPoint(aRect, textField.frame.origin) ) {
+        CGPoint scrollPoint = CGPointMake(0.0, textField.frame.origin.y - kbSize.height);
+        [self.tableView setContentOffset:scrollPoint animated:YES];
+    }
+    
+}
+
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification {
+    NSDictionary* info = [aNotification userInfo];
+    CGSize kbSize      = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    // reset to former insets.
+    UIEdgeInsets currentInsets           = self.tableView.contentInset;
+    self.tableView.contentInset          =
+    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(
+       currentInsets.top,
+       currentInsets.left,
+       currentInsets.bottom - kbSize.height,
+       currentInsets.right
+    );
+    
 }
 
 @end

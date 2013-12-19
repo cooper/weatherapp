@@ -38,6 +38,11 @@
 - (void)viewWillAppear:(BOOL)animated {
     //self.navigationController.navigationBar.tintColor    = BLUE_COLOR;
     //self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
+    if (self.location)
+        [self updateTemperature:self.location.degreesC fahrenheit:self.location.degreesF];
+    
+
+    
 }
 
 - (void)didReceiveMemoryWarning

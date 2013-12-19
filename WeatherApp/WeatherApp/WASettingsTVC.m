@@ -22,18 +22,18 @@
         // Custom initialization
         self.navigationItem.title = @"Settings";
         settings = @[
-            @[@"Temperature scale", @[
-                @"Fahrenheit",
-                @"Celsius",
-                @"Kelvin"
+            @[kTemperatureScaleSetting, @[
+                kTemperatureScaleFahrenheit,
+                kTemperatureScaleCelsius,
+                kTemperatureScaleKelvin
             ]],
-            @[@"Measure of distance", @[
-                @"Miles",
-                @"Kilometers"
+            @[kDistanceMeasureSetting, @[
+                kDistanceMeasureMiles,
+                kDistanceMeasureKilometers
             ]],
-            @[@"Measure of percipitation", @[
-                @"Inches",
-                @"Milimeters"
+            @[kPercipitationMeasureSetting, @[
+                kPercipitationMeasureInches,
+                kPercipitationMeasureMilimeters
             ]]
         ];
     }
@@ -107,7 +107,6 @@
     
     // save changes.
     [DEFAULTS setObject:rowName forKey:sectionName];
-    [APP_DELEGATE changedAllLocations];
     
     // unhighlight row.
     [cell setSelected:NO animated:YES];

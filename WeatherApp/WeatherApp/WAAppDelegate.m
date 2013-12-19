@@ -17,8 +17,7 @@
 
 #pragma mark - Application delegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = TABLE_COLOR;
     
@@ -42,30 +41,25 @@
     return YES;
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
-{
+- (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
+- (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
+- (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
+- (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application
-{
+- (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     [self saveLocationsInDatabase];
 }
@@ -120,12 +114,6 @@
     
 }
 
-- (void)changedAllLocations {
-    if (!self.nc || !self.nc.tvc) return;
-    for (unsigned int i = 0; i <= [self.locationManager.locations count]; i++)
-        [self changedLocationAtIndex:i];
-}
-
 #pragma mark - Core location manager delegate
 
 // got a location update. set our current location object's coordinates.
@@ -161,8 +149,13 @@
 #pragma mark - App management
 
 - (void)setDefaults {
+    
+    // we already did this.
     if ([DEFAULTS boolForKey:@"set_default_options"]) return;
+    
+    // set default locations.
     [DEFAULTS setObject:@[
+                          
         @{
             @"isCurrentLocation":   @YES
         },
@@ -170,19 +163,45 @@
             @"city":        @"Tokyo",
             @"region":      @"Japan",
             @"country3166": @"JP",
-            @"countryCode": @"JP"
+            @"countryCode": @"JP",
+            @"conditions":  @"Mostly Cloudy",
+            @"conditionsImageName": @"mostlycloudy",
+            @"degreesF":    @70,
+            @"degreesC":    @20
         },
         @{
             @"city":        @"Los Angeles",
             @"region":      @"California",
             @"country3166": @"US",
-            @"countryCode": @"US"
+            @"countryCode": @"US",
+            @"conditions":  @"Clear",
+            @"conditionsImageName": @"clear",
+            @"degreesF":    @75,
+            @"degreesC":    @22
         }
+        
     ] forKey:@"locations"];
-    [DEFAULTS setObject:@"Fahrenheit"   forKey:@"Temperature scale"];
-    [DEFAULTS setObject:@"Miles"        forKey:@"Measure of distance"];
-    [DEFAULTS setObject:@"Inches"       forKey:@"Measure of percipitation"];
+    
+    // set default preferences.
+    [DEFAULTS setObject:kTemperatureScaleFahrenheit forKey:kTemperatureScaleSetting];
+    [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
+    [DEFAULTS setObject:kPercipitationMeasureInches forKey:kPercipitationMeasureSetting];
+    
+    // remember that we set these values.
     [DEFAULTS setBool:YES forKey:@"set_default_options"];
+    
+}
+
+#pragma mark - Activity indicator
+
+- (void)beginActivity {
+    activityCount++;
+    if (activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+}
+
+- (void)endActivity {
+    activityCount--;
+    if (!activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 @end

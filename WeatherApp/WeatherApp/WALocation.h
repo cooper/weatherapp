@@ -21,6 +21,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property WAWeatherVC *viewController;          // the associated view controller
 @property BOOL isCurrentLocation;               // true if this is current location object
 @property (readonly) NSUInteger index;          // index in the manager
+@property BOOL loading;                         // location info is loading now
 
 #pragma mark - Location information
 
@@ -31,6 +32,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (nonatomic) NSString *city;                   // full name of city
 @property (nonatomic, readonly) NSString *fullName;     // city and region separated by comma
 @property NSString *l;                                  // wunderground location query identifier
+@property NSString *longName;                           // location name as looked up
+
 
 #pragma mark - Global position
 
@@ -41,9 +44,12 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 #pragma mark - Weather conditions
 
 @property NSDate *conditionsAsOf;               // date of last condition check
-@property UIImage *conditionsImage;             // icon image of conditions
+@property UIImage  *conditionsImage;            // icon image of conditions
+@property NSString *conditionsImageName;        // name of image; i.e. "partlycloudy"
 @property (nonatomic) float degreesC;           // current temp (C)
 @property (nonatomic) float degreesF;           // current temp (F)
+@property (readonly) NSString *temperature;     // localized temperature string
+@property (readonly) NSString *tempUnit;        // localized temperature unit
 @property (nonatomic) NSString *conditions;     // recent conditions; i.e. "Cloudy"
 
 #pragma mark - Fetching data

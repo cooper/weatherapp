@@ -29,6 +29,7 @@
     
     // create and add to manager.
     WALocation *location = [[WALocation alloc] init];
+    location.loading     = YES;
     location.manager     = self; // weak
     [self.locations addObject:location];
     
@@ -45,9 +46,7 @@
 - (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary {
     WALocation *location = [self createLocation];
     for (NSString *key in dictionary) {
-        NSLog(@"checking %@", key);
         if (![location respondsToSelector:NSSelectorFromString(key)]) continue;
-        NSLog(@"settings %@", key);
         [location setValue:dictionary[key] forKey:key];
     }
     return location;

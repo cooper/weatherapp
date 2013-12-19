@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import "WASettingsConstants.h"
 
 #pragma mark - Macros
 
@@ -39,6 +40,8 @@
 #define L(str) NSLocalizedString(str, nil)
 #define URL_ESC(str) [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 #define OR(this, otherwise) (this ? this : otherwise)
+#define EQ(a, b) [a isEqualToString:b]
+#define SETTING_IS(setting, value) EQ([DEFAULTS objectForKey:setting], value)
 
 // Types.
 
@@ -50,6 +53,7 @@ typedef void(^WACallback)(void);
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;
+    NSUInteger              activityCount;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -60,6 +64,8 @@ typedef void(^WACallback)(void);
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
 - (void)changedLocationAtIndex:(NSUInteger)index; //updates table view
-- (void)changedAllLocations;
+
+- (void)beginActivity;
+- (void)endActivity;
 
 @end
