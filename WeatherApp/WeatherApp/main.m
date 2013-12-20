@@ -6,9 +6,7 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 
-#import "WAAppDelegate.h"
 
 int main(int argc, char * argv[])
 {

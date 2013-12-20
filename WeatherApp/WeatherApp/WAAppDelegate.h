@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 #import "WASettingsConstants.h"
@@ -49,7 +50,15 @@ typedef void(^WACallback)(void);
 
 #pragma mark - Application delegate
 
-@class WALocationManager, WAWeatherVC, WALocation, WANavigationController;
+@class
+    WALocationManager,
+    WALocation,
+    WAPageViewController,
+    WANavigationController,
+    WALocationListTVC,
+    WANewLocationTVC,
+    WASettingsTVC,
+    WAWeatherVC;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;
@@ -58,9 +67,9 @@ typedef void(^WACallback)(void);
 
 @property (strong, nonatomic) UIWindow *window;
 @property WANavigationController *nc;
+@property WAPageViewController *pageVC;
 @property WALocationManager *locationManager;
 @property (readonly) WALocation *currentLocation;
-//@property UIPageViewController *pageVC;
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
 - (void)changedLocationAtIndex:(NSUInteger)index; //updates table view

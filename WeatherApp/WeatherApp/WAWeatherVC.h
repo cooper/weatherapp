@@ -6,12 +6,11 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@class WALocation;
-
-@interface WAWeatherVC : UIViewController
+@interface WAWeatherVC : UIViewController <UIGestureRecognizerDelegate> {
+    UIBarButtonItem *refreshButton;
+}
 
 @property IBOutlet UILabel *locationTitle;
 @property IBOutlet UILabel *temperature;

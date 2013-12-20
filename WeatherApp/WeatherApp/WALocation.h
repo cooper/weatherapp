@@ -6,12 +6,8 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "WAAppDelegate.h"
 
 typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSError *err);
-
-@class WAWeatherVC, WALocationManager;
 
 @interface WALocation : NSObject <NSURLConnectionDataDelegate>
 

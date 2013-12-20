@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 
 FOUNDATION_EXPORT NSString * const kTemperatureScaleSetting;
 FOUNDATION_EXPORT NSString * const kDistanceMeasureSetting;

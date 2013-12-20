@@ -8,7 +8,6 @@
 
 #import "WAWeatherVC.h"
 #import "WALocation.h"
-#import "WAAppDelegate.h"
 
 @interface WAWeatherVC ()
 
@@ -32,17 +31,26 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor = TABLE_COLOR;
+    refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
+    self.navigationItem.rightBarButtonItem = refreshButton;
+    
+    // re-enable edge drag gesture.
 
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    //self.navigationController.navigationBar.tintColor    = BLUE_COLOR;
+    //self.navigationController.navigationBar.tintColor    = BLUE_COLOR;]
     //self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
     if (self.location)
         [self updateTemperature:self.location.degreesC fahrenheit:self.location.degreesF];
-    
 
-    
+    //[self.navigationController setNavigationBarHidden:YES animated:animated];
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -53,6 +61,16 @@
 
 - (NSUInteger)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
+}
+
+- (void)refreshButtonTapped {
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [indicator startAnimating];
+    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
+    [self.navigationItem setRightBarButtonItem:item animated:YES];
+    [self.location fetchCurrentConditionsThen:^{
+        if (refreshButton) [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
+    }];
 }
 
 #pragma mark - Updates from WALocation
@@ -89,4 +107,5 @@
 - (void)updateConditions:(NSString *)conditions {
     self.conditionsLabel.text = conditions;
 }
+
 @end

@@ -7,10 +7,10 @@
 //
 
 #import "WALocationListTVC.h"
-#import "WAAPPDelegate.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
 #import "WANavigationController.h"
+#import "WAPageViewController.h"
 #import "WANewLocationTVC.h"
 #import "WAWeatherVC.h"
 #import "WASettingsTVC.h"
@@ -41,14 +41,23 @@
     
     //self.navigationController.navigationBar.tintColor    = [UIColor whiteColor];
     //self.navigationController.navigationBar.barTintColor = BLUE_COLOR;
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
+
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+
+    // in rare occasions, the status bar might still be hidden at this point.
+    // this is just a double-check to ensure it is showing now.
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
     
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    self.navigationItem.title = L(@"Locations");
+    
+    self.navigationItem.title = L(@"Weather");
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];
@@ -80,8 +89,7 @@
     return [APP_DELEGATE.locationManager.locations count] - 1;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
     cell.accessoryType    = UITableViewCellAccessoryDisclosureIndicator;
@@ -209,10 +217,10 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
         [APP_DELEGATE.locationManager destroyLocation:location];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
     
-    [self.tableView setEditing:NO animated:NO]; // FIXME: this is what screws stuff up.
-    [self.tableView reloadData];
+    //[self.tableView setEditing:NO animated:NO]; // FIXME: this is what screws stuff up.
     
 }
 
@@ -236,9 +244,8 @@
     else index = indexPath.row + 1;
     
     // set current page to this location, and dismiss the nc.
-    //[APP_DELEGATE.locationManager focusLocationAtIndex:index];
-    WALocation *location = APP_DELEGATE.locationManager.locations[index];
-    [self.navigationController pushViewController:location.viewController animated:YES];
+    [APP_DELEGATE.locationManager focusLocationAtIndex:index];
+    [self.navigationController pushViewController:APP_DELEGATE.pageVC animated:YES];
     //[APP_DELEGATE.pageVC view];
     
     // update database for reorder and deletion.

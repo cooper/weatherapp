@@ -6,11 +6,11 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import "WAAppDelegate.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
 #import "WAWeatherVC.h"
 #import "WANavigationController.h"
+#import "WAPageViewController.h"
 #import "WALocationListTVC.h"
 
 @implementation WAAppDelegate
@@ -33,6 +33,11 @@
     
     // create the navigation controller.
     self.window.rootViewController = self.nc = [[WANavigationController alloc] initWithMyRootController];
+    
+    // create the page view controller.
+    self.pageVC = [[WAPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:@{ UIPageViewControllerOptionSpineLocationKey: @(UIPageViewControllerSpineLocationMid) }];
+    self.pageVC.dataSource = self.locationManager;
+    [self.pageVC setViewControllers:@[self.currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     // start locating.
     [self startLocating];
@@ -114,6 +119,16 @@
     
 }
 
+- (void)beginActivity {
+    activityCount++;
+    if (activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+}
+
+- (void)endActivity {
+    activityCount--;
+    if (!activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
 #pragma mark - Core location manager delegate
 
 // got a location update. set our current location object's coordinates.
@@ -190,18 +205,6 @@
     // remember that we set these values.
     [DEFAULTS setBool:YES forKey:@"set_default_options"];
     
-}
-
-#pragma mark - Activity indicator
-
-- (void)beginActivity {
-    activityCount++;
-    if (activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-}
-
-- (void)endActivity {
-    activityCount--;
-    if (!activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 @end

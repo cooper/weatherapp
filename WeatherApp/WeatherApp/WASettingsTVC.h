@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 
 @interface WASettingsTVC : UITableViewController {
     NSArray *settings;

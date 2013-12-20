@@ -7,8 +7,9 @@
 //
 
 #import "WANavigationController.h"
-#import "WAAppDelegate.h"
 #import "WALocationListTVC.h"
+#import "WAWeatherVC.h"
+#import "WAPageViewController.h"
 
 @interface WANavigationController ()
 
@@ -19,9 +20,12 @@
 - (id)initWithMyRootController {
     self.tvc  = [[WALocationListTVC alloc] initWithStyle:UITableViewStyleGrouped];
     self      = [super initWithRootViewController:self.tvc];
-    self.navigationBar.barTintColor = BLUE_COLOR;
-    self.navigationBar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
-    self.navigationBar.tintColor = [UIColor whiteColor];
+    
+    UINavigationBar *bar = self.navigationBar;
+    bar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
+    bar.barTintColor        = BLUE_COLOR;
+    bar.tintColor           = [UIColor whiteColor];
+    
     return self;
 }
 
@@ -42,7 +46,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-
 
 @end

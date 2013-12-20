@@ -8,8 +8,8 @@
 
 #import "WALocationManager.h"
 #import "WALocation.h"
-#import "WAAppDelegate.h"
 #import "WAWeatherVC.h"
+#import "WAPageViewController.h"
 
 @implementation WALocationManager
 
@@ -90,6 +90,52 @@
     NSMutableArray *locs = [NSMutableArray array];
     for (WALocation *location in self.locations) [locs addObject:location.userDefaultsDict];
     return locs;
+}
+
+#pragma mark - Page view controller source
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
+    
+    // find index of this location.
+    NSInteger index;
+    if ([viewController isKindOfClass:[WAWeatherVC class]]) {
+        WAWeatherVC *vc = (WAWeatherVC *)viewController;
+        index           = [self.locations indexOfObject:vc.location];
+    }
+    else index = -1;
+    
+    // we cannot have a negative index.
+    if (index - 1 < 0) return nil;
+    
+    // found it.
+    WALocation *before  = self.locations[index - 1];
+    return before.viewController;
+    
+}
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
+    
+    // find the index of this location.
+    NSInteger index;
+    if ([viewController isKindOfClass:[WAWeatherVC class]]) {
+        WAWeatherVC *vc = (WAWeatherVC *)viewController;
+        index           = [self.locations indexOfObject:vc.location];
+    }
+    else index = -1;
+    
+    // after index exceeds our number of locations.
+    if (index + 1 >= [self.locations count]) return nil;
+    
+    // found it.
+    WALocation *after   = self.locations[index + 1];
+    return after.viewController;
+    
+}
+
+- (void)focusLocationAtIndex:(NSUInteger)index {
+    if (index >= [self.locations count]) return;
+    WALocation *location = self.locations[index];
+    [APP_DELEGATE.pageVC setViewControllers:@[location.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
 }
 
 @end

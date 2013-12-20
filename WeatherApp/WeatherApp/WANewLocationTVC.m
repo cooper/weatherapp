@@ -7,7 +7,6 @@
 //
 
 #import "WANewLocationTVC.h"
-#import "WAAppDelegate.h"
 #import "WANavigationController.h"
 #import "WALocationManager.h"
 #import "WALocation.h"
@@ -177,7 +176,7 @@
     
     // send the request asynchronously.
     NSDate *date = [NSDate date];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [APP_DELEGATE beginActivity];
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
     
     
@@ -240,7 +239,7 @@
         // reload section 1 of the table.
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
         
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [APP_DELEGATE endActivity];
         
     }];
     

@@ -7,7 +7,6 @@
 //
 
 #import "WASettingsTVC.h"
-#import "WAAppDelegate.h"
 
 @interface WASettingsTVC ()
 

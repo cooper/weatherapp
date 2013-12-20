@@ -6,11 +6,7 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
-@class WALocation;
-
-@interface WALocationManager : NSObject
+@interface WALocationManager : NSObject <UIPageViewControllerDataSource>
 
 @property NSMutableArray *locations;
 @property NSInteger index;
@@ -21,5 +17,6 @@
 - (void)loadLocations:(NSArray *)locationsArray;        // creates locations from user defaults array
 - (NSArray *)locationsArrayForSaving;                   // locations array for user defaults
 - (void)fetchLocations;                                 // fetches conditions of all locations but current
+- (void)focusLocationAtIndex:(NSUInteger)index;
 
 @end

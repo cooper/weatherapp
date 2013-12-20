@@ -7,7 +7,6 @@
 //
 
 #import "WALocation.h"
-#import "WAAppDelegate.h"
 #import "WAWeatherVC.h"
 #import "WALocationManager.h"
 
