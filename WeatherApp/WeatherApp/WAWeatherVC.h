@@ -17,6 +17,7 @@
 @property IBOutlet UILabel *fullLocationLabel;
 @property IBOutlet UILabel *coordinateLabel;
 @property IBOutlet UILabel *conditionsLabel;
+@property IBOutlet UIImageView *conditionsImageView;
 @property (weak) WALocation *location;
 
 // these methods are for communication between the location object and
@@ -30,5 +31,6 @@
 - (void)updateFullTitle:(NSString *)title;
 - (void)updateConditions:(NSString *)conditions;
 - (void)updateLatitude:(float)latitude longitude:(float)longitude;
+- (void)updateConditionsImage:(UIImage *)image;
 
 @end

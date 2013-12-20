@@ -6,6 +6,7 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 
@@ -32,7 +33,14 @@
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor = TABLE_COLOR;
     
-    // re-enable edge drag gesture.
+    UILabel *label = self.temperature;
+    label.layer.shadowColor     = [UIColor whiteColor].CGColor;
+    label.layer.shadowOffset    = CGSizeMake(0, 0);
+    label.layer.shadowRadius    = 3;
+    label.layer.shadowOpacity   = 1;
+    label.layer.masksToBounds   = NO;
+    label.layer.shouldRasterize = YES;
+
 
 }
 
@@ -94,6 +102,10 @@
 
 - (void)updateConditions:(NSString *)conditions {
     self.conditionsLabel.text = conditions;
+}
+
+- (void)updateConditionsImage:(UIImage *)image {
+    self.conditionsImageView.image = image;
 }
 
 @end

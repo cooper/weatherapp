@@ -239,6 +239,11 @@
     [self.viewController updateConditions:conditions];
 }
 
+- (void)setConditionsImage:(UIImage *)conditionsImage {
+    _conditionsImage = conditionsImage;
+    [self.viewController updateConditionsImage:conditionsImage];
+}
+
 #pragma mark - User defaults
 
 - (NSDictionary *)userDefaultsDict {

@@ -57,7 +57,7 @@
 {
     [super viewDidLoad];
     
-    self.navigationItem.title = L(@"Weather");
+    self.navigationItem.title = L(@"Locations");
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];

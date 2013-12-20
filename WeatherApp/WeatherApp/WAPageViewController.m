@@ -40,6 +40,22 @@
     self.navigationItem.rightBarButtonItem = refreshButton;
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+
+
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+
+    // make navigation bar transparent.
+    //UINavigationBar *bar = self.navigationController.navigationBar;
+    //[bar setBackgroundImage:[UIImage imageNamed:@"icons/dummy"] forBarMetrics:UIBarMetricsDefault];
+    //bar.shadowImage  = [UIImage new];
+    //bar.barTintColor = [UIColor clearColor];
+    //self.navigationController.navigationBar.translucent = YES;
+
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
