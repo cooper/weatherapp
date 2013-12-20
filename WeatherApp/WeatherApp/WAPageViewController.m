@@ -61,6 +61,9 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
+}
+
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     WAWeatherVC *weatherVC = self.viewControllers[0];
     self.location = weatherVC.location;

@@ -253,7 +253,6 @@
 
 - (void)goToNew {
     WANewLocationTVC *vc = [[WANewLocationTVC alloc] initWithStyle:UITableViewStyleGrouped];
-    vc.navigationItem.title = L(@"New");
     [self.navigationController pushViewController:vc animated:YES];
 }
 

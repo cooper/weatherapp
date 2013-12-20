@@ -83,21 +83,29 @@
         // if an icon is included in the response, use it.
         // if the weather API icon contains "/nt", use a nighttime icon.
         if (ob[@"icon"]) {
-            BOOL nightTime           = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
-            NSString *imageName      = IS_IPAD ? FMT(@"%@-ipad", ob[@"icon"]) : ob[@"icon"];
-            NSString *imageNameNite  = FMT(@"%@%@", nightTime ? @"nt_" : @"", imageName);
-            self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/%@", imageNameNite)];
-            self.conditionsImageName = imageNameNite;
+            NSString *icon = ob[@"icon"];
+            
+            // alternate names for icons.
+            if ([icon isEqualToString:@"hazy"])         icon = @"fog";
+            if ([icon isEqualToString:@"partlysunny"])  icon = @"partlycloudy";
+            
+            // determine the image name (night/day)
+            BOOL nightTime     = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
+            NSString *timeName = FMT(@"%@%@", nightTime ? @"nt_" : @"", icon);
+            
+            // attempt to use the day/night version.
+            self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", timeName)];
+            self.conditionsImageName = timeName;
 
             // if it's nighttime and the image does not exist, fall back to a daytime image.
             if (nightTime && !self.conditionsImage) {
-                self.conditionsImageName = imageName;
-                self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/%@", imageName)];
+                self.conditionsImageName = icon;
+                self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", icon)];
             }
                 
         }
         
-        // if we don't have that icon, download wunderground's.
+        // if we don't have an icon by now, download wunderground's.
         if (ob[@"icon_url"] && !self.conditionsImage) {
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
             [self beginLoading];
@@ -108,10 +116,11 @@
             }];
         }
         
-        // update time of last conditions check.
+        // update as of time, and finish loading process.
         self.conditionsAsOf = [NSDate date];
-
         [self endLoading];
+        
+        // execute callback.
         if (then) then();
         
     }];

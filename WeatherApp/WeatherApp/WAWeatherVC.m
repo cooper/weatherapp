@@ -83,7 +83,7 @@
     self.conditionsLabel.text   = self.location.conditions;
     
     // conditions icon.
-    self.conditionsImageView.image = [UIImage imageNamed:FMT(@"icons/%@-230", self.location.conditionsImageName)];
+    self.conditionsImageView.image = [UIImage imageNamed:FMT(@"icons/230/%@", self.location.conditionsImageName)];
     if (!self.conditionsImageView.image) self.conditionsImageView.image = self.location.conditionsImage;
     
     // temperature.

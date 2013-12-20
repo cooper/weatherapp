@@ -40,6 +40,7 @@
     self.tableView.backgroundColor = TABLE_COLOR;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
+    self.navigationItem.title = L(@"New favorite");
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -178,7 +179,8 @@
     NSDate *date = [NSDate date];
     [APP_DELEGATE beginActivity];
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-    
+        [APP_DELEGATE endActivity];
+
     
         // the user already selected something, so just forget about this request.
         // or if the user has typed since this request started, forget it.
@@ -187,7 +189,6 @@
         // a connection error occurred.
         if (connectionError) {
             NSLog(@"Location lookup connection error: %@", connectionError);
-            [APP_DELEGATE endActivity];
             return;
         }
         
@@ -239,8 +240,6 @@
         
         // reload section 1 of the table.
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
-        
-        [APP_DELEGATE endActivity];
         
     }];
     
