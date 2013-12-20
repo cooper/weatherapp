@@ -9,6 +9,9 @@
 #import "WALocation.h"
 #import "WAWeatherVC.h"
 #import "WALocationManager.h"
+#import "WANavigationController.h"
+#import "WALocationListTVC.h"
+#import "WAPageViewController.h"
 
 @implementation WALocation
 
@@ -43,11 +46,9 @@
     }
     
     // fetch the conditions.
-    [APP_DELEGATE beginActivity];
-    self.loading = YES;
+    // todo: err handling, call endLoading in err.
+    [self beginLoading];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        [APP_DELEGATE endActivity];
-        self.loading = NO;
         
         NSDictionary *ob  = data[@"current_observation"];
         NSDictionary *loc = ob[@"display_location"];
@@ -99,21 +100,18 @@
         // if we don't have that icon, download wunderground's.
         if (ob[@"icon_url"] && !self.conditionsImage) {
             NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
-            [APP_DELEGATE beginActivity];
-            self.loading = YES;
+            [self beginLoading];
             [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-                [APP_DELEGATE endActivity];
-                self.loading = NO;
                 if (!data) return;
                 self.conditionsImage = [UIImage imageWithData:data];
-                [APP_DELEGATE changedLocationAtIndex:self.index];
+                [self endLoading];
             }];
         }
         
         // update time of last conditions check.
         self.conditionsAsOf = [NSDate date];
 
-        [APP_DELEGATE changedLocationAtIndex:self.index];
+        [self endLoading];
         if (then) then();
         
     }];
@@ -164,32 +162,6 @@
     }];
 }
 
-#pragma mark - Location properties
-
-- (void)setLatitude:(float)latitude {
-    _latitude = latitude;
-    [self.viewController updateLatitude:latitude longitude:self.longitude];
-}
-
-- (void)setLongitude:(float)longitude {
-    _longitude = longitude;
-    [self.viewController updateLatitude:self.latitude longitude:longitude];
-}
-
-- (void)setCity:(NSString *)city {
-    if (![city length]) return;
-    _city = city;
-    [self.viewController updateLocationTitle:self.city];
-    [self.viewController updateFullTitle:self.fullName];
-}
-
-- (void)setRegion:(NSString *)region {
-    if (![region length]) return;
-    _region = region;
-    [self.viewController updateRegionTitle:region];
-    [self.viewController updateFullTitle:self.fullName];
-}
-
 #pragma mark - Automatic properties
 
 - (NSString *)fullName {
@@ -199,18 +171,6 @@
 
 - (NSUInteger)index {
     return [self.manager.locations indexOfObject:self];
-}
-
-#pragma mark - Current condition properties
-
-- (void)setDegreesC:(float)degreesC {
-    _degreesC = degreesC;
-    [self.viewController updateTemperature:degreesC fahrenheit:self.degreesF];
-}
-
-- (void)setDegreesF:(float)degreesF {
-    _degreesF = degreesF;
-    [self.viewController updateTemperature:self.degreesC fahrenheit:degreesF];
 }
 
 - (NSString *)temperature {
@@ -233,17 +193,6 @@
     else return @"ºC";
 }
 
-- (void)setConditions:(NSString *)conditions {
-    if (![conditions length]) return;
-    _conditions = conditions;
-    [self.viewController updateConditions:conditions];
-}
-
-- (void)setConditionsImage:(UIImage *)conditionsImage {
-    _conditionsImage = conditionsImage;
-    [self.viewController updateConditionsImage:conditionsImage];
-}
-
 #pragma mark - User defaults
 
 - (NSDictionary *)userDefaultsDict {
@@ -262,6 +211,40 @@
         if ([self valueForKey:key]) dict[key] = [self valueForKey:key];
     
     return dict;
+}
+
+#pragma mark - Loading
+
+// indicates begin loading.
+- (void)beginLoading {
+    self.loading = YES;
+    
+    // start status bar indicator.
+    [APP_DELEGATE beginActivity];
+    
+    // if pageVC exists, update its navigation bar.
+    // (to add indicator in place of refresh button)
+    if (APP_DELEGATE.pageVC) [APP_DELEGATE.pageVC updateNavigationBar];
+}
+
+// indicates finish loading.
+- (void)endLoading {
+    self.loading = NO;
+    
+    // stop the status bar indicator.
+    [APP_DELEGATE endActivity];
+    
+    // update the weather view controller's info.
+    [self.viewController update];
+    
+    // if the location list TVC exists, update the cell for this location.
+    WANavigationController *nc = APP_DELEGATE.nc;
+    if (nc && nc.tvc) [nc.tvc updateLocationAtIndex:self.index];
+    
+    // if the pageVC exists, update the navigation bar.
+    // (replace loading indicator with refresh button)
+    if (APP_DELEGATE.pageVC) [APP_DELEGATE.pageVC updateNavigationBar];
+    
 }
 
 @end

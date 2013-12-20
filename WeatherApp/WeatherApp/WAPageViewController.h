@@ -13,5 +13,6 @@
 @property (weak) WALocation *location;
 
 - (void)setViewController:(WAWeatherVC *)weatherVC;
+- (void)updateNavigationBar;
 
 @end

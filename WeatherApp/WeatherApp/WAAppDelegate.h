@@ -72,8 +72,6 @@ typedef void(^WACallback)(void);
 @property (readonly) WALocation *currentLocation;
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
-- (void)changedLocationAtIndex:(NSUInteger)index; //updates table view
-
 - (void)beginActivity;
 - (void)endActivity;
 

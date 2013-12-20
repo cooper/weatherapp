@@ -47,12 +47,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     //self.navigationController.navigationBar.tintColor    = BLUE_COLOR;]
     //self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
-    if (self.location)
-        [self updateTemperature:self.location.degreesC fahrenheit:self.location.degreesF];
 
     //[self.navigationController setNavigationBarHidden:YES animated:animated];
     //self.navigationController.interactivePopGestureRecognizer.delegate = self;
-
+    [self update];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -71,41 +69,31 @@
 
 #pragma mark - Updates from WALocation
 
-// update the current location (city) title.
-- (void)updateLocationTitle:(NSString *)title {
-    self.navigationItem.title =
-    self.locationTitle.text = title;
-}
+- (void)update {
 
-// update the region; the state or country (outside of US).
-- (void)updateRegionTitle:(NSString *)title {
-    self.fullLocationLabel.text = FMT(@"%@, %@", self.locationTitle.text, title);
-}
+    // in location.m, add two methods: beginLoading, finishLoading.
+    // beginLoading will increase activity, set loading property, etc.
+    // finishLoading will decrease activity, undo loading property, update the VC, etc.
+    
+    // info.
+    self.locationTitle.text     = self.location.city;
+    self.fullLocationLabel.text = self.location.fullName;
+  //self.fullLocationLabel.text = FMT(@"%@, %@", self.location.city, self.location.region);
+    self.coordinateLabel.text   = FMT(@"%f,%f", self.location.latitude, self.location.longitude);
+    self.conditionsLabel.text   = self.location.conditions;
+    
+    // conditions icon.
+    self.conditionsImageView.image = self.location.conditionsImage;
 
-// update the current temperature.
-- (void)updateTemperature:(float)metric fahrenheit:(float)fahrenheit {
+    
+    // temperature.
     if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Fahrenheit"])
-        self.temperature.text = [NSString stringWithFormat:@"%.f", fahrenheit];
+        self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesF];
     else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Celsius"])
-        self.temperature.text = [NSString stringWithFormat:@"%.f", metric];
+        self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC];
     else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
-        self.temperature.text = [NSString stringWithFormat:@"%.f", metric + 273.15];
-}
-
-- (void)updateFullTitle:(NSString *)title {
-    self.fullLocationLabel.text = title;
-}
-
-- (void)updateLatitude:(float)latitude longitude:(float)longitude {
-    self.coordinateLabel.text = FMT(@"%f,%f", latitude, longitude);
-}
-
-- (void)updateConditions:(NSString *)conditions {
-    self.conditionsLabel.text = conditions;
-}
-
-- (void)updateConditionsImage:(UIImage *)image {
-    self.conditionsImageView.image = image;
+        self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC + 273.15];
+    
 }
 
 @end

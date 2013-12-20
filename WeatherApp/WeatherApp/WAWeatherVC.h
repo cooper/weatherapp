@@ -25,12 +25,6 @@
 // changes by keeping all interface code within the view controller
 // and all functionality code within the location object.
 
-- (void)updateTemperature:(float)metric fahrenheit:(float)fahrenheit;
-- (void)updateLocationTitle:(NSString *)title;
-- (void)updateRegionTitle:(NSString *)title;
-- (void)updateFullTitle:(NSString *)title;
-- (void)updateConditions:(NSString *)conditions;
-- (void)updateLatitude:(float)latitude longitude:(float)longitude;
-- (void)updateConditionsImage:(UIImage *)image;
+- (void)update;
 
 @end

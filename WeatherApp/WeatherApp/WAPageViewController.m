@@ -41,8 +41,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
-
+    [self updateNavigationBar];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -76,16 +75,18 @@
 
 - (void)updateNavigationBar {
     self.navigationItem.title = self.location.city;
+    if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        [indicator startAnimating];
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
+        [self.navigationItem setRightBarButtonItem:item animated:YES];
+    }
+    else if (!self.location.loading && self.navigationItem.rightBarButtonItem != refreshButton)
+        [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
 }
 
 - (void)refreshButtonTapped {
-    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    [indicator startAnimating];
-    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
-    [self.navigationItem setRightBarButtonItem:item animated:YES];
-    [self.location fetchCurrentConditionsThen:^{
-        if (refreshButton) [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
-    }];
+    [self.location fetchCurrentConditions];
 }
 
 

@@ -187,6 +187,7 @@
         // a connection error occurred.
         if (connectionError) {
             NSLog(@"Location lookup connection error: %@", connectionError);
+            [APP_DELEGATE endActivity];
             return;
         }
         

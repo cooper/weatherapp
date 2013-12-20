@@ -110,15 +110,6 @@
     [DEFAULTS setObject:[self.locationManager locationsArrayForSaving] forKey:@"locations"];
 }
 
-- (void)changedLocationAtIndex:(NSUInteger)index {
-    if (self.nc && self.nc.tvc) [self.nc.tvc updateLocationAtIndex:index];
-    
-    // update the temperature in case setting changed.
-    WALocation *location = self.locationManager.locations[index];
-    [location.viewController updateTemperature:location.degreesC fahrenheit:location.degreesF];
-    
-}
-
 - (void)beginActivity {
     activityCount++;
     if (activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
