@@ -217,10 +217,8 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
         [APP_DELEGATE.locationManager destroyLocation:location];
-        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
     }
-    
-    //[self.tableView setEditing:NO animated:NO]; // FIXME: this is what screws stuff up.
     
 }
 
