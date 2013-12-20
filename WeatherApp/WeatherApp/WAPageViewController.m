@@ -29,8 +29,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
+
+    // this fixes the navigation bar inset issue.
+    // however, it causes the page view controller to ignore the navigation bar completely
+    // (so its frame goes behind the navigation bar as well.)
     self.automaticallyAdjustsScrollViewInsets = NO;
+    
+    self.view.backgroundColor = TABLE_COLOR;
+    refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
+    self.navigationItem.rightBarButtonItem = refreshButton;
 }
 
 - (void)didReceiveMemoryWarning
@@ -41,8 +48,29 @@
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     WAWeatherVC *weatherVC = self.viewControllers[0];
-    self.location          = weatherVC.location;
+    self.location = weatherVC.location;
+    [self updateNavigationBar];
+}
+
+- (void)setViewController:(WAWeatherVC *)weatherVC {
+    [APP_DELEGATE.pageVC setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+    self.location = weatherVC.location;
+    [self updateNavigationBar];
+}
+
+- (void)updateNavigationBar {
     self.navigationItem.title = self.location.city;
 }
+
+- (void)refreshButtonTapped {
+    UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [indicator startAnimating];
+    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
+    [self.navigationItem setRightBarButtonItem:item animated:YES];
+    [self.location fetchCurrentConditionsThen:^{
+        if (refreshButton) [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
+    }];
+}
+
 
 @end

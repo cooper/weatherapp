@@ -10,3 +10,7 @@
 @interface WANavigationController : UINavigationController
 
 - (id)initWithMyRootController;
+
+@property WALocationListTVC *tvc;
+
+@end

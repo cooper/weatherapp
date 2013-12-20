@@ -135,7 +135,7 @@
 - (void)focusLocationAtIndex:(NSUInteger)index {
     if (index >= [self.locations count]) return;
     WALocation *location = self.locations[index];
-    [APP_DELEGATE.pageVC setViewControllers:@[location.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+    [APP_DELEGATE.pageVC setViewController:location.viewController];
 }
 
 @end
