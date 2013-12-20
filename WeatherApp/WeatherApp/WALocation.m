@@ -90,15 +90,15 @@
             if ([icon isEqualToString:@"partlysunny"])  icon = @"partlycloudy";
             
             // determine the image name (night/day)
-            BOOL nightTime     = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
-            NSString *timeName = FMT(@"%@%@", nightTime ? @"nt_" : @"", icon);
+            self.nightTime     = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
+            NSString *timeName = FMT(@"%@%@", self.nightTime ? @"nt_" : @"", icon);
             
             // attempt to use the day/night version.
             self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", timeName)];
             self.conditionsImageName = timeName;
 
             // if it's nighttime and the image does not exist, fall back to a daytime image.
-            if (nightTime && !self.conditionsImage) {
+            if (self.nightTime && !self.conditionsImage) {
                 self.conditionsImageName = icon;
                 self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", icon)];
             }
@@ -206,12 +206,13 @@
 
 - (NSDictionary *)userDefaultsDict {
     NSArray * const keys = @[
-        @"city",                @"l",               @"longName",
+        @"city",                @"longName", @"l",
         @"countryCode",         @"country3166",
         @"regionCode",          @"region",
         @"isCurrentLocation",   @"locationAsOf",
         @"latitude",            @"longitude",
-        @"conditions",          @"conditionsAsOf",  @"conditionsImageName",
+        @"conditions",          @"conditionsAsOf",
+        @"conditionsImageName", @"nightTime",
         @"degreesC",            @"degreesF"
     ];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];

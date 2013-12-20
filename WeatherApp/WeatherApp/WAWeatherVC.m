@@ -31,16 +31,18 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    self.view.backgroundColor = TABLE_COLOR;
+    self.view.backgroundColor  = TABLE_COLOR;
     
-    UILabel *label = self.temperature;
-    label.layer.shadowColor     = [UIColor whiteColor].CGColor;
-    label.layer.shadowOffset    = CGSizeMake(0, 0);
-    label.layer.shadowRadius    = 3;
-    label.layer.shadowOpacity   = 1;
-    label.layer.masksToBounds   = NO;
-    label.layer.shouldRasterize = YES;
+    for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel]) {
+        label.layer.shadowColor     = [UIColor blackColor].CGColor;
+        label.layer.shadowOffset    = CGSizeMake(0, 0);
+        label.layer.shadowRadius    = label == self.temperature ? 3.0 : 2.0;
+        label.layer.shadowOpacity   = 1.0;
+        label.layer.masksToBounds   = NO;
+        label.layer.shouldRasterize = YES;
+    }
 
+    self.conditionsImageView.alpha = 0.8;
 
 }
 
@@ -51,6 +53,29 @@
     //[self.navigationController setNavigationBarHidden:YES animated:animated];
     //self.navigationController.interactivePopGestureRecognizer.delegate = self;
     [self update];
+    
+    if ([self.location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound) {
+        UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/umbrella2.jpg"]];
+        background.frame = self.view.bounds;
+        [self.view addSubview:background];
+        [self.view sendSubviewToBack:background];
+        NSLog(@"yep i did it");
+    }
+    else if ([self.location.conditions rangeOfString:@"overcast" options:NSCaseInsensitiveSearch].location != NSNotFound) {
+        UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/overcast2.jpg"]];
+        background.frame = self.view.bounds;
+        [self.view addSubview:background];
+        [self.view sendSubviewToBack:background];
+        NSLog(@"yep i did it");
+    }
+    else if ([self.location.conditionsImageName rangeOfString:@"cloud"].location != NSNotFound) {
+        UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clouds.jpg"]];
+        background.frame = self.view.bounds;
+        [self.view addSubview:background];
+        [self.view sendSubviewToBack:background];
+        NSLog(@"yep i did it");
+    }
+    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -93,7 +118,7 @@
         self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC];
     else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
         self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC + 273.15];
-    
+
 }
 
 @end
