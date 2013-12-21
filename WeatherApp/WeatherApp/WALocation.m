@@ -241,6 +241,14 @@
 - (void)endLoading {
     self.loading = NO;
     
+    // create the view controller.
+    if (!self.initialLoadingComplete) {
+        WAWeatherVC *weatherVC  = [[WAWeatherVC alloc] initWithNibName:@"WAWeatherVC" bundle:nil];
+        self.viewController = weatherVC;
+        weatherVC.location  = self;         // weak
+        self.initialLoadingComplete = YES;
+    }
+    
     // stop the status bar indicator.
     [APP_DELEGATE endActivity];
     

@@ -30,6 +30,8 @@
 {
     [super viewDidLoad];
 
+    self.navigationItem.title = L(@"Current");
+
     // this fixes the navigation bar inset issue.
     // however, it causes the page view controller to ignore the navigation bar completely
     // (so its frame goes behind the navigation bar as well.)
@@ -77,7 +79,6 @@
 }
 
 - (void)updateNavigationBar {
-    self.navigationItem.title = self.location.city;
     if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {
         UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         [indicator startAnimating];

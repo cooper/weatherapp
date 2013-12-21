@@ -24,6 +24,7 @@
 		A71C0900181ED1B7003488ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A71C08FE181ED1B7003488ED /* InfoPlist.strings */; };
 		A71C0902181ED1B7003488ED /* WeatherAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A71C0901181ED1B7003488ED /* WeatherAppTests.m */; };
 		A747819C1864EF00003DCA60 /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = A747819B1864EF00003DCA60 /* backgrounds */; };
+		A747819E18661209003DCA60 /* backgrounds.plist in Resources */ = {isa = PBXBuildFile; fileRef = A747819D18661209003DCA60 /* backgrounds.plist */; };
 		A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786135A1863DA1C0052FCC5 /* WAPageViewController.m */; };
 		A7E9779518288423004189B0 /* WANavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779418288423004189B0 /* WANavigationController.m */; };
 		A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779718288432004189B0 /* WALocationListTVC.m */; };
@@ -70,6 +71,7 @@
 		A71C08FF181ED1B7003488ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A71C0901181ED1B7003488ED /* WeatherAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WeatherAppTests.m; sourceTree = "<group>"; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
+		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
 		A78613591863DA1C0052FCC5 /* WAPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAPageViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A786135A1863DA1C0052FCC5 /* WAPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAPageViewController.m; sourceTree = "<group>"; };
 		A7E9779318288423004189B0 /* WANavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WANavigationController.h; path = WeatherApp/WANavigationController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -169,6 +171,7 @@
 		A71C08E2181ED1B6003488ED /* WeatherApp */ = {
 			isa = PBXGroup;
 			children = (
+				A747819D18661209003DCA60 /* backgrounds.plist */,
 				BC8C143D18216A1E003BA98D /* Localizable.strings */,
 				BC1367FA182162920090CAC5 /* UserDefaults.txt */,
 				A70EE9D71827142E00F317A9 /* icons */,
@@ -368,6 +371,7 @@
 				A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */,
 				A70EE9D81827142E00F317A9 /* icons in Resources */,
 				A747819C1864EF00003DCA60 /* backgrounds in Resources */,
+				A747819E18661209003DCA60 /* backgrounds.plist in Resources */,
 				BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -535,6 +539,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Weather;
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -551,6 +556,7 @@
 				INFOPLIST_FILE = "WeatherApp/Weather-Info.plist";
 				PRODUCT_NAME = Weather;
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

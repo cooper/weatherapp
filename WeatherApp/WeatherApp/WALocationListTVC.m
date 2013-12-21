@@ -132,10 +132,12 @@
         NSForegroundColorAttributeName: [UIColor grayColor]
     } range:NSMakeRange([city length] + 1, [region length])];
     
+    
+    // FIXME: perhaps it looks better with no icons on initial load...
     // load the image if we haven't already.
     // this is so an image from the former run shows before the location is updated.
     if (location.conditionsImageName && !location.conditionsImage)
-        location.conditionsImage = [UIImage imageNamed:FMT(@"icons/%@", location.conditionsImageName)];
+        location.conditionsImage = [UIImage imageNamed:FMT(@"icons/50/%@", location.conditionsImageName)];
     
     // if there is still no image at this point, use a dummy (clear) filler.
     if (!location.conditionsImage)
@@ -143,7 +145,7 @@
     
     // if the location is loading, add an activity indicator.
     if (location.loading) {
-        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         indicator.frame = CGRectMake(25, 25, 0, 0);
         indicator.color = [UIColor blueColor];
         [cell.imageView addSubview:indicator];
@@ -161,11 +163,7 @@
     NSRange tempRange  = NSMakeRange(0, [location.temperature length] + 1);
     
     // if we have no conditions, leave the sublabel blank.
-    if (!location.conditionsAsOf) {
-    
-    }
-    
-    else {
+    if (location.conditionsAsOf) {
         NSString *tempAndConditions = FMT(@"%@%@ %@", location.temperature, tempUnit, OR(location.conditions, @""));
         
         // make the temperature part of the sublabel bold.
@@ -173,6 +171,10 @@
         [sublabel addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:cell.detailTextLabel.font.pointSize + 4] range:tempRange];
         cell.detailTextLabel.attributedText = sublabel;
     }
+    
+    // if initial load isn't complete, remove the arrow.
+    if (!location.initialLoadingComplete)
+        cell.accessoryType = UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -190,6 +192,17 @@
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0 && indexPath.row != 0) return NO;
+    
+    // current locating initial load not complete.
+    if (indexPath.section == 0 && !APP_DELEGATE.currentLocation.initialLoadingComplete)
+        return NO;
+    
+    // other location initial load not complete.
+    if (indexPath.section == 1) {
+        WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
+        if (!location.initialLoadingComplete) return NO;
+    }
+    
     return YES;
 }
 
@@ -240,6 +253,10 @@
     
     // other location.
     else index = indexPath.row + 1;
+    
+    // initial load not complete.
+    WALocation *location = APP_DELEGATE.locationManager.locations[index];
+    if (!location.initialLoadingComplete) return;
     
     // set current page to this location, and dismiss the nc.
     [APP_DELEGATE.locationManager focusLocationAtIndex:index];

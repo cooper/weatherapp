@@ -43,7 +43,8 @@
     }
 
     self.conditionsImageView.alpha = 0.8;
-
+    [self update];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -97,37 +98,22 @@
     else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
         self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC + 273.15];
 
-    
-    // in order by priority. the first match wins.
-    NSArray *backgrounds = @[
-        @{
-            @"name":        @"rainy",
-            @"icon":        @"rain",
-            @"day":         @[@"umbrella2"]
-        },
-        @{
-            @"name":        @"overcast",
-            @"conditions":  @"overcast",
-            @"day":         @[@"overcast2", @"overcast"]
-        },
-        @{
-            @"name":        @"smoke",
-            @"conditions":  @"smoke",
-            @"day":         @[@"smoke", @"smoke2"]
-        },
-        @{
-            @"name":        @"cloudy",
-            @"icon":        @"cloud",
-            @"day":         @[@"clouds"]
-        },
-        @{
-            @"name":        @"clear",
-            @"icon":        @"clear",
-            @"day":         @[@"clear", @"clear2"],
-            @"night":       @[@"clear-night", @"clear-night3"]
-        }
-    ];
+    [self updateBackground];
+}
 
+- (void)updateBackground {
+
+    // in order by priority. the first match wins.
+    
+    // matching is case-insensitive. night is preferred if it's night time,
+    // but if a night array does not exist, day acts as a fallback.
+    
+    // the background selector alternates through each array by storing
+    // the last-used index in the user defaults database.
+    
+    // load backgrounds from plist.
+    NSString *bgPlist    = [[NSBundle mainBundle] pathForResource: @"backgrounds" ofType: @"plist"];
+    NSArray *backgrounds = [NSArray arrayWithContentsOfFile:bgPlist];
     
     // if the icon and conditions haven't changed, don't waste energy analyzing backgrounds.
     unsigned int i = 0; NSDictionary *selection;
@@ -206,7 +192,8 @@
             [self.view sendSubviewToBack:background];
         }
         
-        background.image = [UIImage imageNamed:FMT(@"backgrounds/%@.jpg", chosenBackground)];
+        NSLog(@"YES, LOADED");
+        background.image = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/%@.jpg", chosenBackground)]];
         background.frame = self.view.bounds;
         
         currentBackgroundName       = selection[@"name"];
@@ -217,7 +204,38 @@
         NSLog(@"updating background to %@", chosenBackground);
         
     }
+}
 
+// preload image.
+// FIXME: from https://gist.github.com/steipete/1144242
+// - needs paraphrasing and cleanup.
+- (UIImage *)preloadImage:(UIImage *)uiimage {
+    CGImageRef image = uiimage.CGImage;
+    
+    // make a bitmap context of a suitable size to draw to, forcing decode
+    size_t width  = CGImageGetWidth(image);
+    size_t height = CGImageGetHeight(image);
+    
+    CGColorSpaceRef colourSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef imageContext   =  CGBitmapContextCreate(
+        NULL, width, height, 8, width * 4, colourSpace,
+        kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little
+    );
+    CGColorSpaceRelease(colourSpace);
+    
+    // draw the image to the context, release it
+    CGContextDrawImage(imageContext, CGRectMake(0, 0, width, height), image);
+    
+    // now get an image ref from the context
+    CGImageRef outputImage = CGBitmapContextCreateImage(imageContext);
+    
+    UIImage *cachedImage = [UIImage imageWithCGImage:outputImage];
+    
+    // clean up
+    CGImageRelease(outputImage);
+    CGContextRelease(imageContext);
+    
+    return cachedImage;
 }
 
 @end

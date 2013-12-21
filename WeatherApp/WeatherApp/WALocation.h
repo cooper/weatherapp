@@ -18,6 +18,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property BOOL isCurrentLocation;                       // true if this is current location object
 @property (readonly) NSUInteger index;                  // index in the manager
 @property BOOL loading;                                 // location info is loading now
+@property BOOL initialLoadingComplete;                  // initial conditions check after launch
 
 #pragma mark - Location information
 

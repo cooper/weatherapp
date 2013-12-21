@@ -37,7 +37,6 @@
     // create the page view controller.
     self.pageVC = [[WAPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:@{ UIPageViewControllerOptionSpineLocationKey: @(UIPageViewControllerSpineLocationMid) }];
     self.pageVC.dataSource = self.locationManager;
-    [self.pageVC setViewControllers:@[self.currentLocation.viewController] direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     // start locating.
     [self startLocating];
