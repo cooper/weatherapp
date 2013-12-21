@@ -54,28 +54,6 @@
     //self.navigationController.interactivePopGestureRecognizer.delegate = self;
     [self update];
     
-    if ([self.location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound) {
-        UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/umbrella2.jpg"]];
-        background.frame = self.view.bounds;
-        [self.view addSubview:background];
-        [self.view sendSubviewToBack:background];
-        NSLog(@"yep i did it");
-    }
-    else if ([self.location.conditions rangeOfString:@"overcast" options:NSCaseInsensitiveSearch].location != NSNotFound) {
-        UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/overcast2.jpg"]];
-        background.frame = self.view.bounds;
-        [self.view addSubview:background];
-        [self.view sendSubviewToBack:background];
-        NSLog(@"yep i did it");
-    }
-    else if ([self.location.conditionsImageName rangeOfString:@"cloud"].location != NSNotFound) {
-        UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clouds.jpg"]];
-        background.frame = self.view.bounds;
-        [self.view addSubview:background];
-        [self.view sendSubviewToBack:background];
-        NSLog(@"yep i did it");
-    }
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -118,6 +96,127 @@
         self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC];
     else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
         self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC + 273.15];
+
+    
+    // in order by priority. the first match wins.
+    NSArray *backgrounds = @[
+        @{
+            @"name":        @"rainy",
+            @"icon":        @"rain",
+            @"day":         @[@"umbrella2"]
+        },
+        @{
+            @"name":        @"overcast",
+            @"conditions":  @"overcast",
+            @"day":         @[@"overcast2", @"overcast"]
+        },
+        @{
+            @"name":        @"smoke",
+            @"conditions":  @"smoke",
+            @"day":         @[@"smoke", @"smoke2"]
+        },
+        @{
+            @"name":        @"cloudy",
+            @"icon":        @"cloud",
+            @"day":         @[@"clouds"]
+        },
+        @{
+            @"name":        @"clear",
+            @"icon":        @"clear",
+            @"day":         @[@"clear", @"clear2"],
+            @"night":       @[@"clear-night", @"clear-night3"]
+        }
+    ];
+
+    
+    // if the icon and conditions haven't changed, don't waste energy analyzing backgrounds.
+    unsigned int i = 0; NSDictionary *selection;
+    if ([currentBackgroundIcon isEqualToString:self.location.conditionsImageName] && [currentBackgroundConditions isEqualToString:self.location.conditions])
+        NSLog(@"icon and conditions not changed");
+    
+    // find a background.
+    else for (NSDictionary *bg in backgrounds) {
+        BOOL matchesIcon = bg[@"icon"] && [self.location.conditionsImageName rangeOfString:bg[@"icon"] options:NSCaseInsensitiveSearch].location != NSNotFound;
+        BOOL matchesConditions = bg[@"conditions"] && [self.location.conditions rangeOfString:bg[@"conditions"] options:NSCaseInsensitiveSearch].location != NSNotFound;
+    
+        // this is a match.
+        if (matchesIcon || matchesConditions) {
+        
+            NSLog(@"%@ matches!", bg[@"name"]);
+            
+            // if it's night and backgrounds exist for such, prefer them.
+            BOOL nightTime = NO;
+            if (self.location.nightTime && bg[@"night"]) nightTime = YES;
+            
+            // here's our winning list.
+            selection = @{
+                @"index": @(i),
+                @"name":  bg[@"name"],
+                @"night": @(nightTime)
+            };
+            break;
+            
+        }
+        
+        i++;
+    }
+    
+    // if the background category and time of day are same, nothing needs to be changed.
+    NSString *chosenBackground;
+    if ([currentBackgroundName isEqualToString:selection[@"name"]] && currentBackgroundTimeOfDay == [selection[@"night"] boolValue])
+        NSLog(@"conditions/icon changed, but category and time of day still same");
+    
+    // a background group was selected.
+    else if (selection) {
+    
+        unsigned int i      = [selection[@"index"] unsignedIntValue];
+        BOOL nightTime      = [selection[@"night"] boolValue];
+        NSString *timeOfDay = nightTime ? @"night" : @"day";
+
+        
+        NSString *storageName = FMT(@"%@-%@", selection[@"name"], timeOfDay);
+        NSArray *choices      = backgrounds[i][timeOfDay];
+        
+        // fetch the background storage.
+        NSMutableDictionary *bgStorage = [[DEFAULTS objectForKey:@"backgrounds"] mutableCopy];
+        unsigned int useIndex = 0;
+        
+        // use the one after the last-used.
+        if (bgStorage[storageName])
+            useIndex = [bgStorage[storageName] unsignedIntValue] + 1;
+        
+        // we exceeded the array's limits; go back to the first.
+        if (useIndex >= [choices count]) useIndex = 0;
+        
+        // here's the final winner.
+        chosenBackground       = choices[useIndex];
+        bgStorage[storageName] = @(useIndex);
+        [DEFAULTS setObject:bgStorage forKey:@"backgrounds"];
+        
+        NSLog(@"chosen: %@", chosenBackground);
+        
+    }
+    
+    // finally apply the background.
+    if (chosenBackground) {
+    
+        if (!background) {
+            background = [[UIImageView alloc] init];
+            [self.view addSubview:background];
+            [self.view sendSubviewToBack:background];
+        }
+        
+        background.image = [UIImage imageNamed:FMT(@"backgrounds/%@.jpg", chosenBackground)];
+        background.frame = self.view.bounds;
+        
+        currentBackgroundName       = selection[@"name"];
+        currentBackgroundIcon       = self.location.conditionsImageName;
+        currentBackgroundConditions = self.location.conditions;
+        currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
+        
+        NSLog(@"updating background to %@", chosenBackground);
+        
+    }
 
 }
 

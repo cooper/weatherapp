@@ -10,6 +10,11 @@
 
 @interface WAWeatherVC : UIViewController <UIGestureRecognizerDelegate> {
     UIBarButtonItem *refreshButton;
+    UIImageView *background;
+    NSString *currentBackgroundName;
+    NSString *currentBackgroundIcon;
+    NSString *currentBackgroundConditions;
+    BOOL currentBackgroundTimeOfDay;
 }
 
 @property IBOutlet UILabel *locationTitle;

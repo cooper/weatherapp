@@ -193,6 +193,8 @@
     [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
     [DEFAULTS setObject:kPercipitationMeasureInches forKey:kPercipitationMeasureSetting];
     
+    [DEFAULTS setObject:@{} forKey:@"backgrounds"];
+    
     // remember that we set these values.
     [DEFAULTS setBool:YES forKey:@"set_default_options"];
     

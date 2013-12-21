@@ -41,7 +41,7 @@
     
     //self.navigationController.navigationBar.tintColor    = [UIColor whiteColor];
     //self.navigationController.navigationBar.barTintColor = BLUE_COLOR;
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    //[self.navigationController setNavigationBarHidden:NO animated:animated];
 
 }
 
@@ -217,7 +217,7 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
         [APP_DELEGATE.locationManager destroyLocation:location];
-        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
     
 }
