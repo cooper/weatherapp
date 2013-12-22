@@ -49,7 +49,7 @@
 
     // in rare occasions, the status bar might still be hidden at this point.
     // this is just a double-check to ensure it is showing now.
-    [self.navigationController setNavigationBarHidden:NO animated:animated];
+    //[self.navigationController setNavigationBarHidden:NO animated:animated];
     
 }
 
@@ -57,11 +57,16 @@
 {
     [super viewDidLoad];
     
+    // remove the border between cells.
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+
     self.navigationItem.title = L(@"Locations");
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];
-    self.tableView.backgroundColor = TABLE_COLOR;
+    //self.tableView.backgroundColor = TABLE_COLOR;
+    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clear.jpg"]];
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -145,10 +150,9 @@
     // here's the background.
     if (location.cellBackground) {
         UIImageView *cellBg = [[UIImageView alloc] init];
-        [cell addSubview:cellBg];
-        [cell sendSubviewToBack:cellBg];
-        cellBg.image = location.cellBackground;
-        cellBg.frame = cell.bounds;
+        cellBg.image        = location.cellBackground;
+        cellBg.frame        = cell.bounds;
+        cell.backgroundView = cellBg;
     }
     
     // if the location is loading, add an activity indicator.
@@ -165,6 +169,18 @@
     cell.detailTextLabel.textColor  = BLUE_COLOR;
     cell.detailTextLabel.font       = [UIFont systemFontOfSize:detailSize];
     cell.imageView.image            = location.conditionsImage;
+    cell.textLabel.backgroundColor  = cell.detailTextLabel.backgroundColor = [UIColor clearColor];
+    
+    // text shadows.
+    for (UILabel *label in @[cell.textLabel, cell.detailTextLabel]) {
+        label.layer.shadowColor     = [UIColor blackColor].CGColor;
+        label.layer.shadowOffset    = CGSizeMake(0, 0);
+        label.layer.shadowRadius    = 3.0;
+        label.layer.shadowOpacity   = 1.0;
+        label.layer.masksToBounds   = NO;
+        label.layer.shouldRasterize = YES;
+        label.textColor             = [UIColor whiteColor];
+    }
     
     // make the temperature part of the sublabel bold.
     NSString *tempUnit = SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin) ? @"K" : @"º";
