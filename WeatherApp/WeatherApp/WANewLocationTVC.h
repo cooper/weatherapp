@@ -7,11 +7,13 @@
 //
 
 
-@interface WANewLocationTVC : UITableViewController <UITextFieldDelegate> {
+@interface WANewLocationTVC : UITableViewController <UITextFieldDelegate, UISearchDisplayDelegate> {
     NSMutableArray *results;    // array of search results
     NSDate *lastTypeDate;       // time of last typing event (key press)
     UITextField *textField;     // the search text field in the first row
     BOOL selectedOne;           // true if the user selected a location result
+    UISearchBar *searchBar;
+    UISearchDisplayController *searchController;
 }
 
 @end

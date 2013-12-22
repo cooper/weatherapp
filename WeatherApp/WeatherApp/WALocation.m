@@ -15,6 +15,12 @@
 
 @implementation WALocation
 
++ (id)newDummy {
+    WALocation *location = [[self alloc] init];
+    location.dummy = YES;
+    return location;
+}
+
 #pragma mark - Fetching data
 
 - (void)fetchCurrentConditions {
@@ -208,6 +214,7 @@
 #pragma mark - User defaults
 
 - (NSDictionary *)userDefaultsDict {
+    if (self.dummy) return @{};
     NSArray * const keys = @[
         @"city",                @"longName", @"l",
         @"countryCode",         @"country3166",

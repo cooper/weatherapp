@@ -18,18 +18,23 @@
 @implementation WANavigationController
 
 - (id)initWithMyRootController {
-    self.tvc  = [[WALocationListTVC alloc] initWithStyle:UITableViewStyleGrouped];
+    self.tvc  = [[WALocationListTVC alloc] initWithStyle:UITableViewStylePlain];
     self      = [super initWithRootViewController:self.tvc];
     
     UINavigationBar *bar = self.navigationBar;
     bar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
-    bar.barTintColor        = BLUE_COLOR;
+//    bar.barTintColor        = [UIColor clearColor];//BLUE_COLOR;
     bar.tintColor           = [UIColor whiteColor];
+//    bar.backgroundColor     = [UIColor colorWithPatternImage:[UIImage imageNamed:@"icons/dummy"]];
+//    bar.shadowImage         = [UIImage new];
+    [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+    self.navigationBar.shadowImage = [UIImage new];
+    self.navigationBar.translucent = YES;
     
     return self;
 }
 
--(UIStatusBarStyle)preferredStatusBarStyle {
+- (UIStatusBarStyle)preferredStatusBarStyle {
     return UIStatusBarStyleLightContent; 
 }
 

@@ -27,7 +27,9 @@
 {
     self = [super initWithStyle:style];
     if (self) {
+        NSLog(@"initialization");
         // Custom initialization
+
     }
 
     return self;
@@ -57,11 +59,16 @@
 {
     [super viewDidLoad];
     
+    self.tableView        =
+    self.reorderTableView = [[BVReorderTableView alloc] initWithFrame:self.tableView.frame style:self.tableView.style];
+    self.reorderTableView.delegate = self;
+    
+    NSLog(@"did load");
     // remove the border between cells.
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
     self.navigationItem.title = L(@"Locations");
-    self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    //self.navigationItem.leftBarButtonItem = self.editButtonItem;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];
     //self.tableView.backgroundColor = TABLE_COLOR;
@@ -79,47 +86,51 @@
 
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 2) return 45;
-    return IS_IPAD ? 120 : 60;
+    return 100;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 3;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section != 1) return 1;
-    return [APP_DELEGATE.locationManager.locations count] - 1;
+    return [APP_DELEGATE.locationManager.locations count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
-    cell.accessoryType    = UITableViewCellAccessoryDisclosureIndicator;
-    cell.backgroundColor  = [UIColor whiteColor];
-    
-    // this is the "settings" section.
-    if (indexPath.section == 2) {
-        cell.textLabel.text = L(@"Settings");
-        return cell;
-    }
-
-    // current location cell can't be moved.
-    cell.showsReorderControl = indexPath.section == 0;
-
     // find the location object.
-    NSUInteger index     = indexPath.row + indexPath.section;
-    WALocation *location = APP_DELEGATE.locationManager.locations[index];
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
     
-    // on iPad, double the font sizes.
-    CGFloat size       = cell.textLabel.font.pointSize;
-    CGFloat detailSize = cell.detailTextLabel.font.pointSize;
-    if (IS_IPAD) {
-        size       *= 2;
-        detailSize *= 2;
-    }
+    // is this a dummy cell?
+    // dummy cells take place
+    if (location.dummy) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"dummy"];
+        if (!cell) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dummy"];
+            cell.backgroundColor  = [UIColor clearColor];
+        }
+        return cell;
+    };
+
+    // find or create cell.
+    // we only want to reuse a cell if our initial load is complete.
+    // otherwise, a new location's cell will have another's style.
+    UITableViewCell *cell;
+    if (location.initialLoadingComplete)
+        cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
+    if (!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
+    
+    cell.backgroundColor  = [UIColor clearColor];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    cell.showsReorderControl = indexPath.row == 0;
+    
+    // font sizes.
+    CGFloat size       = 25;
+    CGFloat detailSize = 20;
 
     NSString *city   = [location.city   length] ? location.city   : @"";
     NSString *region = [location.region length] ? location.region : ([location.longName length] ? location.longName : L(@"Locating..."));
@@ -133,17 +144,17 @@
     
     // make the region name smaller.
     [name setAttributes:@{
-        NSFontAttributeName:            [UIFont systemFontOfSize:(size - (IS_IPAD ? 10 : 5))],
+        NSFontAttributeName:            [UIFont systemFontOfSize:(size - 10)],
         NSForegroundColorAttributeName: [UIColor grayColor]
     } range:NSMakeRange([city length] + 1, [region length])];
     
-    // FIXME: perhaps it looks better with no icons on initial load...
-    // load the image if we haven't already.
-    // this is so an image from the former run shows before the location is updated.
-    if (location.conditionsImageName && !location.conditionsImage)
-        location.conditionsImage = [UIImage imageNamed:FMT(@"icons/50/%@", location.conditionsImageName)];
+//    // FI/XME: perhaps it looks better with no icons on initial load...
+//    // load the image if we haven't already.
+//    // this is so an image from the former run shows before the location is updated.
+//    if (location.conditionsImageName && !location.conditionsImage)
+//        location.conditionsImage = [UIImage imageNamed:FMT(@"icons/50/%@", location.conditionsImageName)];
     
-    // if there is still no image at this point, use a dummy (clear) filler.
+    // if there is no image at this point, use a dummy (clear) filler.
     if (!location.conditionsImage)
         location.conditionsImage = [UIImage imageNamed:@"icons/dummy"];
     
@@ -155,11 +166,16 @@
         cell.backgroundView = cellBg;
     }
     
+    // here's the selected translucent blue tint.
+    cell.selectedBackgroundView = [[UIView alloc] init];
+    cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:  0./255. green:150./255. blue:1 alpha:0.3];
+    cell.backgroundColor = [UIColor clearColor];
+    
     // if the location is loading, add an activity indicator.
     if (location.loading) {
         UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         indicator.frame = CGRectMake(25, 25, 0, 0);
-        indicator.color = [UIColor blueColor];
+        //indicator.color = [UIColor blueColor];
         [cell.imageView addSubview:indicator];
         [indicator startAnimating];
     }
@@ -174,12 +190,14 @@
     // text shadows.
     for (UILabel *label in @[cell.textLabel, cell.detailTextLabel]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
-        label.layer.shadowOffset    = CGSizeMake(0, 0);
-        label.layer.shadowRadius    = 3.0;
+        label.layer.shadowOffset    = CGSizeMake(1, 0);
+        label.layer.shadowRadius    = 2.0;
         label.layer.shadowOpacity   = 1.0;
         label.layer.masksToBounds   = NO;
         label.layer.shouldRasterize = YES;
-        label.textColor             = [UIColor whiteColor];
+        label.textColor             = TABLE_COLOR;
+        label.adjustsFontSizeToFitWidth = YES;
+        //label.baselineAdjustment = UIBaselineAdjustmentNone;
     }
     
     // make the temperature part of the sublabel bold.
@@ -204,8 +222,6 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 0) return L(@"Current location");
-    if (section == 1) return L(@"Favorite locations");
     return nil;
 }
 
@@ -215,31 +231,22 @@
 
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == 0 && indexPath.row != 0) return NO;
-    
-    // current locating initial load not complete.
-    if (indexPath.section == 0 && !APP_DELEGATE.currentLocation.initialLoadingComplete)
-        return NO;
-    
-    // other location initial load not complete.
-    if (indexPath.section == 1) {
-        WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
-        if (!location.initialLoadingComplete) return NO;
-    }
+
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    if (!location.initialLoadingComplete) return NO;
     
     return YES;
 }
 
 // prevent editing of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section != 1) return NO;
+    if (indexPath.row == 0) return NO;
     return YES;
 }
 
 // prevent moving of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section != 1) return NO;
-    return YES;
+    return indexPath.row != 0;
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -250,40 +257,23 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    if (indexPath.row == 0) return;
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row + 1];
+        WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
         [APP_DELEGATE.locationManager destroyLocation:location];
-        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
-    
+    [APP_DELEGATE saveLocationsInDatabase];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSUInteger index;
-    
-    // current location.
-    if (indexPath.section == 0) {
-        if (indexPath.row != 0) return;
-        index = 0;
-    }
-    
-    // settings.
-    else if (indexPath.section == 2) {
-        WASettingsTVC *settingsTVC = [[WASettingsTVC alloc] initWithStyle:UITableViewStyleGrouped];
-        [self.navigationController pushViewController:settingsTVC animated:YES];
-        return;
-    }
-    
-    // other location.
-    else index = indexPath.row + 1;
     
     // initial load not complete.
-    WALocation *location = APP_DELEGATE.locationManager.locations[index];
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
     if (!location.initialLoadingComplete) return;
     
     // set current page to this location, and dismiss the nc.
-    [APP_DELEGATE.locationManager focusLocationAtIndex:index];
+    [APP_DELEGATE.locationManager focusLocationAtIndex:indexPath.row];
     [self.navigationController pushViewController:APP_DELEGATE.pageVC animated:YES];
     //[APP_DELEGATE.pageVC view];
     
@@ -301,25 +291,25 @@
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 
     // switch the locations.
-    NSUInteger from = sourceIndexPath.row + 1;
-    NSUInteger to    = destinationIndexPath.row + 1;
+    NSUInteger from = sourceIndexPath.row;
+    NSUInteger to    = destinationIndexPath.row;
     WALocation *loc1 = APP_DELEGATE.locationManager.locations[from];
     WALocation *loc2 = APP_DELEGATE.locationManager.locations[to];
     APP_DELEGATE.locationManager.locations[to]   = loc1;
     APP_DELEGATE.locationManager.locations[from] = loc2;
     
+    [APP_DELEGATE saveLocationsInDatabase];
+
 }
 
 // do not allow weather cells to be moved out of section 1.
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    if (proposedDestinationIndexPath.section != sourceIndexPath.section) return sourceIndexPath;
+    if (proposedDestinationIndexPath.row == 0) return sourceIndexPath;
     return proposedDestinationIndexPath;
 }
 
 - (void)updateLocationAtIndex:(NSUInteger)index {
-    NSUInteger section = index == 0 ? 0 : 1;
-    if (index) index--;
-    NSArray *rows = @[[NSIndexPath indexPathForRow:index inSection:section]];
+    NSArray *rows = @[[NSIndexPath indexPathForRow:index inSection:0]];
     [self.tableView reloadRowsAtIndexPaths:rows withRowAnimation:UITableViewRowAnimationFade];
 }
 
@@ -379,5 +369,28 @@
 }
  
  */
+
+#pragma mark - Reorderable table delegate
+
+- (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    [APP_DELEGATE.locationManager.locations replaceObjectAtIndex:indexPath.row withObject:[WALocation newDummy]];
+    return location;
+}
+
+// This method is called when the selected row is dragged to a new position. You simply update your
+// data source to reflect that the rows have switched places. This can be called multiple times
+// during the reordering process
+- (void)moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    [self tableView:self.tableView moveRowAtIndexPath:fromIndexPath toIndexPath:toIndexPath];
+}
+
+// This method is called when the selected row is released to its new position. The object is the same
+// object you returned in saveObjectAndInsertBlankRowAtIndexPath:. Simply update the data source so the
+// object is in its new position. You should do any saving/cleanup here.
+- (void)finishReorderingWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"%@, %ld, %ld", object, (long)indexPath.section, (long)indexPath.row);
+    APP_DELEGATE.locationManager.locations[indexPath.row] = object;
+}
 
 @end

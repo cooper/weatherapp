@@ -41,6 +41,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
     self.navigationItem.title = L(@"New favorite");
+    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clear.jpg"]];
+
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -87,18 +89,17 @@
     // input section.
     if (indexPath.section == 0) {
         
-        if (!textField) {
+        if (!textField)
             textField = [[UITextField alloc] initWithFrame:CGRectMake(15, 10, 280, 30)];
-        }
         
         textField.adjustsFontSizeToFitWidth = YES;
         textField.textColor = [UIColor blackColor];
 
-        textField.keyboardType = UIKeyboardTypeDefault;
+        textField.keyboardType  = UIKeyboardTypeDefault;
         textField.returnKeyType = UIReturnKeyDefault;
-        textField.placeholder = L(@"Type to look up a location");
+        textField.placeholder   = L(@"Search locations...");
 
-        textField.backgroundColor = [UIColor whiteColor];
+        textField.backgroundColor = [UIColor clearColor];
         textField.autocorrectionType = UITextAutocorrectionTypeNo; // no auto correction support
         textField.autocapitalizationType = UITextAutocapitalizationTypeNone; // no auto capitalization support
         
@@ -110,19 +111,19 @@
         [textField setEnabled: YES];
         
         [cell.contentView addSubview:textField];
-
+        cell.backgroundColor = TABLE_COLOR;
         return cell;
     }
     
     cell.textLabel.text = results[indexPath.row][@"longName"];
-    
+    cell.backgroundColor = [UIColor clearColor];
+    cell.textLabel.textColor = [UIColor whiteColor];
     cell.textLabel.adjustsFontSizeToFitWidth = YES;
 
     return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 0) return L(@"Search");
     return nil;
 }
 

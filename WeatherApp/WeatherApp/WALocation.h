@@ -19,6 +19,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (readonly) NSUInteger index;                  // index in the manager
 @property BOOL loading;                                 // location info is loading now
 @property BOOL initialLoadingComplete;                  // initial conditions check after launch
+@property BOOL dummy;                                   // dummy for reordering.
 
 #pragma mark - Location information
 
@@ -31,6 +32,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSString *l;                                  // wunderground location query identifier
 @property NSString *longName;                           // location name as looked up
 
++ (id)newDummy;
 
 #pragma mark - Global position
 

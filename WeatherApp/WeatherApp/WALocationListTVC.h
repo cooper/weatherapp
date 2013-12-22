@@ -6,9 +6,12 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
+#import "BVReorderTableView.h"
 
-@interface WALocationListTVC : UITableViewController
+@interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate>
 
 - (void)updateLocationAtIndex:(NSUInteger)index;
+
+@property BVReorderTableView *reorderTableView;
 
 @end
