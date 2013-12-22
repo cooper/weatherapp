@@ -33,7 +33,7 @@
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor  = TABLE_COLOR;
     
-    for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel]) {
+    for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel, self.timeLabel]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
         label.layer.shadowOffset    = CGSizeMake(0, 0);
         label.layer.shadowRadius    = label == self.temperature ? 3.0 : 2.0;
@@ -98,144 +98,29 @@
     else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
         self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC + 273.15];
 
+    // as of.
+//    NSDate *now = [NSDate date];
+//    NSDate *obv = self.location.observationsAsOf;
+//    NSDateComponents *today    = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:now];
+//    NSDateComponents *obvDay   = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:obv];
+//    NSDateFormatterStyle style = [today day] == [obvDay day] ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
+//    self.timeLabel.text = [NSDateFormatter localizedStringFromDate:self.location.observationsAsOf dateStyle:style timeStyle:NSDateFormatterLongStyle];
+    self.timeLabel.text = self.location.observationTimeString;
+    
     [self updateBackground];
 }
 
 - (void)updateBackground {
-
-    // in order by priority. the first match wins.
     
-    // matching is case-insensitive. night is preferred if it's night time,
-    // but if a night array does not exist, day acts as a fallback.
-    
-    // the background selector alternates through each array by storing
-    // the last-used index in the user defaults database.
-    
-    // load backgrounds from plist.
-    NSString *bgPlist    = [[NSBundle mainBundle] pathForResource: @"backgrounds" ofType: @"plist"];
-    NSArray *backgrounds = [NSArray arrayWithContentsOfFile:bgPlist];
-    
-    // if the icon and conditions haven't changed, don't waste energy analyzing backgrounds.
-    unsigned int i = 0; NSDictionary *selection;
-    if ([currentBackgroundIcon isEqualToString:self.location.conditionsImageName] && [currentBackgroundConditions isEqualToString:self.location.conditions])
-        NSLog(@"icon and conditions not changed");
-    
-    // find a background.
-    else for (NSDictionary *bg in backgrounds) {
-        BOOL matchesIcon = bg[@"icon"] && [self.location.conditionsImageName rangeOfString:bg[@"icon"] options:NSCaseInsensitiveSearch].location != NSNotFound;
-        BOOL matchesConditions = bg[@"conditions"] && [self.location.conditions rangeOfString:bg[@"conditions"] options:NSCaseInsensitiveSearch].location != NSNotFound;
-    
-        // this is a match.
-        if (matchesIcon || matchesConditions) {
-        
-            NSLog(@"%@ matches!", bg[@"name"]);
-            
-            // if it's night and backgrounds exist for such, prefer them.
-            BOOL nightTime = NO;
-            if (self.location.nightTime && bg[@"night"]) nightTime = YES;
-            
-            // here's our winning list.
-            selection = @{
-                @"index": @(i),
-                @"name":  bg[@"name"],
-                @"night": @(nightTime)
-            };
-            break;
-            
-        }
-        
-        i++;
+    if (!background) {
+        background = [[UIImageView alloc] init];
+        [self.view addSubview:background];
+        [self.view sendSubviewToBack:background];
     }
     
-    // if the background category and time of day are same, nothing needs to be changed.
-    NSString *chosenBackground;
-    if ([currentBackgroundName isEqualToString:selection[@"name"]] && currentBackgroundTimeOfDay == [selection[@"night"] boolValue])
-        NSLog(@"conditions/icon changed, but category and time of day still same");
-    
-    // a background group was selected.
-    else if (selection) {
-    
-        unsigned int i      = [selection[@"index"] unsignedIntValue];
-        BOOL nightTime      = [selection[@"night"] boolValue];
-        NSString *timeOfDay = nightTime ? @"night" : @"day";
+    background.image = self.location.background;
+    background.frame = self.view.bounds;
 
-        
-        NSString *storageName = FMT(@"%@-%@", selection[@"name"], timeOfDay);
-        NSArray *choices      = backgrounds[i][timeOfDay];
-        
-        // fetch the background storage.
-        NSMutableDictionary *bgStorage = [[DEFAULTS objectForKey:@"backgrounds"] mutableCopy];
-        unsigned int useIndex = 0;
-        
-        // use the one after the last-used.
-        if (bgStorage[storageName])
-            useIndex = [bgStorage[storageName] unsignedIntValue] + 1;
-        
-        // we exceeded the array's limits; go back to the first.
-        if (useIndex >= [choices count]) useIndex = 0;
-        
-        // here's the final winner.
-        chosenBackground       = choices[useIndex];
-        bgStorage[storageName] = @(useIndex);
-        [DEFAULTS setObject:bgStorage forKey:@"backgrounds"];
-        
-        NSLog(@"chosen: %@", chosenBackground);
-        
-    }
-    
-    // finally apply the background.
-    if (chosenBackground) {
-    
-        if (!background) {
-            background = [[UIImageView alloc] init];
-            [self.view addSubview:background];
-            [self.view sendSubviewToBack:background];
-        }
-        
-        NSLog(@"YES, LOADED");
-        background.image = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/%@.jpg", chosenBackground)]];
-        background.frame = self.view.bounds;
-        
-        currentBackgroundName       = selection[@"name"];
-        currentBackgroundIcon       = self.location.conditionsImageName;
-        currentBackgroundConditions = self.location.conditions;
-        currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
-        
-        NSLog(@"updating background to %@", chosenBackground);
-        
-    }
-}
-
-// preload image.
-// FIXME: from https://gist.github.com/steipete/1144242
-// - needs paraphrasing and cleanup.
-- (UIImage *)preloadImage:(UIImage *)uiimage {
-    CGImageRef image = uiimage.CGImage;
-    
-    // make a bitmap context of a suitable size to draw to, forcing decode
-    size_t width  = CGImageGetWidth(image);
-    size_t height = CGImageGetHeight(image);
-    
-    CGColorSpaceRef colourSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef imageContext   =  CGBitmapContextCreate(
-        NULL, width, height, 8, width * 4, colourSpace,
-        kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little
-    );
-    CGColorSpaceRelease(colourSpace);
-    
-    // draw the image to the context, release it
-    CGContextDrawImage(imageContext, CGRectMake(0, 0, width, height), image);
-    
-    // now get an image ref from the context
-    CGImageRef outputImage = CGBitmapContextCreateImage(imageContext);
-    
-    UIImage *cachedImage = [UIImage imageWithCGImage:outputImage];
-    
-    // clean up
-    CGImageRelease(outputImage);
-    CGContextRelease(imageContext);
-    
-    return cachedImage;
 }
 
 @end

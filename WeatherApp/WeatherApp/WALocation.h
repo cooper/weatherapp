@@ -41,6 +41,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 #pragma mark - Weather conditions
 
 @property NSDate *conditionsAsOf;                       // date of last condition check
+@property NSDate *observationsAsOf;                     // observation unix time
+@property NSString *observationTimeString;              // observation time string
 @property UIImage  *conditionsImage;                    // icon image of conditions
 @property NSString *conditionsImageName;                // name of image; i.e. "partlycloudy"
 @property float degreesC;                               // current temp (C)
@@ -49,6 +51,15 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (readonly) NSString *tempUnit;                // localized temperature unit
 @property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
 @property BOOL nightTime;                               // is it night time?
+
+#pragma mark - Backgrounds
+
+@property UIImage *background;
+@property UIImage *cellBackground;
+@property NSString *currentBackgroundName;
+@property NSString *currentBackgroundIcon;
+@property NSString *currentBackgroundConditions;
+@property BOOL currentBackgroundTimeOfDay;
 
 #pragma mark - Fetching data
 

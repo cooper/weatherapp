@@ -22,6 +22,7 @@
 @property IBOutlet UILabel *fullLocationLabel;
 @property IBOutlet UILabel *coordinateLabel;
 @property IBOutlet UILabel *conditionsLabel;
+@property IBOutlet UILabel *timeLabel;
 @property IBOutlet UIImageView *conditionsImageView;
 @property (weak) WALocation *location;
 

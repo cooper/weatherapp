@@ -132,7 +132,6 @@
         NSForegroundColorAttributeName: [UIColor grayColor]
     } range:NSMakeRange([city length] + 1, [region length])];
     
-    
     // FIXME: perhaps it looks better with no icons on initial load...
     // load the image if we haven't already.
     // this is so an image from the former run shows before the location is updated.
@@ -142,6 +141,15 @@
     // if there is still no image at this point, use a dummy (clear) filler.
     if (!location.conditionsImage)
         location.conditionsImage = [UIImage imageNamed:@"icons/dummy"];
+    
+    // here's the background.
+    if (location.cellBackground) {
+        UIImageView *cellBg = [[UIImageView alloc] init];
+        [cell addSubview:cellBg];
+        [cell sendSubviewToBack:cellBg];
+        cellBg.image = location.cellBackground;
+        cellBg.frame = cell.bounds;
+    }
     
     // if the location is loading, add an activity indicator.
     if (location.loading) {
