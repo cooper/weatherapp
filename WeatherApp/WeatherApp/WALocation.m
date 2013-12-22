@@ -367,7 +367,7 @@
         self.currentBackgroundConditions = self.conditions;
         self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
         self.background     = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/%@.jpg", chosenBackground)]];
-        self.cellBackground = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/100/%@.jpg", chosenBackground)]];
+        self.cellBackground = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/200/%@.jpg", chosenBackground)]];
     }
     
 }
