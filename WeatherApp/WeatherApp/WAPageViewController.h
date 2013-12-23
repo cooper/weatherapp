@@ -6,11 +6,15 @@
 //  Copyright (c) 2013 Really Good. All rights reserved.
 //
 
-@interface WAPageViewController : UIPageViewController <UIPageViewControllerDelegate> {
+@interface WAPageViewController : UIPageViewController <UIPageViewControllerDelegate, UIScrollViewDelegate> {
     UIBarButtonItem *refreshButton;
+    UIImageView *background;
+    UIImageView *backBackground;
+
 }
 
 @property (weak) WALocation *location;
+@property (weak) WALocation *toLocation;
 
 - (void)setViewController:(WAWeatherVC *)weatherVC;
 - (void)updateNavigationBar;

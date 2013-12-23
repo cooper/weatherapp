@@ -37,9 +37,22 @@
     // (so its frame goes behind the navigation bar as well.)
     self.automaticallyAdjustsScrollViewInsets = NO;
     
-    self.view.backgroundColor = TABLE_COLOR;
+    self.view.backgroundColor = [UIColor clearColor];
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+    
+    [self.view.subviews[0] setDelegate:self];
+    
+    background = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    background.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:background];
+    [self.view sendSubviewToBack:background];
+    
+    backBackground = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    backBackground.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:backBackground];
+    [self.view sendSubviewToBack:backBackground];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -64,11 +77,23 @@
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
+    WAWeatherVC *weatherVC = pendingViewControllers[0];
+    self.toLocation = weatherVC.location;
+    backBackground.image = self.toLocation.background;
+    backBackground.frame = self.view.bounds;
+    NSLog(@"to: %@, %@", self.toLocation.city, backBackground.image);
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     WAWeatherVC *weatherVC = self.viewControllers[0];
-    self.location = weatherVC.location;
+    self.location   = weatherVC.location;
+    self.toLocation = nil;
+    
+    NSLog(@"switching from %@ to %@", background, backBackground);
+    background.image        = self.location.background;
+    background.alpha        = 1;
+    backBackground.image    = nil;
+    
     [self updateNavigationBar];
 }
 
@@ -87,11 +112,30 @@
     }
     else if (!self.location.loading && self.navigationItem.rightBarButtonItem != refreshButton)
         [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
+    [self updateBackground];
 }
 
 - (void)refreshButtonTapped {
     [self.location fetchCurrentConditions];
 }
 
+#pragma mark - Scroll view delegate
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    // 568/100 = yOffset/x
+    // x(568/100) = yOffset
+    // x = yOffset/(568/100)
+    CGFloat x = scrollView.contentOffset.y / (568.00/100.00);
+    
+    // we're going the opposite way.
+    if (x > 100.00) x = 100 - (x - 100);
+    
+    background.alpha = x / 100;
+}
+
+- (void)updateBackground {
+    background.image = self.location.background;
+    background.frame = self.view.bounds;
+}
 
 @end

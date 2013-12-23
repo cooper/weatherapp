@@ -31,7 +31,7 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    self.view.backgroundColor  = TABLE_COLOR;
+    self.view.backgroundColor  = [UIColor clearColor];
     
     for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel, self.timeLabel]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
@@ -107,20 +107,7 @@
 //    self.timeLabel.text = [NSDateFormatter localizedStringFromDate:self.location.observationsAsOf dateStyle:style timeStyle:NSDateFormatterLongStyle];
     self.timeLabel.text = self.location.observationTimeString;
     
-    [self updateBackground];
-}
-
-- (void)updateBackground {
-    
-    if (!background) {
-        background = [[UIImageView alloc] init];
-        [self.view addSubview:background];
-        [self.view sendSubviewToBack:background];
-    }
-    
-    background.image = self.location.background;
-    background.frame = self.view.bounds;
-
+    //[self updateBackground];
 }
 
 @end
