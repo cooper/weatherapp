@@ -63,7 +63,6 @@ typedef void(^WACallback)(void);
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;
     NSUInteger              activityCount;
-    WALocation              *_currentLocation;
 }
 
 @property (strong, nonatomic) UIWindow *window;

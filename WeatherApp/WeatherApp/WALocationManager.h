@@ -10,6 +10,7 @@
 
 @property NSMutableArray *locations;
 @property NSInteger index;
+@property WALocation *currentLocation;
 
 - (WALocation *)createLocation;                         // creates a location and adds it to manager
 - (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary;

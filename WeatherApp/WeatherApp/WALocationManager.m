@@ -44,6 +44,7 @@
         if (![location respondsToSelector:NSSelectorFromString(key)]) continue;
         [location setValue:dictionary[key] forKey:key];
     }
+    if (location.isCurrentLocation) self.currentLocation = location;
     return location;
 }
 
