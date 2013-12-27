@@ -126,7 +126,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
     
     cell.backgroundColor  = [UIColor clearColor];
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    //cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     //cell.showsReorderControl = indexPath.row == 0;
     
     // font sizes.
@@ -155,10 +155,6 @@
 //    if (location.conditionsImageName && !location.conditionsImage)
 //        location.conditionsImage = [UIImage imageNamed:FMT(@"icons/50/%@", location.conditionsImageName)];
     
-    // if there is no image at this point, use a dummy (clear) filler.
-    if (!location.conditionsImage)
-        location.conditionsImage = [UIImage imageNamed:@"icons/dummy"];
-    
     // here's the background.
     if (location.cellBackground) {
         UIImageView *cellBg = [[UIImageView alloc] init];
@@ -169,17 +165,22 @@
     
     // here's the selected translucent blue tint.
     cell.selectedBackgroundView = [[UIView alloc] init];
-    cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:  0./255. green:150./255. blue:1 alpha:0.3];
+    cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
     cell.backgroundColor = [UIColor clearColor];
     
     // if the location is loading, add an activity indicator.
     if (location.loading) {
+        //location.conditionsImage = [UIImage imageNamed:@"icons/50/load1"];
         UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         indicator.frame = CGRectMake(25, 25, 0, 0);
         //indicator.color = [UIColor blueColor];
         [cell.imageView addSubview:indicator];
         [indicator startAnimating];
     }
+    
+    // if there is no image at this point, use a dummy (clear) filler.
+    if (!location.conditionsImage)
+        location.conditionsImage = [UIImage imageNamed:@"icons/dummy"];
     
     // set weather info.
     cell.textLabel.attributedText   = name;
