@@ -71,7 +71,13 @@
 #pragma mark - Location service management
 
 - (WALocation *)currentLocation {
-    return self.locationManager.locations[0];
+    if (_currentLocation) return _currentLocation;
+    for (WALocation *loc in self.locationManager.locations)
+    if (loc.isCurrentLocation) {
+        _currentLocation = loc;
+        break;
+    }
+    return _currentLocation;
 }
 
 // starts our location service.

@@ -127,7 +127,7 @@
     
     cell.backgroundColor  = [UIColor clearColor];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    cell.showsReorderControl = indexPath.row == 0;
+    //cell.showsReorderControl = indexPath.row == 0;
     
     // font sizes.
     CGFloat size       = 25;
@@ -241,13 +241,15 @@
 
 // prevent editing of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row == 0) return NO;
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    if (location.isCurrentLocation) return NO;
     return YES;
 }
 
 // prevent moving of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return indexPath.row != 0;
+//    return indexPath.row != 0;
+    return YES;
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -258,9 +260,9 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row == 0) return;
+    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    if (location.isCurrentLocation) return;
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
         [APP_DELEGATE.locationManager destroyLocation:location];
         [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
@@ -305,7 +307,7 @@
 
 // do not allow weather cells to be moved out of section 1.
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    if (proposedDestinationIndexPath.row == 0) return sourceIndexPath;
+    //if (proposedDestinationIndexPath.row == 0) return sourceIndexPath;
     return proposedDestinationIndexPath;
 }
 
