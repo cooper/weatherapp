@@ -112,6 +112,7 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dummy"];
             cell.backgroundColor  = [UIColor clearColor];
         }
+        cell.alpha = 0;
         return cell;
     };
 

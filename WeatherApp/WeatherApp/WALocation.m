@@ -366,8 +366,10 @@
         self.currentBackgroundIcon       = self.conditionsImageName;
         self.currentBackgroundConditions = self.conditions;
         self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
-        self.background     = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/%@.jpg", chosenBackground)]];
-        self.cellBackground = [self preloadImage:[UIImage imageNamed:FMT(@"backgrounds/200/%@.jpg", chosenBackground)]];
+        NSString *backgroundFile     = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
+        NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
+        self.background     = [self preloadImage:[UIImage imageWithContentsOfFile:backgroundFile]];
+        self.cellBackground = [self preloadImage:[UIImage imageWithContentsOfFile:cellBackgroundFile]];
     }
     
 }

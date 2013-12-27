@@ -9,6 +9,7 @@
 #import "WAPageViewController.h"
 #import "WALocation.h"
 #import "WAWeatherVC.h"
+#import "WALocationManager.h"
 
 @interface WAPageViewController ()
 
@@ -42,6 +43,7 @@
     self.navigationItem.rightBarButtonItem = refreshButton;
     
     [self.view.subviews[0] setDelegate:self];
+    self.view.multipleTouchEnabled = NO;
     
     background = [[UIImageView alloc] initWithFrame:self.view.bounds];
     background.backgroundColor = [UIColor clearColor];
@@ -77,24 +79,26 @@
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
-    WAWeatherVC *weatherVC = pendingViewControllers[0];
-    self.toLocation = weatherVC.location;
-    backBackground.image = self.toLocation.background;
+    NSLog(@"WILL TRANSITION FROM/TO: %@, %@", self.viewControllers, pendingViewControllers);
+    WAWeatherVC *toVC   = pendingViewControllers[0];
+    //WAWeatherVC *fromVC = self.viewControllers[0];
+    
+    NSUInteger i = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
+    WALocation *locationBefore = APP_DELEGATE.locationManager.locations[i];
+    background.image = locationBefore.background;
+    background.frame = self.view.bounds;
+    
+    backBackground.image = toVC.location.background;
     backBackground.frame = self.view.bounds;
-    NSLog(@"to: %@, %@", self.toLocation.city, backBackground.image);
+    
+    NSLog(@"Transitioning to %@", toVC.location.city);
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     WAWeatherVC *weatherVC = self.viewControllers[0];
-    self.location   = weatherVC.location;
-    self.toLocation = nil;
-    
-    NSLog(@"switching from %@ to %@", background, backBackground);
-    background.image        = self.location.background;
-    background.alpha        = 1;
-    backBackground.image    = nil;
-    
-    [self updateNavigationBar];
+    NSLog(@"Setting city from %@ to %@", self.location.city, weatherVC.location.city);
+    self.location = weatherVC.location;
+    if (completed) [self updateNavigationBar]; // fixes it.
 }
 
 - (void)setViewController:(WAWeatherVC *)weatherVC {
@@ -126,14 +130,20 @@
     // x(568/100) = yOffset
     // x = yOffset/(568/100)
     CGFloat x = scrollView.contentOffset.y / (568.00/100.00);
+    //NSLog(@"x: %f", x);
     
-    // we're going the opposite way.
-    if (x > 100.00) x = 100 - (x - 100);
+    // up or down?
+    if (x > 100) goingDown = YES;
+    else goingDown = NO;
+
+    // going down, so subtract from 200.
+    if (x > 100.00) x = 200. - x;
     
     background.alpha = x / 100;
 }
 
 - (void)updateBackground {
+    NSLog(@"Setting background.image to %@", self.location.city);
     background.image = self.location.background;
     background.frame = self.view.bounds;
 }

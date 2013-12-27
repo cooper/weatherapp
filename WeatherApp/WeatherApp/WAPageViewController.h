@@ -10,11 +10,10 @@
     UIBarButtonItem *refreshButton;
     UIImageView *background;
     UIImageView *backBackground;
-
+    BOOL goingDown;
 }
 
 @property (weak) WALocation *location;
-@property (weak) WALocation *toLocation;
 
 - (void)setViewController:(WAWeatherVC *)weatherVC;
 - (void)updateNavigationBar;
