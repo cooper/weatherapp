@@ -72,7 +72,14 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     //self.tableView.backgroundColor = [UIColor colorWithRed:230./255. green:240./255. blue:255./255. alpha:1];
     //self.tableView.backgroundColor = TABLE_COLOR;
-    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clear.jpg"]];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStylePlain target:self action:@selector(settingsButtonTapped)];
+    
+    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clear2.jpg"]];
+//    
+//    // scroll view delegate
+//    UIScrollView *scrollView = self.tableView;
+//    scrollView.delegate      = self;
     
 }
 
@@ -291,6 +298,11 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
+- (void)settingsButtonTapped {
+    WASettingsTVC *vc = [[WASettingsTVC alloc] initWithStyle:UITableViewStyleGrouped];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
 // move
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 
@@ -397,5 +409,11 @@
     APP_DELEGATE.locationManager.locations[indexPath.row] = object;
     [APP_DELEGATE saveLocationsInDatabase];
 }
+
+//#pragma mark - Scroll view delegate
+//
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+//    [APP_DELEGATE.nc scrollView:scrollView didScrollTo:scrollView.contentOffset];
+//}
 
 @end

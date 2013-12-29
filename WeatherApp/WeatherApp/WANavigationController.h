@@ -9,8 +9,11 @@
 
 @interface WANavigationController : UINavigationController
 
-- (id)initWithMyRootController;
 
 @property WALocationListTVC *tvc;
+
+- (id)initWithMyRootController;
+
+//- (void)scrollView:(UIScrollView *)scrollView didScrollTo:(CGPoint)point;
 
 @end

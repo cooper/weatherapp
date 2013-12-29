@@ -8,7 +8,7 @@
 
 #import "BVReorderTableView.h"
 
-@interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate>
+@interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate, UIScrollViewDelegate>
 
 - (void)updateLocationAtIndex:(NSUInteger)index;
 

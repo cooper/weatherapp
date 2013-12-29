@@ -31,7 +31,7 @@
 {
     [super viewDidLoad];
 
-    self.navigationItem.title = L(@"Current");
+    //self.navigationItem.title = L(@"Current");
 
     // this fixes the navigation bar inset issue.
     // however, it causes the page view controller to ignore the navigation bar completely
@@ -41,6 +41,9 @@
     self.view.backgroundColor = [UIColor clearColor];
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+    
+    // remove the text on the back button.
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
     
     [self.view.subviews[0] setDelegate:self];
     self.view.multipleTouchEnabled = NO;
@@ -84,6 +87,7 @@
     //WAWeatherVC *fromVC = self.viewControllers[0];
     
     NSUInteger i = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
+    // TODO: make sure this index exists just as a double check.
     WALocation *locationBefore = APP_DELEGATE.locationManager.locations[i];
     background.image = locationBefore.background;
     background.frame = self.view.bounds;

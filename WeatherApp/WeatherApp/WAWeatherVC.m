@@ -108,6 +108,10 @@
     self.timeLabel.text = self.location.observationTimeString;
     
     //[self updateBackground];
+    
+    self.timeLabel.alpha         =
+    self.fullLocationLabel.alpha =
+    self.coordinateLabel.alpha   = 0;
 }
 
 @end

@@ -20,16 +20,29 @@
 - (id)initWithMyRootController {
     self.tvc  = [[WALocationListTVC alloc] initWithStyle:UITableViewStylePlain];
     self      = [super initWithRootViewController:self.tvc];
-    
     UINavigationBar *bar = self.navigationBar;
-    bar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
-//    bar.barTintColor        = [UIColor clearColor];//BLUE_COLOR;
-    bar.tintColor           = [UIColor whiteColor];
-//    bar.backgroundColor     = [UIColor colorWithPatternImage:[UIImage imageNamed:@"icons/dummy"]];
-//    bar.shadowImage         = [UIImage new];
+
+    // make bar transparent.
     [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
-    self.navigationBar.shadowImage = [UIImage new];
-    self.navigationBar.translucent = YES;
+
+//    [self.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+    
+//    // create navigation bar shadow.
+//    bar.layer.shadowRadius    = 1.0;
+//    bar.layer.shadowOpacity   = 1.0;
+//    bar.layer.shadowOffset    = CGSizeMake(0, 0);
+//    bar.layer.shadowColor     = [UIColor blackColor].CGColor;
+//    bar.layer.shouldRasterize = YES;
+//    
+//    
+//    
+//    // other navbar appearance settings.
+//    bar.shadowImage = [UIImage new];
+    bar.translucent = YES;
+    bar.tintColor   = [UIColor whiteColor];
+    bar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
+    
+
     
     return self;
 }
@@ -51,5 +64,19 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+//#pragma mark - Scroll views
+//
+//
+//- (void)scrollView:(UIScrollView *)scrollView didScrollTo:(CGPoint)point {
+//    return;
+//    BOOL atTop = point.y + scrollView.contentInset.top <= 5;
+//    if ( atTop && self.navigationBar.alpha == 1) return;
+//    if (!atTop && self.navigationBar.alpha == 0) return;
+//    [UIView animateWithDuration:0.2 animations:^{
+//        if (atTop) self.navigationBar.alpha = 1;
+//        else self.navigationBar.alpha = 0;
+//    }];
+//}
 
 @end
