@@ -22,7 +22,7 @@
     self = [super initWithTransitionStyle:style navigationOrientation:navigationOrientation options:options];
     if (self) {
         NSLog(@"basicly");
-        self.delegate = self;
+        self.delegate = self; // FIXME: is this a problem?
     }
     return self;
 }
@@ -37,7 +37,7 @@
     // however, it causes the page view controller to ignore the navigation bar completely
     // (so its frame goes behind the navigation bar as well.)
     self.automaticallyAdjustsScrollViewInsets = NO;
-    
+        
     self.view.backgroundColor = [UIColor clearColor];
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
@@ -133,17 +133,17 @@
     // 568/100 = yOffset/x
     // x(568/100) = yOffset
     // x = yOffset/(568/100)
-    CGFloat x = scrollView.contentOffset.y / (568.00/100.00);
+    CGFloat x = scrollView.contentOffset.y / (568./100.);
     //NSLog(@"x: %f", x);
     
     // up or down?
-    if (x > 100) goingDown = YES;
+    if (x > 100.) goingDown = YES;
     else goingDown = NO;
 
     // going down, so subtract from 200.
-    if (x > 100.00) x = 200. - x;
+    if (x > 100.) x = 200. - x;
     
-    background.alpha = x / 100;
+    background.alpha = x / 100.;
 }
 
 - (void)updateBackground {

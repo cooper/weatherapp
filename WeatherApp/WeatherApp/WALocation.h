@@ -49,8 +49,11 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSString *conditionsImageName;                // name of image; i.e. "partlycloudy"
 @property float degreesC;                               // current temp (C)
 @property float degreesF;                               // current temp (F)
+@property float feelsLikeC;                             // feels like (C)
+@property float feelsLikeF;                             // feels like (F)
 @property (readonly) NSString *temperature;             // localized temperature string
 @property (readonly) NSString *tempUnit;                // localized temperature unit
+@property (readonly) NSString *feelsLike;               // localized feels like string
 @property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
 @property BOOL nightTime;                               // is it night time?
 

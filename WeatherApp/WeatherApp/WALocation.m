@@ -64,13 +64,21 @@
         // force the view to load if it hasn't already.
         [self.viewController view];
         
-        // set our city/region information.
         // note: the setters ignore any lengthless value.
         // the setters call the interface methods to make changes.
+        
+        // fallback to ISO 3166 country code if city == state.
+        // we'll make a special exception for PRC through --
+        // this is because wunderground says major cities of China are states.
+        // I have no way to determine the actual name of the country in this scenario.
+        BOOL same = [loc[@"state_name"] isEqualToString:loc[@"city"]];
+        NSString *possibleCountryName = [self.country3166 isEqualToString:@"CN"] ? @"China" : self.country3166;
+        
+        // set our city/region information.
         self.city         = loc[@"city"];
         self.countryCode  = loc[@"country"];
         self.country3166  = loc[@"country_iso3166"];
-        self.region       = OR(loc[@"state_name"], loc[@"country"]);
+        self.region       = same ? possibleCountryName : loc[@"state_name"];
         
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
@@ -79,11 +87,13 @@
             self.longitude    = [loc[@"longitude"] floatValue];
         }
         
+        // no longer round temperatures to the nearest whole degree here.
+        self.degreesC   = [ob[@"temp_c"] floatValue];
+        self.degreesF   = [ob[@"temp_f"] floatValue];
+        self.feelsLikeC = [ob[@"feelslike_c"] floatValue];
+        self.feelsLikeF = [ob[@"feelslike_f"] floatValue];
         
-        // round temperatures to the nearest whole degree.
-        self.degreesC = lroundf([ob[@"temp_c"] floatValue]);
-        self.degreesF = lroundf([ob[@"temp_f"] floatValue]);
-        
+        // conditions string.
         self.conditions = ob[@"weather"];
         
         // if an icon is included in the response, use it.
@@ -203,6 +213,18 @@
     return [NSString stringWithFormat:@"%.f", t];
 }
 
+- (NSString *)feelsLike {
+    float t;
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        t = self.feelsLikeF;
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        t = self.feelsLikeC + 273.15;
+    else
+        t = self.feelsLikeC;
+    
+    return [NSString stringWithFormat:@"%.f", t];
+}
+
 - (NSString *)tempUnit {
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
         return @"ºF";
@@ -210,6 +232,7 @@
         return @"K";
     else return @"ºC";
 }
+
 
 #pragma mark - User defaults
 

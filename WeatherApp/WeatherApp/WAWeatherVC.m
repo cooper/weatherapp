@@ -33,7 +33,7 @@
     // Do any additional setup after loading the view from its nib.
     self.view.backgroundColor  = [UIColor clearColor];
     
-    for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel, self.timeLabel]) {
+    for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel, self.feelsLikeLabel]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
         label.layer.shadowOffset    = CGSizeMake(0, 0);
         label.layer.shadowRadius    = label == self.temperature ? 3.0 : 2.0;
@@ -48,13 +48,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    //self.navigationController.navigationBar.tintColor    = BLUE_COLOR;]
-    //self.navigationController.navigationBar.barTintColor = [UIColor clearColor];
-
-    //[self.navigationController setNavigationBarHidden:YES animated:animated];
-    //self.navigationController.interactivePopGestureRecognizer.delegate = self;
     [self update];
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -74,15 +68,10 @@
 #pragma mark - Updates from WALocation
 
 - (void)update {
-
-    // in location.m, add two methods: beginLoading, finishLoading.
-    // beginLoading will increase activity, set loading property, etc.
-    // finishLoading will decrease activity, undo loading property, update the VC, etc.
     
     // info.
     self.locationTitle.text     = self.location.city;
     self.fullLocationLabel.text = self.location.fullName;
-  //self.fullLocationLabel.text = FMT(@"%@, %@", self.location.city, self.location.region);
     self.coordinateLabel.text   = FMT(@"%f,%f", self.location.latitude, self.location.longitude);
     self.conditionsLabel.text   = self.location.conditions;
     
@@ -90,28 +79,14 @@
     self.conditionsImageView.image = [UIImage imageNamed:FMT(@"icons/230/%@", self.location.conditionsImageName)];
     if (!self.conditionsImageView.image) self.conditionsImageView.image = self.location.conditionsImage;
     
-    // temperature.
-    if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Fahrenheit"])
-        self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesF];
-    else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Celsius"])
-        self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC];
-    else if ([[DEFAULTS objectForKey:@"Temperature scale"] isEqualToString:@"Kelvin"])
-        self.temperature.text = [NSString stringWithFormat:@"%.f", self.location.degreesC + 273.15];
+    // localized temperature.
+    self.temperature.text = self.location.temperature;
+    
+    // feels like differs from actual.
+    if (![self.location.temperature isEqualToString:self.location.feelsLike])
+        self.feelsLikeLabel.text  = FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit);
+    else self.feelsLikeLabel.text = @"";
 
-    // as of.
-//    NSDate *now = [NSDate date];
-//    NSDate *obv = self.location.observationsAsOf;
-//    NSDateComponents *today    = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:now];
-//    NSDateComponents *obvDay   = [[NSCalendar currentCalendar] components:NSDayCalendarUnit fromDate:obv];
-//    NSDateFormatterStyle style = [today day] == [obvDay day] ? NSDateFormatterNoStyle : NSDateFormatterShortStyle;
-//    self.timeLabel.text = [NSDateFormatter localizedStringFromDate:self.location.observationsAsOf dateStyle:style timeStyle:NSDateFormatterLongStyle];
-    self.timeLabel.text = self.location.observationTimeString;
-    
-    //[self updateBackground];
-    
-    self.timeLabel.alpha         =
-    self.fullLocationLabel.alpha =
-    self.coordinateLabel.alpha   = 0;
 }
 
 @end

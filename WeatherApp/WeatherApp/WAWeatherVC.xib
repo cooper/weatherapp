@@ -9,10 +9,10 @@
                 <outlet property="conditionsImageView" destination="fmy-su-mGQ" id="KZj-gV-IY1"/>
                 <outlet property="conditionsLabel" destination="kKh-y6-hoG" id="fmy-71-vII"/>
                 <outlet property="coordinateLabel" destination="g0W-gG-nXE" id="6wm-mI-3pf"/>
+                <outlet property="feelsLikeLabel" destination="yZ3-Q3-IUy" id="6iC-j8-wrU"/>
                 <outlet property="fullLocationLabel" destination="hGT-nI-x1U" id="M4v-z5-fGb"/>
                 <outlet property="locationTitle" destination="aut-qi-YHj" id="tZX-Q5-enr"/>
                 <outlet property="temperature" destination="Tpc-5G-RMw" id="6oO-Ru-xfr"/>
-                <outlet property="timeLabel" destination="yZ3-Q3-IUy" id="1QZ-oT-CCQ"/>
                 <outlet property="view" destination="1" id="3"/>
             </connections>
         </placeholder>
@@ -81,7 +81,7 @@
                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Update time" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yZ3-Q3-IUy">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Feels like" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yZ3-Q3-IUy">
                     <rect key="frame" x="0.0" y="467" width="320" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
