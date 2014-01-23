@@ -42,6 +42,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 
 #pragma mark - Weather conditions
 
+@property NSDictionary *response;
 @property NSDate *conditionsAsOf;                       // date of last condition check
 @property NSDate *observationsAsOf;                     // observation unix time
 @property NSString *observationTimeString;              // observation time string
@@ -51,11 +52,19 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property float degreesF;                               // current temp (F)
 @property float feelsLikeC;                             // feels like (C)
 @property float feelsLikeF;                             // feels like (F)
+@property float dewPointC;
+@property float dewPointF;
+@property float heatIndexC;
+@property float heatIndexF;
 @property (readonly) NSString *temperature;             // localized temperature string
 @property (readonly) NSString *tempUnit;                // localized temperature unit
 @property (readonly) NSString *feelsLike;               // localized feels like string
+@property (readonly) NSString *dewPoint;                
+@property (readonly) NSString *heatIndex;
 @property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
 @property BOOL nightTime;                               // is it night time?
+@property NSArray *forecast;
+@property NSArray *textForecast;
 
 #pragma mark - Backgrounds
 
@@ -66,11 +75,14 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSString *currentBackgroundConditions;
 @property BOOL currentBackgroundTimeOfDay;
 
+- (void)updateBackgroundBoth:(BOOL)both;
+
 #pragma mark - Fetching data
 
 - (void)fetchCurrentConditions;
 - (void)fetchCurrentConditionsThen:(WACallback)then;
 - (void)fetchThreeDayForecast;
+- (void)fetchIcon;
 
 #pragma mark - User defaults
 

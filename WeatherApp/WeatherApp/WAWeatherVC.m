@@ -9,6 +9,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "WAWeatherVC.h"
 #import "WALocation.h"
+#import "WAConditionDetailTVC.h"
 
 @interface WAWeatherVC ()
 
@@ -27,12 +28,13 @@
     return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+
+    // clear because background's on page controller.
     self.view.backgroundColor  = [UIColor clearColor];
     
+    // add shadows.
     for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel, self.feelsLikeLabel]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
         label.layer.shadowOffset    = CGSizeMake(0, 0);
@@ -41,8 +43,15 @@
         label.layer.masksToBounds   = NO;
         label.layer.shouldRasterize = YES;
     }
-
+    
+    // make icon translucent so it's not too obnoxious.
     self.conditionsImageView.alpha = 0.8;
+    
+    // add tap gesture.
+    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tempTapped)];
+    [self.view addGestureRecognizer:recognizer];
+    
+    // update with current information.
     [self update];
     
 }
@@ -63,6 +72,12 @@
 
 - (NSUInteger)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
+}
+
+- (void)tempTapped {
+    WAConditionDetailTVC *tvc = [[WAConditionDetailTVC alloc] initWithStyle:UITableViewStylePlain];
+    tvc.location = self.location;
+    [self.navigationController pushViewController:tvc animated:YES];
 }
 
 #pragma mark - Updates from WALocation

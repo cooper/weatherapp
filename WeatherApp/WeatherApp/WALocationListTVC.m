@@ -21,7 +21,7 @@
 
 @implementation WALocationListTVC
 
-#pragma  mark - Table view controller
+#pragma mark - Table view controller
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -123,7 +123,7 @@
         cell.alpha = 0;
         return cell;
     };
-
+    
     // find or create cell.
     // we only want to reuse a cell if our initial load is complete.
     // otherwise, a new location's cell will have another's style.
@@ -132,6 +132,13 @@
         cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
     if (!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
+
+    [[self class] applyWeatherInfo:location toCell:cell];
+    
+    return cell;
+}
+
++ (void)applyWeatherInfo:(WALocation *)location toCell:(UITableViewCell *)cell {
     
     cell.backgroundColor  = [UIColor clearColor];
     //cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -228,7 +235,6 @@
     if (!location.initialLoadingComplete)
         cell.accessoryType = UITableViewCellAccessoryNone;
     
-    return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {

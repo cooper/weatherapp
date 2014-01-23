@@ -8,12 +8,12 @@
 
 @interface WAPageViewController : UIPageViewController <UIPageViewControllerDelegate, UIScrollViewDelegate> {
     UIBarButtonItem *refreshButton;
-    UIImageView *background;
     UIImageView *backBackground;
     BOOL goingDown;
 }
 
 @property (weak) WALocation *location;
+@property UIImageView *background;
 
 - (void)setViewController:(WAWeatherVC *)weatherVC;
 - (void)updateNavigationBar;

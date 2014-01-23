@@ -10,6 +10,7 @@
 		A70EE9C01823622B00F317A9 /* WANewLocationTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A70EE9BF1823622B00F317A9 /* WANewLocationTVC.m */; };
 		A70EE9D11826C1CD00F317A9 /* WASettingsTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A70EE9D01826C1CD00F317A9 /* WASettingsTVC.m */; };
 		A70EE9D81827142E00F317A9 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = A70EE9D71827142E00F317A9 /* icons */; };
+		A7164981189078E800205E07 /* WAConditionDetailTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7164980189078E800205E07 /* WAConditionDetailTVC.m */; };
 		A71C08DD181ED1B6003488ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DC181ED1B6003488ED /* Foundation.framework */; };
 		A71C08DF181ED1B6003488ED /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DE181ED1B6003488ED /* CoreGraphics.framework */; };
 		A71C08E1181ED1B6003488ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08E0181ED1B6003488ED /* UIKit.framework */; };
@@ -42,6 +43,8 @@
 		A70EE9CF1826C1CD00F317A9 /* WASettingsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WASettingsTVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A70EE9D01826C1CD00F317A9 /* WASettingsTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = WASettingsTVC.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A70EE9D71827142E00F317A9 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; path = icons; sourceTree = "<group>"; };
+		A716497F189078E800205E07 /* WAConditionDetailTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAConditionDetailTVC.h; sourceTree = "<group>"; };
+		A7164980189078E800205E07 /* WAConditionDetailTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAConditionDetailTVC.m; sourceTree = "<group>"; };
 		A71C08D9181ED1B6003488ED /* Weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A71C08DC181ED1B6003488ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A71C08DE181ED1B6003488ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -117,6 +120,15 @@
 			name = "Settings table view controller";
 			sourceTree = "<group>";
 		};
+		A7164982189078F300205E07 /* Condition detail table vc */ = {
+			isa = PBXGroup;
+			children = (
+				A716497F189078E800205E07 /* WAConditionDetailTVC.h */,
+				A7164980189078E800205E07 /* WAConditionDetailTVC.m */,
+			);
+			name = "Condition detail table vc";
+			sourceTree = "<group>";
+		};
 		A71C08D0181ED1B6003488ED = {
 			isa = PBXGroup;
 			children = (
@@ -149,7 +161,6 @@
 		A71C08E2181ED1B6003488ED /* WeatherApp */ = {
 			isa = PBXGroup;
 			children = (
-				A739BFAD1866B8BA0003D323 /* Reorder table */,
 				A70EE9D71827142E00F317A9 /* icons */,
 				A747819B1864EF00003DCA60 /* backgrounds */,
 				BC1367F9182091CC0090CAC5 /* Application delegate */,
@@ -161,7 +172,9 @@
 				A70EE9C11823623100F317A9 /* New location table view controller */,
 				A70EE9D21826C1D100F317A9 /* Settings table view controller */,
 				BCA93CD3181EEB2F00516E7E /* Location view controller */,
+				A7164982189078F300205E07 /* Condition detail table vc */,
 				A71C08EE181ED1B7003488ED /* Images.xcassets */,
+				A739BFAD1866B8BA0003D323 /* Reorder table */,
 				A71C08E3181ED1B6003488ED /* Supporting Files */,
 			);
 			path = WeatherApp;
@@ -353,6 +366,7 @@
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,
 				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,
 				A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */,
+				A7164981189078E800205E07 /* WAConditionDetailTVC.m in Sources */,
 				BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */,
 				A71C08E9181ED1B6003488ED /* main.m in Sources */,
 				A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */,

@@ -17,6 +17,8 @@
 
 @implementation WAPageViewController
 
+@synthesize background = background;
+
 - (id)initWithTransitionStyle:(UIPageViewControllerTransitionStyle)style navigationOrientation:(UIPageViewControllerNavigationOrientation)navigationOrientation options:(NSDictionary *)options
 {
     self = [super initWithTransitionStyle:style navigationOrientation:navigationOrientation options:options];
@@ -41,6 +43,7 @@
     self.view.backgroundColor = [UIColor clearColor];
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+    self.navigationItem.title = @"Conditions";
     
     // remove the text on the back button.
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
@@ -48,7 +51,7 @@
     [self.view.subviews[0] setDelegate:self];
     self.view.multipleTouchEnabled = NO;
     
-    background = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    self.background = background = [[UIImageView alloc] initWithFrame:self.view.bounds];
     background.backgroundColor = [UIColor clearColor];
     [self.view addSubview:background];
     [self.view sendSubviewToBack:background];

@@ -11,6 +11,7 @@
 @interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate, UIScrollViewDelegate>
 
 - (void)updateLocationAtIndex:(NSUInteger)index;
++ (void)applyWeatherInfo:(WALocation *)location toCell:(UITableViewCell *)cell;
 
 @property BVReorderTableView *reorderTableView;
 

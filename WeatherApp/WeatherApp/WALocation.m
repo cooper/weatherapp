@@ -29,27 +29,8 @@
 
 // fetches and updates the current weather conditions of the location.
 - (void)fetchCurrentConditionsThen:(WACallback)then {
-
-    // determine how we will look up this location.
-    NSString *q;
-    
-    // use our coordinates.
-    if (self.isCurrentLocation) {
-        NSLog(@"Looking up with %f,%f",     self.latitude, self.longitude);
-        q = FMT(@"conditions/q/%f,%f.json", self.latitude, self.longitude);
-    }
-    
-    // use wunderground ID.
-    else if ([self.l length]) {
-        NSLog(@"Looking up with %@", self.l);
-        q = FMT(@"conditions/%@.json", self.l);
-    }
-    
-    // use the preferred region and city name.
-    else {
-        NSLog(@"Looking up with %@", self.fullName);
-        q = FMT(@"conditions/q/%@/%@.json", URL_ESC(self.region), URL_ESC(self.city));
-    }
+    [self fetchThreeDayForecast];
+    NSString *q = [self bestLookupMethod:@"conditions"];
     
     // fetch the conditions.
     // todo: err handling, call endLoading in err.
@@ -87,50 +68,30 @@
             self.longitude    = [loc[@"longitude"] floatValue];
         }
         
+        // temperatures.
         // no longer round temperatures to the nearest whole degree here.
-        self.degreesC   = [ob[@"temp_c"] floatValue];
-        self.degreesF   = [ob[@"temp_f"] floatValue];
-        self.feelsLikeC = [ob[@"feelslike_c"] floatValue];
-        self.feelsLikeF = [ob[@"feelslike_f"] floatValue];
         
-        // conditions string.
+        self.degreesC   = [ob[@"temp_c"]       floatValue];
+        self.degreesF   = [ob[@"temp_f"]       floatValue];
+        self.feelsLikeC = [ob[@"feelslike_c"]  floatValue];
+        self.feelsLikeF = [ob[@"feelslike_f"]  floatValue];
+        
+        if (![ob[@"dewpoint_c"] isMemberOfClass:[NSString class]]) {
+            self.dewPointC  = [ob[@"dewpoint_c"]   floatValue];
+            self.dewPointF  = [ob[@"dewpoint_f"]   floatValue];
+        } else self.heatIndexC = self.heatIndexF = 0;
+        
+        if (![ob[@"head_index_c"] isMemberOfClass:[NSString class]]) {
+            self.heatIndexC = [ob[@"heat_index_c"] floatValue];
+            self.heatIndexF = [ob[@"heat_index_f"] floatValue];
+        } else self.heatIndexC = self.heatIndexF = 0;
+        
+        // conditions.
+        self.response   = [ob mutableCopy];
         self.conditions = ob[@"weather"];
         
-        // if an icon is included in the response, use it.
-        // if the weather API icon contains "/nt", use a nighttime icon.
-        if (ob[@"icon"]) {
-            NSString *icon = ob[@"icon"];
-            
-            // alternate names for icons.
-            if ([icon isEqualToString:@"hazy"])         icon = @"fog";
-            if ([icon isEqualToString:@"partlysunny"])  icon = @"partlycloudy";
-            
-            // determine the image name (night/day)
-            self.nightTime     = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
-            NSString *timeName = FMT(@"%@%@", self.nightTime ? @"nt_" : @"", icon);
-            
-            // attempt to use the day/night version.
-            self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", timeName)];
-            self.conditionsImageName = timeName;
-
-            // if it's nighttime and the image does not exist, fall back to a daytime image.
-            if (self.nightTime && !self.conditionsImage) {
-                self.conditionsImageName = icon;
-                self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", icon)];
-            }
-                
-        }
-        
-        // if we don't have an icon by now, download wunderground's.
-        if (ob[@"icon_url"] && !self.conditionsImage) {
-            NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
-            [self beginLoading];
-            [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-                if (!data) return;
-                self.conditionsImage = [UIImage imageWithData:data];
-                [self endLoading];
-            }];
-        }
+        // icon.
+        [self fetchIcon];
         
         // update as of time, and finish loading process.
         self.conditionsAsOf   = [NSDate date];
@@ -147,6 +108,78 @@
 }
         
 - (void)fetchThreeDayForecast {
+    NSString *q = [self bestLookupMethod:@"forecast"];
+    [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
+        self.forecast = data[@"forecast"][@"simpleforecast"][@"forecastday"];
+        self.textForecast = data[@"forecast"][@"txt_forecast"][@"forecastday"];
+    }];
+}
+
+- (void)fetchIcon {
+    NSDictionary *ob = self.response;
+    
+    // if an icon is included in the response, use it.
+    // if the weather API icon contains "/nt", use a nighttime icon.
+    if (ob[@"icon"]) {
+        NSString *icon = ob[@"icon"];
+        
+        // alternate names for icons.
+        if ([icon isEqualToString:@"hazy"])         icon = @"fog";
+        if ([icon isEqualToString:@"partlysunny"])  icon = @"partlycloudy";
+        
+        // determine the image name (night/day)
+        self.nightTime     = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
+        NSString *timeName = FMT(@"%@%@", self.nightTime ? @"nt_" : @"", icon);
+        
+        // attempt to use the day/night version.
+        self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", timeName)];
+        self.conditionsImageName = timeName;
+
+        // if it's nighttime and the image does not exist, fall back to a daytime image.
+        if (self.nightTime && !self.conditionsImage) {
+            self.conditionsImageName = icon;
+            self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", icon)];
+        }
+            
+    }
+
+    // if we don't have an icon by now, download wunderground's.
+    if (ob[@"icon_url"] && !self.conditionsImage) {
+        NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
+        [self beginLoading];
+        [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+            if (!data) return;
+            self.conditionsImage = [UIImage imageWithData:data];
+            [self endLoading];
+        }];
+    }
+    
+}
+
+- (NSString *)bestLookupMethod:(NSString *)type {
+
+    // determine how we will look up this location.
+    NSString *q;
+    
+    // use our coordinates.
+    if (self.isCurrentLocation) {
+        NSLog(@"Looking up %@ with %f,%f", type, self.latitude, self.longitude);
+        q = FMT(@"%@/q/%f,%f.json", type, self.latitude, self.longitude);
+    }
+    
+    // use wunderground ID.
+    else if ([self.l length]) {
+        NSLog(@"Looking %@ up with %@", type, self.l);
+        q = FMT(@"%@/%@.json", type, self.l);
+    }
+    
+    // use the preferred region and city name.
+    else {
+        NSLog(@"Looking up %@ with %@", type, self.fullName);
+        q = FMT(@"%@/q/%@/%@.json", type, URL_ESC(self.region), URL_ESC(self.city));
+    }
+
+    return q;
 }
 
 // send a request to the API. runs asynchronously, decodes JSON,
@@ -225,6 +258,30 @@
     return [NSString stringWithFormat:@"%.f", t];
 }
 
+- (NSString *)dewPoint {
+    float t;
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        t = self.dewPointF;
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        t = self.dewPointC + 273.15;
+    else
+        t = self.dewPointC;
+    
+    return [NSString stringWithFormat:@"%.f", t];
+}
+
+- (NSString *)heatIndex {
+    float t;
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        t = self.heatIndexF;
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        t = self.heatIndexC + 273.15;
+    else
+        t = self.heatIndexC;
+    
+    return [NSString stringWithFormat:@"%.f", t];
+}
+
 - (NSString *)tempUnit {
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
         return @"ºF";
@@ -232,7 +289,6 @@
         return @"K";
     else return @"ºC";
 }
-
 
 #pragma mark - User defaults
 
@@ -302,6 +358,10 @@
 #pragma mark - Backgrounds
 
 - (void)updateBackground {
+    return [self updateBackgroundBoth:YES];
+}
+
+- (void)updateBackgroundBoth:(BOOL)both {
     
     // in order by priority. the first match wins.
     
@@ -389,10 +449,15 @@
         self.currentBackgroundIcon       = self.conditionsImageName;
         self.currentBackgroundConditions = self.conditions;
         self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
-        NSString *backgroundFile     = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
+
+        if (both) {
+            NSString *backgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
+            self.background = [self preloadImage:[UIImage imageWithContentsOfFile:backgroundFile]];
+        }
+
         NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
-        self.background     = [self preloadImage:[UIImage imageWithContentsOfFile:backgroundFile]];
         self.cellBackground = [self preloadImage:[UIImage imageWithContentsOfFile:cellBackgroundFile]];
+
     }
     
 }
