@@ -23,11 +23,10 @@
 		A747819C1864EF00003DCA60 /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = A747819B1864EF00003DCA60 /* backgrounds */; };
 		A747819E18661209003DCA60 /* backgrounds.plist in Resources */ = {isa = PBXBuildFile; fileRef = A747819D18661209003DCA60 /* backgrounds.plist */; };
 		A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786135A1863DA1C0052FCC5 /* WAPageViewController.m */; };
+		A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */; };
 		A7E9779518288423004189B0 /* WANavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779418288423004189B0 /* WANavigationController.m */; };
 		A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779718288432004189B0 /* WALocationListTVC.m */; };
 		BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */ = {isa = PBXBuildFile; fileRef = BC1367FA182162920090CAC5 /* UserDefaults.txt */; };
-		BC64B24C186DDA2D005C8A53 /* WALocationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = BC64B24B186DDA2C005C8A53 /* WALocationCell.m */; };
-		BC64B24E186DDA52005C8A53 /* WALocationCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = BC64B24D186DDA52005C8A53 /* WALocationCell.xib */; };
 		BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7CA060184E63BA00AAF520 /* WASettingsConstants.m */; };
 		BC8C143B18216A1E003BA98D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BC8C143D18216A1E003BA98D /* Localizable.strings */; };
 		BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */ = {isa = PBXBuildFile; fileRef = BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */; };
@@ -43,8 +42,8 @@
 		A70EE9CF1826C1CD00F317A9 /* WASettingsTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WASettingsTVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A70EE9D01826C1CD00F317A9 /* WASettingsTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = WASettingsTVC.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A70EE9D71827142E00F317A9 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; path = icons; sourceTree = "<group>"; };
-		A716497F189078E800205E07 /* WAConditionDetailTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAConditionDetailTVC.h; sourceTree = "<group>"; };
-		A7164980189078E800205E07 /* WAConditionDetailTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAConditionDetailTVC.m; sourceTree = "<group>"; };
+		A716497F189078E800205E07 /* WAConditionDetailTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAConditionDetailTVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		A7164980189078E800205E07 /* WAConditionDetailTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = WAConditionDetailTVC.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08D9181ED1B6003488ED /* Weather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A71C08DC181ED1B6003488ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A71C08DE181ED1B6003488ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -54,24 +53,23 @@
 		A71C08E8181ED1B6003488ED /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08EA181ED1B6003488ED /* Weather-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "Weather-Prefix.pch"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08EB181ED1B6003488ED /* WAAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAAppDelegate.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
-		A71C08EC181ED1B6003488ED /* WAAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WAAppDelegate.m; sourceTree = "<group>"; };
+		A71C08EC181ED1B6003488ED /* WAAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = WAAppDelegate.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08EE181ED1B7003488ED /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A71C08F5181ED1B7003488ED /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		A739BFA61866A5220003D323 /* navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbar.png; sourceTree = "<group>"; };
 		A739BFAA1866B8B40003D323 /* BVReorderTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BVReorderTableView.h; sourceTree = "<group>"; };
-		A739BFAB1866B8B40003D323 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BVReorderTableView.m; sourceTree = "<group>"; };
+		A739BFAB1866B8B40003D323 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BVReorderTableView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
 		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
 		A78613591863DA1C0052FCC5 /* WAPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAPageViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A786135A1863DA1C0052FCC5 /* WAPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAPageViewController.m; sourceTree = "<group>"; };
+		A7CDF03C1891C6E50073E76F /* UIImage+Preload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Preload.h"; sourceTree = "<group>"; };
+		A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Preload.m"; sourceTree = "<group>"; };
 		A7E9779318288423004189B0 /* WANavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WANavigationController.h; path = WeatherApp/WANavigationController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A7E9779418288423004189B0 /* WANavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = WANavigationController.m; path = WeatherApp/WANavigationController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7E9779618288432004189B0 /* WALocationListTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WALocationListTVC.h; path = WeatherApp/WALocationListTVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A7E9779718288432004189B0 /* WALocationListTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = WALocationListTVC.m; path = WeatherApp/WALocationListTVC.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		BC1367FA182162920090CAC5 /* UserDefaults.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UserDefaults.txt; sourceTree = "<group>"; };
-		BC64B24A186DDA2C005C8A53 /* WALocationCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WALocationCell.h; sourceTree = "<group>"; };
-		BC64B24B186DDA2C005C8A53 /* WALocationCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WALocationCell.m; sourceTree = "<group>"; };
-		BC64B24D186DDA52005C8A53 /* WALocationCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WALocationCell.xib; sourceTree = "<group>"; };
+		BC1367FA182162920090CAC5 /* UserDefaults.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = UserDefaults.txt; sourceTree = "<group>"; };
 		BC7CA05F184E63BA00AAF520 /* WASettingsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WASettingsConstants.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BC7CA060184E63BA00AAF520 /* WASettingsConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WASettingsConstants.m; sourceTree = "<group>"; };
 		BC8C143C18216A1E003BA98D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -174,6 +172,7 @@
 				BCA93CD3181EEB2F00516E7E /* Location view controller */,
 				A7164982189078F300205E07 /* Condition detail table vc */,
 				A71C08EE181ED1B7003488ED /* Images.xcassets */,
+				A7CDF03F1891C7360073E76F /* UIImage preload category */,
 				A739BFAD1866B8BA0003D323 /* Reorder table */,
 				A71C08E3181ED1B6003488ED /* Supporting Files */,
 			);
@@ -213,6 +212,15 @@
 			name = "Page view controller";
 			sourceTree = "<group>";
 		};
+		A7CDF03F1891C7360073E76F /* UIImage preload category */ = {
+			isa = PBXGroup;
+			children = (
+				A7CDF03C1891C6E50073E76F /* UIImage+Preload.h */,
+				A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */,
+			);
+			name = "UIImage preload category";
+			sourceTree = "<group>";
+		};
 		BC1367F9182091CC0090CAC5 /* Application delegate */ = {
 			isa = PBXGroup;
 			children = (
@@ -232,23 +240,11 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
-		BC64B24F186DDA66005C8A53 /* Location cell (unused) */ = {
-			isa = PBXGroup;
-			children = (
-				BC64B24A186DDA2C005C8A53 /* WALocationCell.h */,
-				BC64B24B186DDA2C005C8A53 /* WALocationCell.m */,
-				BC64B24D186DDA52005C8A53 /* WALocationCell.xib */,
-			);
-			name = "Location cell (unused)";
-			path = WeatherApp;
-			sourceTree = "<group>";
-		};
 		BC64C8C81822CF2800C59F00 /* Location list table view controller */ = {
 			isa = PBXGroup;
 			children = (
 				A7E9779618288432004189B0 /* WALocationListTVC.h */,
 				A7E9779718288432004189B0 /* WALocationListTVC.m */,
-				BC64B24F186DDA66005C8A53 /* Location cell (unused) */,
 			);
 			name = "Location list table view controller";
 			path = ..;
@@ -345,7 +341,6 @@
 				A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */,
 				A739BFA71866A5220003D323 /* navbar.png in Resources */,
 				A70EE9D81827142E00F317A9 /* icons in Resources */,
-				BC64B24E186DDA52005C8A53 /* WALocationCell.xib in Resources */,
 				A747819C1864EF00003DCA60 /* backgrounds in Resources */,
 				A747819E18661209003DCA60 /* backgrounds.plist in Resources */,
 				BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */,
@@ -370,9 +365,9 @@
 				BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */,
 				A71C08E9181ED1B6003488ED /* main.m in Sources */,
 				A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */,
+				A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */,
 				A70EE9C01823622B00F317A9 /* WANewLocationTVC.m in Sources */,
 				A7E9779518288423004189B0 /* WANavigationController.m in Sources */,
-				BC64B24C186DDA2D005C8A53 /* WALocationCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

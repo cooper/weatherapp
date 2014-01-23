@@ -3,7 +3,7 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import "WALocationManager.h"
@@ -13,12 +13,9 @@
 
 @implementation WALocationManager
 
-- (id)init
-{
+- (id)init {
     self = [super init];
-    if (self) {
-        self.locations = [NSMutableArray array];
-    }
+    if (self) self.locations = [NSMutableArray array];
     return self;
 }
 
@@ -78,13 +75,14 @@
 
 - (void)loadLocations:(NSArray *)locationsArray {
     if (!locationsArray) return;
-    //unsigned int i = 0;
-    for (NSDictionary *l in locationsArray) [self createLocationFromDictionary:l];
+    for (NSDictionary *l in locationsArray)
+        [self createLocationFromDictionary:l];
 }
 
 - (NSArray *)locationsArrayForSaving {
     NSMutableArray *locs = [NSMutableArray array];
-    for (WALocation *location in self.locations) [locs addObject:location.userDefaultsDict];
+    for (WALocation *location in self.locations)
+        [locs addObject:location.userDefaultsDict];
     return locs;
 }
 

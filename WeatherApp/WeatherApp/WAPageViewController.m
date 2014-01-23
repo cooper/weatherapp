@@ -3,7 +3,7 @@
 //  Weather
 //
 //  Created by Mitchell Cooper on 12/19/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import "WAPageViewController.h"
@@ -11,51 +11,53 @@
 #import "WAWeatherVC.h"
 #import "WALocationManager.h"
 
-@interface WAPageViewController ()
-
-@end
-
 @implementation WAPageViewController
 
 @synthesize background = background;
 
-- (id)initWithTransitionStyle:(UIPageViewControllerTransitionStyle)style navigationOrientation:(UIPageViewControllerNavigationOrientation)navigationOrientation options:(NSDictionary *)options
-{
+#pragma mark - Page view controller
+
+- (id)initWithTransitionStyle:(UIPageViewControllerTransitionStyle)style navigationOrientation:(UIPageViewControllerNavigationOrientation)navigationOrientation options:(NSDictionary *)options {
     self = [super initWithTransitionStyle:style navigationOrientation:navigationOrientation options:options];
-    if (self) {
-        NSLog(@"basicly");
-        self.delegate = self; // FIXME: is this a problem?
-    }
+    if (self) self.delegate = self; // we'll never destroy the page VC anyway.
     return self;
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+- (void)setViewController:(WAWeatherVC *)weatherVC {
+    [APP_DELEGATE.pageVC setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+    self.location = weatherVC.location;
+    [self updateNavigationBar];
+}
 
-    //self.navigationItem.title = L(@"Current");
+- (void)viewDidLoad {
+    [super viewDidLoad];
 
     // this fixes the navigation bar inset issue.
     // however, it causes the page view controller to ignore the navigation bar completely
     // (so its frame goes behind the navigation bar as well.)
     self.automaticallyAdjustsScrollViewInsets = NO;
         
-    self.view.backgroundColor = [UIColor clearColor];
+    self.view.backgroundColor      = [UIColor clearColor];
+    self.view.multipleTouchEnabled = NO;
+    self.navigationItem.title      = @"Conditions";
+    
+    // refresh button.
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
-    self.navigationItem.title = @"Conditions";
     
     // remove the text on the back button.
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
     
+    // scroll view delegate.
     [self.view.subviews[0] setDelegate:self];
-    self.view.multipleTouchEnabled = NO;
     
+    // from background.
     self.background = background = [[UIImageView alloc] initWithFrame:self.view.bounds];
     background.backgroundColor = [UIColor clearColor];
     [self.view addSubview:background];
     [self.view sendSubviewToBack:background];
     
+    // to background.
     backBackground = [[UIImageView alloc] initWithFrame:self.view.bounds];
     backBackground.backgroundColor = [UIColor clearColor];
     [self.view addSubview:backBackground];
@@ -67,30 +69,12 @@
     [self updateNavigationBar];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-
-    // make navigation bar transparent.
-    //UINavigationBar *bar = self.navigationController.navigationBar;
-    //[bar setBackgroundImage:[UIImage imageNamed:@"icons/dummy"] forBarMetrics:UIBarMetricsDefault];
-    //bar.shadowImage  = [UIImage new];
-    //bar.barTintColor = [UIColor clearColor];
-    //self.navigationController.navigationBar.translucent = YES;
-
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+#pragma mark - Page view controller delegate
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
-    NSLog(@"WILL TRANSITION FROM/TO: %@, %@", self.viewControllers, pendingViewControllers);
-    WAWeatherVC *toVC   = pendingViewControllers[0];
-    //WAWeatherVC *fromVC = self.viewControllers[0];
+    WAWeatherVC *toVC = pendingViewControllers[0];
+    NSUInteger i      = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
     
-    NSUInteger i = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
-    // TODO: make sure this index exists just as a double check.
     WALocation *locationBefore = APP_DELEGATE.locationManager.locations[i];
     background.image = locationBefore.background;
     background.frame = self.view.bounds;
@@ -108,36 +92,47 @@
     if (completed) [self updateNavigationBar]; // fixes it.
 }
 
-- (void)setViewController:(WAWeatherVC *)weatherVC {
-    [APP_DELEGATE.pageVC setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
-    self.location = weatherVC.location;
-    [self updateNavigationBar];
-}
+#pragma mark - Update information
 
+// update the information and buttons on the navigation bar.
 - (void)updateNavigationBar {
+
+    // loading and refresh button is visible.
     if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {
         UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         [indicator startAnimating];
         UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
         [self.navigationItem setRightBarButtonItem:item animated:YES];
     }
+    
+    // not loading and refresh button is not visible.
     else if (!self.location.loading && self.navigationItem.rightBarButtonItem != refreshButton)
         [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
+    
+    // update the background while we're at it.
     [self updateBackground];
+    
 }
 
+// update the background image.
+- (void)updateBackground {
+    NSLog(@"Setting background.image to %@", self.location.city);
+    background.image = self.location.background;
+    background.frame = self.view.bounds;
+}
+
+#pragma mark - Interface actions
+
+// update conditions.
 - (void)refreshButtonTapped {
     [self.location fetchCurrentConditions];
 }
 
 #pragma mark - Scroll view delegate
 
+// gradually fade the background with scrolling.
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    // 568/100 = yOffset/x
-    // x(568/100) = yOffset
-    // x = yOffset/(568/100)
     CGFloat x = scrollView.contentOffset.y / (568./100.);
-    //NSLog(@"x: %f", x);
     
     // up or down?
     if (x > 100.) goingDown = YES;
@@ -147,12 +142,6 @@
     if (x > 100.) x = 200. - x;
     
     background.alpha = x / 100.;
-}
-
-- (void)updateBackground {
-    NSLog(@"Setting background.image to %@", self.location.city);
-    background.image = self.location.background;
-    background.frame = self.view.bounds;
 }
 
 @end

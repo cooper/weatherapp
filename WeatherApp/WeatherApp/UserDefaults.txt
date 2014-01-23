@@ -2,13 +2,11 @@ locations = [
 
     an array of dictionaries containing information about locations.
 
-    {
-        current location one is the first.
+    {        current location one is the first.
         this could contain the most recent coordinates from the last run.
     },
 
-    {
-        an example of a dictionary containing information about a location
+    {        an example of a dictionary containing information about a location
         @"city":
         @"stateShort":
         @"state":

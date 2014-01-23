@@ -3,7 +3,7 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 @interface WALocationManager : NSObject <UIPageViewControllerDataSource>
@@ -13,7 +13,7 @@
 @property WALocation *currentLocation;
 
 - (WALocation *)createLocation;                         // creates a location and adds it to manager
-- (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary;
+- (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary; // create from user defaults
 - (void)destroyLocation:(WALocation *)location;         // destroys a location by removing from manager
 - (void)loadLocations:(NSArray *)locationsArray;        // creates locations from user defaults array
 - (NSArray *)locationsArrayForSaving;                   // locations array for user defaults

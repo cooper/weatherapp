@@ -1,12 +1,10 @@
 //
-//  WAConditionDetailTVCViewController.h
+//  WAConditionDetailTVC.h
 //  Weather
 //
 //  Created by Mitchell Cooper on 1/22/14.
-//  Copyright (c) 2014 Really Good. All rights reserved.
+//  Copyright (c) 2014 Mitchell Cooper. All rights reserved.
 //
-
-#import <UIKit/UIKit.h>
 
 @interface WAConditionDetailTVC : UITableViewController {
     NSArray *currentConditions;

@@ -1,32 +1,20 @@
 //
-//  WAWeatherController.m
+//  WAWeatherVC.m
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import <QuartzCore/QuartzCore.h>
+
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 #import "WAConditionDetailTVC.h"
 
-@interface WAWeatherVC ()
-
-@end
-
 @implementation WAWeatherVC
 
 #pragma mark - View controller
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -35,7 +23,11 @@
     self.view.backgroundColor  = [UIColor clearColor];
     
     // add shadows.
-    for (UILabel *label in @[self.temperature, self.conditionsLabel, self.locationTitle, self.coordinateLabel, self.fullLocationLabel, self.feelsLikeLabel]) {
+    for (UILabel *label in @[
+        self.temperature, self.conditionsLabel,
+        self.locationTitle, self.coordinateLabel,
+        self.fullLocationLabel, self.feelsLikeLabel
+    ]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
         label.layer.shadowOffset    = CGSizeMake(0, 0);
         label.layer.shadowRadius    = label == self.temperature ? 3.0 : 2.0;
@@ -60,19 +52,11 @@
     [self update];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (NSUInteger)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
 }
+
+#pragma mark - Interface actions
 
 - (void)tempTapped {
     WAConditionDetailTVC *tvc = [[WAConditionDetailTVC alloc] initWithStyle:UITableViewStylePlain];

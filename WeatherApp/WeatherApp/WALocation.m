@@ -3,7 +3,7 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import "WALocation.h"
@@ -12,9 +12,11 @@
 #import "WANavigationController.h"
 #import "WALocationListTVC.h"
 #import "WAPageViewController.h"
+#import "UIImage+Preload.h"
 
 @implementation WALocation
 
+// create a new dummy location.
 + (id)newDummy {
     WALocation *location = [[self alloc] init];
     location.dummy = YES;
@@ -106,7 +108,8 @@
     }];
     
 }
-        
+
+// three-day forecast.
 - (void)fetchThreeDayForecast {
     NSString *q = [self bestLookupMethod:@"forecast"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
@@ -115,6 +118,7 @@
     }];
 }
 
+// determine icon and download if necessary.
 - (void)fetchIcon {
     NSDictionary *ob = self.response;
     
@@ -140,7 +144,7 @@
             self.conditionsImageName = icon;
             self.conditionsImage     = [UIImage imageNamed:FMT(@"icons/50/%@", icon)];
         }
-            
+        
     }
 
     // if we don't have an icon by now, download wunderground's.
@@ -156,6 +160,7 @@
     
 }
 
+// determine the URL based on available information.
 - (NSString *)bestLookupMethod:(NSString *)type {
 
     // determine how we will look up this location.
@@ -302,7 +307,9 @@
         @"latitude",            @"longitude",
         @"conditions",          @"conditionsAsOf",
         @"conditionsImageName", @"nightTime",
-        @"degreesC",            @"degreesF"
+        @"degreesC",            @"degreesF",
+        @"feelsLikeC",          @"feelsLikeF",
+        @"heatIndexC",          @"heatIndexF"
     ];
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     
@@ -324,6 +331,7 @@
     // if pageVC exists, update its navigation bar.
     // (to add indicator in place of refresh button)
     if (APP_DELEGATE.pageVC) [APP_DELEGATE.pageVC updateNavigationBar];
+    
 }
 
 // indicates finish loading.
@@ -388,7 +396,7 @@
         // this is a match.
         if (matchesIcon || matchesConditions) {
             
-            NSLog(@"%@ matches!", bg[@"name"]);
+            NSLog(@"Background %@ matches!", bg[@"name"]);
             
             // if it's night and backgrounds exist for such, prefer them.
             BOOL nightTime = NO;
@@ -449,49 +457,18 @@
         self.currentBackgroundIcon       = self.conditionsImageName;
         self.currentBackgroundConditions = self.conditions;
         self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
-
+        
+        // load the full-size background as well.
         if (both) {
             NSString *backgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
-            self.background = [self preloadImage:[UIImage imageWithContentsOfFile:backgroundFile]];
+            self.background = [[UIImage imageWithContentsOfFile:backgroundFile] preloadedImage];
         }
 
         NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
-        self.cellBackground = [self preloadImage:[UIImage imageWithContentsOfFile:cellBackgroundFile]];
+        self.cellBackground = [[UIImage imageWithContentsOfFile:cellBackgroundFile] preloadedImage];
 
     }
     
-}
-
-// preload image.
-// FIXME: from https://gist.github.com/steipete/1144242
-// - needs paraphrasing and cleanup.
-- (UIImage *)preloadImage:(UIImage *)uiimage {
-    CGImageRef image = uiimage.CGImage;
-    
-    // make a bitmap context of a suitable size to draw to, forcing decode
-    size_t width  = CGImageGetWidth(image);
-    size_t height = CGImageGetHeight(image);
-    
-    CGColorSpaceRef colourSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef imageContext   =  CGBitmapContextCreate(
-                                                         NULL, width, height, 8, width * 4, colourSpace,
-                                                         kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little
-                                                         );
-    CGColorSpaceRelease(colourSpace);
-    
-    // draw the image to the context, release it
-    CGContextDrawImage(imageContext, CGRectMake(0, 0, width, height), image);
-    
-    // now get an image ref from the context
-    CGImageRef outputImage = CGBitmapContextCreateImage(imageContext);
-    
-    UIImage *cachedImage = [UIImage imageWithCGImage:outputImage];
-    
-    // clean up
-    CGImageRelease(outputImage);
-    CGContextRelease(imageContext);
-    
-    return cachedImage;
 }
 
 @end

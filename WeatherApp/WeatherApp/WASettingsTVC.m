@@ -3,77 +3,49 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 11/3/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import "WASettingsTVC.h"
 
-@interface WASettingsTVC ()
-
-@end
-
 @implementation WASettingsTVC
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-        self.navigationItem.title = @"Settings";
-        settings = @[
-            @[kTemperatureScaleSetting, @[
-                kTemperatureScaleFahrenheit,
-                kTemperatureScaleCelsius,
-                kTemperatureScaleKelvin
-            ]],
-            @[kDistanceMeasureSetting, @[
-                kDistanceMeasureMiles,
-                kDistanceMeasureKilometers
-            ]],
-            @[kPercipitationMeasureSetting, @[
-                kPercipitationMeasureInches,
-                kPercipitationMeasureMilimeters
-            ]]
-        ];
-    }
-    return self;
-}
+#pragma mark - Table view controller
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    self.tableView.backgroundColor = TABLE_COLOR;    
+    self.navigationItem.title = @"Settings";
+    settings = @[
+        @[kTemperatureScaleSetting, @[
+            kTemperatureScaleFahrenheit,
+            kTemperatureScaleCelsius,
+            kTemperatureScaleKelvin
+        ]],
+        @[kDistanceMeasureSetting, @[
+            kDistanceMeasureMiles,
+            kDistanceMeasureKilometers
+        ]],
+        @[kPercipitationMeasureSetting, @[
+            kPercipitationMeasureInches,
+            kPercipitationMeasureMilimeters
+        ]]
+    ];
     
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    self.tableView.backgroundColor = TABLE_COLOR;
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    // Return the number of sections.
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return [settings count];
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    // Return the number of rows in the section.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [settings[section][1] count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
     NSString *sectionName = settings[indexPath.section][0];
     NSString *rowName     = settings[indexPath.section][1][indexPath.row];

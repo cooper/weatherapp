@@ -1,0 +1,23 @@
+//
+//  WASettingsConstants.m
+//  WeatherApp
+//
+//  Created by Mitchell Cooper on 12/3/13.
+//  Copyright (c) 2013 Really Good. All rights reserved.
+//
+
+#import "WASettingsConstants.h"
+
+NSString * const kTemperatureScaleSetting           = @"Temperature scale";
+NSString * const kDistanceMeasureSetting            = @"Measure of distance";
+NSString * const kPercipitationMeasureSetting       = @"Measure of percipitation";
+
+NSString * const kTemperatureScaleFahrenheit        = @"Fahrenheit";
+NSString * const kTemperatureScaleCelsius           = @"Celsius";
+NSString * const kTemperatureScaleKelvin            = @"Kelvin";
+
+NSString * const kDistanceMeasureMiles              = @"Miles";
+NSString * const kDistanceMeasureKilometers         = @"Kilometers";
+
+NSString * const kPercipitationMeasureInches        = @"Inches";
+NSString * const kPercipitationMeasureMilimeters    = @"Milimeters";

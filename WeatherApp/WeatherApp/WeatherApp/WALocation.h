@@ -1,0 +1,91 @@
+//
+//  WALocation.h
+//  WeatherApp
+//
+//  Created by Mitchell Cooper on 10/28/13.
+//  Copyright (c) 2013 Really Good. All rights reserved.
+//
+
+
+typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSError *err);
+
+@interface WALocation : NSObject <NSURLConnectionDataDelegate>
+
+#pragma mark - General properties
+
+@property (weak) WALocationManager *manager;            // the manager
+@property WAWeatherVC *viewController;                  // the associated view controller
+@property BOOL isCurrentLocation;                       // true if this is current location object
+@property (readonly) NSUInteger index;                  // index in the manager
+@property BOOL loading;                                 // location info is loading now
+@property BOOL initialLoadingComplete;                  // initial conditions check after launch
+@property BOOL dummy;                                   // dummy for reordering.
+
+#pragma mark - Location information
+
+@property NSString *countryCode;                        // common country code
+@property NSString *country3166;                        // ISO 3166 country code
+@property NSString *region;                             // state, province, country, etc.
+@property NSString *regionCode;                         // state, province, country, etc. code
+@property NSString *city;                               // full name of city
+@property (readonly) NSString *fullName;                // city and region separated by comma
+@property NSString *l;                                  // wunderground location query identifier
+@property NSString *longName;                           // location name as looked up
+
++ (id)newDummy;
+
+#pragma mark - Global position
+
+@property NSDate *locationAsOf;                         // date of last location check
+@property float latitude;                               // set automatically when coordinate set
+@property float longitude;                              // set automatically when coordinate set
+
+#pragma mark - Weather conditions
+
+@property NSDictionary *response;
+@property NSDate *conditionsAsOf;                       // date of last condition check
+@property NSDate *observationsAsOf;                     // observation unix time
+@property NSString *observationTimeString;              // observation time string
+@property UIImage  *conditionsImage;                    // icon image of conditions
+@property NSString *conditionsImageName;                // name of image; i.e. "partlycloudy"
+@property float degreesC;                               // current temp (C)
+@property float degreesF;                               // current temp (F)
+@property float feelsLikeC;                             // feels like (C)
+@property float feelsLikeF;                             // feels like (F)
+@property float dewPointC;
+@property float dewPointF;
+@property float heatIndexC;
+@property float heatIndexF;
+@property (readonly) NSString *temperature;             // localized temperature string
+@property (readonly) NSString *tempUnit;                // localized temperature unit
+@property (readonly) NSString *feelsLike;               // localized feels like string
+@property (readonly) NSString *dewPoint;                
+@property (readonly) NSString *heatIndex;
+@property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
+@property BOOL nightTime;                               // is it night time?
+@property NSArray *forecast;
+@property NSArray *textForecast;
+
+#pragma mark - Backgrounds
+
+@property UIImage *background;
+@property UIImage *cellBackground;
+@property NSString *currentBackgroundName;
+@property NSString *currentBackgroundIcon;
+@property NSString *currentBackgroundConditions;
+@property BOOL currentBackgroundTimeOfDay;
+
+- (void)updateBackgroundBoth:(BOOL)both;
+
+#pragma mark - Fetching data
+
+- (void)fetchCurrentConditions;
+- (void)fetchCurrentConditionsThen:(WACallback)then;
+- (void)fetchThreeDayForecast;
+- (void)fetchIcon;
+
+#pragma mark - User defaults
+
+- (NSDictionary *)userDefaultsDict;
+
+@end

@@ -1,16 +1,15 @@
 //
-//  WAWeatherController.h
+//  WAWeatherVC.h
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import <CoreLocation/CoreLocation.h>
 
 @interface WAWeatherVC : UIViewController <UIGestureRecognizerDelegate> {
     UIBarButtonItem *refreshButton;
-//    UIImageView *background;
 }
 
 @property IBOutlet UILabel *locationTitle;

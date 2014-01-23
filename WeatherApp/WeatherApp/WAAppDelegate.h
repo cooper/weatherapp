@@ -3,7 +3,7 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -58,7 +58,8 @@ typedef void(^WACallback)(void);
     WALocationListTVC,
     WANewLocationTVC,
     WASettingsTVC,
-    WAWeatherVC;
+    WAWeatherVC,
+    WAConditionDetailTVC;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;
@@ -72,7 +73,7 @@ typedef void(^WACallback)(void);
 @property (readonly) WALocation *currentLocation;
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
-- (void)beginActivity;
-- (void)endActivity;
+- (void)beginActivity;              // increase activity counter
+- (void)endActivity;                // decrease activity counter
 
 @end

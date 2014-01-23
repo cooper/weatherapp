@@ -1,9 +1,9 @@
 //
-//  WAConditionDetailTVCViewController.m
+//  WAConditionDetailTVC.m
 //  Weather
 //
 //  Created by Mitchell Cooper on 1/22/14.
-//  Copyright (c) 2014 Really Good. All rights reserved.
+//  Copyright (c) 2014 Mitchell Cooper. All rights reserved.
 //
 
 #import "WAConditionDetailTVC.h"
@@ -11,45 +11,23 @@
 #import "WALocationListTVC.h"
 #import "WAPageViewController.h"
 
-@interface WAConditionDetailTVC ()
-
-@end
-
 @implementation WAConditionDetailTVC
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+#pragma mark - Table view controller
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    self.navigationItem.title = @"Details";
+    
+    self.navigationItem.title     = @"Details";
     self.tableView.backgroundView = [[UIImageView alloc] initWithImage:self.location.background];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
     currentConditions    = [self detailsForLocation:self.location];
     forecastedConditions = [self forecastForLocation:self.location];
-    
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+#pragma mark - Weather info
 
 - (NSArray *)detailsForLocation:(WALocation *)location {
     NSMutableArray *a = [NSMutableArray array];
@@ -57,39 +35,47 @@
     
     // temperatures.
     [a addObjectsFromArray:@[
-        @[@"Temperature", FMT(@"%@ %@", location.temperature, location.tempUnit)],
-        @[@"Feels like",  FMT(@"%@ %@", location.feelsLike,   location.tempUnit)],
-        @[@"Dew point",   FMT(@"%@ %@", location.dewPoint,    location.tempUnit)]
+        @[@"Temperature",       FMT(@"%@ %@", location.temperature, location.tempUnit)],
+        @[@"Feels like",        FMT(@"%@ %@", location.feelsLike,   location.tempUnit)],
+        @[@"Dew point",         FMT(@"%@ %@", location.dewPoint,    location.tempUnit)]
     ]];
     
-    if (location.heatIndexF)
-        [a addObject:@[@"Heat index", FMT(@"%@%@", location.heatIndex, location.tempUnit)]];
+    // only show heat index if there is one.
+    if (location.heatIndexF) [a addObject:@[
+        @"Heat index",          FMT(@"%@%@", location.heatIndex, location.tempUnit)
+    ]];
     
-    // precipitation.
+    // precipitation in inches.
     if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches)) [a addObjectsFromArray:@[
-        @[@"Precip. today",   FMT(@"%@ in", r[@"precip_today_in"])],
-        @[@"Precip. in hour", FMT(@"%@ mm", r[@"precip_1hr_in"])]
-    ]];
-    else [a addObjectsFromArray:@[
-        @[@"Precip. today",   FMT(@"%@ mm", r[@"precip_today_metric"])],
-        @[@"Precip. in hour", FMT(@"%@ mm", r[@"precip_1hr_metric"])]
+        @[@"Precip. today",     FMT(@"%@ in",       r[@"precip_today_in"])],
+        @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_in"])]
     ]];
     
+    // precipitation in milimeters.
+    else [a addObjectsFromArray:@[
+        @[@"Precip. today",     FMT(@"%@ mm",       r[@"precip_today_metric"])],
+        @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_metric"])]
+    ]];
+    
+    // pressure and humidity.
+    // (pressure in both milibars and inches regardless of settings)
     [a addObjectsFromArray:@[
-        @[@"Pressure", FMT(@"%@ mb / %@ in", r[@"pressure_mb"], r[@"pressure_in"])],
-        @[@"Humidity", r[@"relative_humidity"]]
-        //@[@"Summary",  r[@"weather"]]
+        @[@"Pressure",          FMT(@"%@ mb / %@ in", r[@"pressure_mb"], r[@"pressure_in"])],
+        @[@"Humidity",          r[@"relative_humidity"]]
     ]];
     
+    // wind info and visibility in miles.
     if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-        @[@"Wind speed", FMT(@"%@ mph", r[@"wind_mph"])],
-        @[@"Wind direction", FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"])],
-        @[@"Visibility", FMT(@"%@ mi",  r[@"visibility_mi"])]
+        @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])],
+        @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])],
+        @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])]
     ]];
+    
+    // wind info and visibility in kilometers.
     else [a addObjectsFromArray:@[
-        @[@"Wind speed", FMT(@"%@ km/hr", r[@"wind_kph"])],
-        @[@"Wind direction", FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"])],
-        @[@"Visibility", FMT(@"%@ km",   r[@"visibility_mi"])]
+        @[@"Wind speed",        FMT(@"%@ km/hr",    r[@"wind_kph"])],
+        @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])],
+        @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_mi"])]
     ]];
     
     return a;
@@ -104,36 +90,43 @@
 
 - (NSArray *)forecastForDay:(NSDictionary *)f text:(NSDictionary *)t {
     NSMutableArray *a    = [NSMutableArray array];
+
+    // create a fake location for the cell.
     WALocation *location = [[WALocation alloc] init];
     location.loading     = NO;
     location.initialLoadingComplete = YES;
     
+    // temperatures.
     location.degreesC   = [f[@"high"][@"celsius"]    floatValue];
     location.degreesF   = [f[@"high"][@"fahrenheit"] floatValue];
     location.feelsLikeC = [f[@"low"][@"celsius"]     floatValue];
     location.feelsLikeF = [f[@"low"][@"fahrenheit"]  floatValue];
     
+    // location (time).
     location.city       = f[@"date"][@"weekday"];
     location.region     = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
-    location.conditions = f[@"conditions"];
+    
+    // conditions.
+    location.conditions     = f[@"conditions"];
     location.conditionsAsOf = [NSDate date];
     
+    // icon.
     location.response = @{
         @"icon":        f[@"icon"],
         @"icon_url":    f[@"icon_url"]
     };
     [location fetchIcon];
     
-    NSLog(@"FETCHED: %@", location.conditionsImageName);
+    // cell background.
     [location updateBackgroundBoth:NO];
     
+    // other detail cells.
     [a addObjectsFromArray:@[
         @[@"High temperature", FMT(@"%@ %@", location.temperature, location.tempUnit)],
         @[@"Low temperature",  FMT(@"%@ %@", location.feelsLike,   location.tempUnit)]
     ]];
     
-    NSLog(@"%@", location.userDefaultsDict);
-    
+    // forecast description.
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
         [a addObject:@[t[@"fcttext"], @""]];
     else
@@ -144,36 +137,27 @@
 
 #pragma mark - Table view data source
 
-- (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section
-{
-    UITableViewHeaderFooterView *footer = (UITableViewHeaderFooterView *)view;
-    footer.textLabel.textColor          = [UIColor whiteColor];
-    footer.contentView.backgroundColor  = [UIColor colorWithPatternImage:[UIImage imageNamed:@"navbar.png"]];
-    footer.textLabel.textAlignment      = NSTextAlignmentLeft;
-}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
 
-- (CGFloat)tableView:(UITableView*)tableView heightForHeaderInSection:(NSInteger)section
-{
-    return 0.0;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    // Return the number of sections.
+    // number of forecasts + the current conditions.
     return [self.location.forecast count] + 1;
+    
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    // Return the number of rows in the section.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+
+    // current conditions section.
     if (!section) return [currentConditions count];
     
+    // forecast section.
     return [forecastedConditions[section - 1] count] + 2; // plus header and footer
+    
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (!indexPath.row) return 100;
     
+    // description cell.
     if (indexPath.section && indexPath.row > [forecastedConditions[indexPath.section - 1] count])
         return 150;
     
@@ -223,56 +207,5 @@
     
     return cell;
 }
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a story board-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-
- */
 
 @end

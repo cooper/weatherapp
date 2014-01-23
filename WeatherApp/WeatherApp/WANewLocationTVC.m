@@ -3,7 +3,7 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 11/1/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 #import "WANewLocationTVC.h"
@@ -16,32 +16,19 @@
 
 #pragma mark - Table view controller
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-        results = [NSMutableArray array];//[NSMutableArray array];
-    }
-    
-    return self;
-}
-
-#pragma  mark - View controller
-
-- (void)viewWillAppear:(BOOL)animated {
-    //NSLog(@"Loading data in new location table view");
-    //[self.tableView reloadData];
-}
-
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    self.tableView.backgroundColor = TABLE_COLOR;
+    results = [NSMutableArray array];
+    
+    // keyboard notifications.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
+    
     self.navigationItem.title = L(@"New favorite");
-    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clear.jpg"]];
+
+    // background.
+    self.tableView.backgroundColor = TABLE_COLOR;
+    self.tableView.backgroundView  = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"backgrounds/clear.jpg"]];
 
 }
 
@@ -49,38 +36,18 @@
     [textField becomeFirstResponder];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-- (void)later {
-    [results addObject:@"another one"];
-    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
-}
-
-- (void)muchlater {
-    [results removeObject:@"hi"];
-    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:1] withRowAnimation:UITableViewRowAnimationAutomatic];
-}*/
-
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 2;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section == 0) return 1;
     return [results count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:indexPath.section ?  @"cell" : @"inputcell"];
     

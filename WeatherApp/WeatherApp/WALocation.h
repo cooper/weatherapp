@@ -3,7 +3,7 @@
 //  WeatherApp
 //
 //  Created by Mitchell Cooper on 10/28/13.
-//  Copyright (c) 2013 Really Good. All rights reserved.
+//  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
 
@@ -52,15 +52,15 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property float degreesF;                               // current temp (F)
 @property float feelsLikeC;                             // feels like (C)
 @property float feelsLikeF;                             // feels like (F)
-@property float dewPointC;
-@property float dewPointF;
-@property float heatIndexC;
-@property float heatIndexF;
+@property float dewPointC;                              // dew point (C)
+@property float dewPointF;                              // dew point (F)
+@property float heatIndexC;                             // heat index (C)
+@property float heatIndexF;                             // heat index (F)
 @property (readonly) NSString *temperature;             // localized temperature string
 @property (readonly) NSString *tempUnit;                // localized temperature unit
 @property (readonly) NSString *feelsLike;               // localized feels like string
-@property (readonly) NSString *dewPoint;                
-@property (readonly) NSString *heatIndex;
+@property (readonly) NSString *dewPoint;                // localized dew point string
+@property (readonly) NSString *heatIndex;               // localized heat index string
 @property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
 @property BOOL nightTime;                               // is it night time?
 @property NSArray *forecast;
