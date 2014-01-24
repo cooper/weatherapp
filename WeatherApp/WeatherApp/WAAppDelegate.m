@@ -88,11 +88,7 @@
     
 }
 
-#pragma mark - For use anywhere
-
-- (void)saveLocationsInDatabase {
-    [DEFAULTS setObject:[self.locationManager locationsArrayForSaving] forKey:@"locations"];
-}
+#pragma mark - Activity
 
 - (void)beginActivity {
     activityCount++;
@@ -128,15 +124,22 @@
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     if (status != kCLAuthorizationStatusAuthorized) return;
+    
     // only start updating location if we're able to.
     if ([CLLocationManager locationServicesEnabled]) {
         [coreLocationManager startUpdatingLocation];
         [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
         NSLog(@"enabled!");
     }
+    
 }
 
-#pragma mark - App management
+#pragma mark - User defaults
+
+- (void)saveLocationsInDatabase {
+    [DEFAULTS setObject:[self.locationManager locationsArrayForSaving] forKey:@"locations"];
+    [DEFAULTS synchronize];
+}
 
 - (void)setDefaults {
     

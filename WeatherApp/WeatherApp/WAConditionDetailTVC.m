@@ -67,6 +67,7 @@
     // wind info and visibility in miles.
     if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
         @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])],
+        @[@"Gusts speed",       FMT(@"%@ mph",      r[@"wind_gust_mph"])],
         @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])],
         @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])]
     ]];
@@ -74,6 +75,7 @@
     // wind info and visibility in kilometers.
     else [a addObjectsFromArray:@[
         @[@"Wind speed",        FMT(@"%@ km/hr",    r[@"wind_kph"])],
+        @[@"Gusts speed",       FMT(@"%@ km/hr",    r[@"wind_gust_kph"])],
         @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])],
         @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_mi"])]
     ]];
@@ -127,10 +129,11 @@
     ]];
     
     // forecast description.
+    // FIXME: this is completely wrong.
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        [a addObject:@[t[@"fcttext"], @""]];
+        [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext"]), @""]];
     else
-        [a addObject:@[t[@"fcttext_metric"], @""]];
+        [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext_metric"]), @""]];
     
     return @[location, a];
 }
