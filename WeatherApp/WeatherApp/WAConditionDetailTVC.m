@@ -31,7 +31,7 @@
 
 - (NSArray *)detailsForLocation:(WALocation *)location {
     NSMutableArray *a = [NSMutableArray array];
-    NSDictionary *r   = location.response;
+    NSDictionary   *r = location.response;
     
     // temperatures.
     [a addObjectsFromArray:@[
@@ -48,7 +48,7 @@
     // precipitation in inches.
     if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches)) [a addObjectsFromArray:@[
         @[@"Precip. today",     FMT(@"%@ in",       r[@"precip_today_in"])],
-        @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_in"])]
+        @[@"Precip. in hour",   FMT(@"%@ in",       r[@"precip_1hr_in"])]
     ]];
     
     // precipitation in milimeters.

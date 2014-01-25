@@ -66,25 +66,64 @@
     if (!coreLocationManager) coreLocationManager = [[CLLocationManager alloc] init];
     
     // set our desired accuracy.
-    coreLocationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-    coreLocationManager.distanceFilter  = 1000; // only notify when change is 1000 meters or more
+    coreLocationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+    coreLocationManager.distanceFilter  = 100;
     coreLocationManager.delegate        = self;
+    
     [coreLocationManager startUpdatingLocation];
-
-    NSLog(@"basically started");
+    NSLog(@"Started location services");
     
 }
 
 - (void)stopLocating {
-    NSLog(@"assuming accuracy is good enough");
     
-    // FIXME: this currently just stops locating.
-    // maybe I should implement refreshing eventually.
+    // if it's been less than 5 seconds since the last lookup, don't do it.
+    // this is just extra protection against wunderground's API limits.
+    if (self.currentLocation.conditionsAsOf &&
+        [self.currentLocation.conditionsAsOf timeIntervalSinceNow] > -5.) {
+        NSLog(@"Just looked up less than 5 seconds ago. Not doing it again");
+        return;
+    }
+    
+    // initial condition check.
+    // checked again after 5 seconds of no location updates.
+    NSLog(@"Checking current conditions initially");
+    [self.currentLocation fetchCurrentConditions];
+    initialTime = self.currentLocation.locationAsOf;
+    
+    // quit locating if necessary.
+    [self performSelector:@selector(checkIfDoneLocating) withObject:nil afterDelay:5];
+    
+}
+
+// timed-out method checks if location hasn't been updated for 5 seconds
+// or more and disables location services if it has.
+- (void)checkIfDoneLocating {
+    NSLog(@"Checking if we're done locating");
+
+    // it has updated recently.
+    if ([self.currentLocation.locationAsOf timeIntervalSinceNow] > -2) {
+        NSLog(@"Received an update within last 2 seconds; waiting 3 more.");
+        
+        // check again in 3 more seconds.
+        [self performSelector:@selector(checkIfDoneLocating) withObject:nil afterDelay:3];
+        return;
+        
+    }
+    
+    // it has been. stop updating the location.
+    NSLog(@"Stopping location services");
     [coreLocationManager stopUpdatingLocation];
     
-    // fetch the current conditions if location was found
-    // FIXME: what is latitude is 0? chances are slim, but that's still valid...
-    if (self.currentLocation.latitude) [self.currentLocation fetchCurrentConditions];
+    // nothing changed.
+    if ([initialTime isEqualToDate:self.currentLocation.locationAsOf]) {
+        NSLog(@"Location has not changed");
+        return;
+    }
+    
+    // the location did change.
+    NSLog(@"Location has changed. Fetching current conditions with updated location");
+    [self.currentLocation fetchCurrentConditions];
     
 }
 
@@ -111,7 +150,7 @@
     self.currentLocation.latitude     = recentLocation.coordinate.latitude;
     self.currentLocation.longitude    = recentLocation.coordinate.longitude;
     self.currentLocation.locationAsOf = [NSDate date];
-    
+        
 }
 
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
@@ -128,8 +167,10 @@
     // only start updating location if we're able to.
     if ([CLLocationManager locationServicesEnabled]) {
         [coreLocationManager startUpdatingLocation];
+        
+        // initial lookup after 3 seconds.
         [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
-        NSLog(@"enabled!");
+        
     }
     
 }

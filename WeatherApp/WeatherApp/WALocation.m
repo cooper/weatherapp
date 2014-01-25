@@ -220,7 +220,7 @@
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
-        NSLog(@"json: %@", jsonData);
+        //NSLog(@"json: %@", jsonData);
         
         // update the database.
         [APP_DELEGATE saveLocationsInDatabase];

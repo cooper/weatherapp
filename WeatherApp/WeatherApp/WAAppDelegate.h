@@ -13,45 +13,41 @@
 
 #pragma mark - Macros
 
+// Commonly-accessed properties.
+
 #define APP_DELEGATE ((WAAppDelegate *)([UIApplication sharedApplication].delegate))
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 
-// Device idioms.
+// Wunderground API settings.
 
-#define IS_IPHONE   ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-#define IS_IPAD     ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
-
-// API settings.
-
-#define WU_API_KEY              @"ffd9e1544413efef"
-#define GEO_LOOKUP_USERNAME     @"cooper"
+#define WU_API_KEY          @"ffd9e1544413efef"
 
 // Colors.
 
-#define LLLL_BLUE_COLOR  [UIColor colorWithRed: 20./255. green:200./255. blue:1 alpha:1]
-#define  LLL_BLUE_COLOR  [UIColor colorWithRed:  0./255. green:180./255. blue:1 alpha:1]
-#define   LL_BLUE_COLOR  [UIColor colorWithRed:  0./255. green:170./255. blue:1 alpha:1]
-#define    L_BLUE_COLOR  [UIColor colorWithRed:  0./255. green:160./255. blue:1 alpha:1]
-#define      BLUE_COLOR  [UIColor colorWithRed:  0./255. green:150./255. blue:1 alpha:1]
-#define TABLE_COLOR      [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:1]
+#define LLLL_BLUE_COLOR     [UIColor colorWithRed: 20./255. green:200./255. blue:1 alpha:1]
+#define  LLL_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:180./255. blue:1 alpha:1]
+#define   LL_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:170./255. blue:1 alpha:1]
+#define    L_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:160./255. blue:1 alpha:1]
+#define      BLUE_COLOR     [UIColor colorWithRed:  0./255. green:150./255. blue:1 alpha:1]
+#define TABLE_COLOR         [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:1]
 
 // Convenience functions.
 
-#define FMT(str, ...) [NSString stringWithFormat:str, ##__VA_ARGS__]
-#define L(str) NSLocalizedString(str, nil)
-#define URL_ESC(str) [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+#define FMT(str, ...)       [NSString stringWithFormat:str, ##__VA_ARGS__]
+#define L(str)              NSLocalizedString(str, nil)
+#define URL_ESC(str)        [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 #define OR(this, otherwise) (this ? this : otherwise)
-#define EQ(a, b) [a isEqualToString:b]
+#define EQ(a, b)            [a isEqualToString:b]
 #define SETTING_IS(setting, value) EQ([DEFAULTS objectForKey:setting], value)
 
 // Types.
 
-typedef void(^WACallback)(void);
+typedef void(^WACallback)(void);    // WALocation's callback type
 
 #pragma mark - Application delegate
 
-@class
-    WALocationManager,
+@class                              // predeclare class names for use in headers
+    WALocationManager,              // throughout the application's source files
     WALocation,
     WAPageViewController,
     WANavigationController,
@@ -62,15 +58,16 @@ typedef void(^WACallback)(void);
     WAConditionDetailTVC;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
-    CLLocationManager       *coreLocationManager;
-    NSUInteger              activityCount;
+    CLLocationManager       *coreLocationManager;   // Core Location API manager
+    NSDate                  *initialTime;           // time of last location lookup at initial condition lookup
+    NSUInteger              activityCount;          // reference count for activity indicator
 }
 
-@property (strong, nonatomic) UIWindow *window;
-@property WANavigationController *nc;
-@property WAPageViewController *pageVC;
-@property WALocationManager *locationManager;
-@property (readonly) WALocation *currentLocation;
+@property (strong, nonatomic) UIWindow *window;     // the application window
+@property WANavigationController *nc;               // the main navigation controller
+@property WAPageViewController *pageVC;             // the location page view controller (swipe up/down)
+@property WALocationManager *locationManager;       // our location manager
+@property (readonly) WALocation *currentLocation;   // the current location object
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
 - (void)beginActivity;              // increase activity counter
