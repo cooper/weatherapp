@@ -116,7 +116,6 @@
 
 // update the background image.
 - (void)updateBackground {
-    NSLog(@"Setting background.image to %@", self.location.city);
     background.image = self.location.background;
     background.frame = self.view.bounds;
 }

@@ -59,8 +59,8 @@ typedef void(^WACallback)(void);    // WALocation's callback type
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;   // Core Location API manager
-    NSDate                  *initialTime;           // time of last location lookup at initial condition lookup
     NSUInteger              activityCount;          // reference count for activity indicator
+    BOOL                    gotLocation;            // device has been located initially
 }
 
 @property (strong, nonatomic) UIWindow *window;     // the application window

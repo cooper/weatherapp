@@ -370,7 +370,7 @@
 }
 
 - (void)updateBackgroundBoth:(BOOL)both {
-    
+    NSLog(@"update background on %@", self.city);
     // in order by priority. the first match wins.
     
     // matching is case-insensitive. night is preferred if it's night time,
@@ -386,7 +386,7 @@
     // if the icon and conditions haven't changed, don't waste energy analyzing backgrounds.
     unsigned int i = 0; NSDictionary *selection;
     if ([self.currentBackgroundIcon isEqualToString:self.conditionsImageName] && [self.currentBackgroundConditions isEqualToString:self.conditions])
-        NSLog(@"icon and conditions not changed");
+        NSLog(@"Icon and conditions not changed. Background is same");
     
     // find a background.
     else for (NSDictionary *bg in backgrounds) {
@@ -395,8 +395,6 @@
         
         // this is a match.
         if (matchesIcon || matchesConditions) {
-            
-            NSLog(@"Background %@ matches!", bg[@"name"]);
             
             // if it's night and backgrounds exist for such, prefer them.
             BOOL nightTime = NO;
@@ -418,7 +416,7 @@
     // if the background category and time of day are same, nothing needs to be changed.
     NSString *chosenBackground;
     if ([self.currentBackgroundName isEqualToString:selection[@"name"]] && self.currentBackgroundTimeOfDay == [selection[@"night"] boolValue])
-        NSLog(@"conditions/icon changed, but category and time of day still same");
+        NSLog(@"Conditions/icon changed, but category and time of day still same");
     
     // a background group was selected.
     else if (selection) {
@@ -447,17 +445,19 @@
         bgStorage[storageName] = @(useIndex);
         [DEFAULTS setObject:bgStorage forKey:@"backgrounds"];
         
-        NSLog(@"chosen: %@", chosenBackground);
-        
     }
     
     // finally apply the background.
-    if (chosenBackground) {
-        self.currentBackgroundName       = selection[@"name"];
-        self.currentBackgroundIcon       = self.conditionsImageName;
-        self.currentBackgroundConditions = self.conditions;
-        self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
-        
+    if (!chosenBackground) return;
+    
+    self.currentBackgroundName       = selection[@"name"];
+    self.currentBackgroundIcon       = self.conditionsImageName;
+    self.currentBackgroundConditions = self.conditions;
+    self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
+    
+    // UIImage is not thread-safe, so we have to load these in the main queue.
+    //dispatch_async(dispatch_get_main_queue(), ^{
+    
         // load the full-size background as well.
         if (both) {
             NSString *backgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
@@ -467,8 +467,8 @@
         NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
         self.cellBackground = [[UIImage imageWithContentsOfFile:cellBackgroundFile] preloadedImage];
 
-    }
-    
+    //});
+
 }
 
 @end

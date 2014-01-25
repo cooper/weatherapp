@@ -4,6 +4,20 @@
 <array>
 	<dict>
 		<key>name</key>
+		<string>haze</string>
+		<key>icon</key>
+		<string>fog</string>
+		<key>conditions</key>
+		<string>haze</string>
+		<key>day</key>
+		<array>
+			<string>haze</string>
+			<string>haze2</string>
+			<string>haze3</string>
+		</array>
+	</dict>
+	<dict>
+		<key>name</key>
 		<string>rainy</string>
 		<key>icon</key>
 		<string>rain</string>
