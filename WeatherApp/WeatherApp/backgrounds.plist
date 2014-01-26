@@ -4,6 +4,28 @@
 <array>
 	<dict>
 		<key>name</key>
+		<string>snow</string>
+		<key>icon</key>
+		<string>snow</string>
+		<key>conditions</key>
+		<string>snow</string>
+		<key>day</key>
+		<array>
+			<string>snow</string>
+			<string>snow2</string>
+			<string>snow3</string>
+			<string>snow4</string>
+		</array>
+		<key>night</key>
+		<array>
+			<string>snow-night</string>
+			<string>snow-night2</string>
+			<string>snow-night3</string>
+			<string>snow-night4</string>
+		</array>
+	</dict>
+	<dict>
+		<key>name</key>
 		<string>haze</string>
 		<key>icon</key>
 		<string>fog</string>

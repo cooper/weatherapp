@@ -66,7 +66,7 @@
     if (!coreLocationManager) coreLocationManager = [[CLLocationManager alloc] init];
     
     // set our desired accuracy.
-    coreLocationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+    coreLocationManager.desiredAccuracy = kCLLocationAccuracyBest;
     coreLocationManager.delegate        = self;
     
     [coreLocationManager startUpdatingLocation];

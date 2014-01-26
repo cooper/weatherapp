@@ -131,6 +131,9 @@
         if ([icon isEqualToString:@"hazy"])         icon = @"fog";
         if ([icon isEqualToString:@"partlysunny"])  icon = @"partlycloudy";
         
+        // we don't care about chances.
+        icon = [icon stringByReplacingOccurrencesOfString:@"chance" withString:@""];
+        
         // determine the image name (night/day)
         self.nightTime     = [ob[@"icon_url"] rangeOfString:@"/nt"].location != NSNotFound;
         NSString *timeName = FMT(@"%@%@", self.nightTime ? @"nt_" : @"", icon);
