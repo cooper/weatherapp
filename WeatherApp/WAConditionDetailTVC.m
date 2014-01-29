@@ -83,14 +83,14 @@
         
         // wind in miles.
         if ([r[@"wind_mph"] floatValue]) [a addObjectsFromArray:@[
-            @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])                         ],
-            @[@"Gust speed",        FMT(@"%@ mph",      r[@"wind_gust_mph"])                    ],
-            @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])     ],
+            @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])                     ],
+            @[@"Gust speed",        FMT(@"%@ mph",      r[@"wind_gust_mph"])                ],
+            @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"]) ],
         ]];
         
         // visibility in miles.
         if ([r[@"visibility_mi"] floatValue]) [a addObject:
-            @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])                    ]
+            @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])    ]
         ];
         
     }
@@ -107,10 +107,16 @@
         
         // visibility in kilometers.
         if ([r[@"visibility_km"] floatValue]) [a addObject:
-            @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_km"])                    ]
+            @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_km"])    ]
         ];
         
     }
+    
+    // coordinates.
+    [a addObjectsFromArray:@[
+        @[@"Latitude",          FMT(@"%f", self.location.latitude)  ],
+        @[@"Longitude",         FMT(@"%f", self.location.longitude) ]
+    ]];
     
     return a;
 }
@@ -201,7 +207,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 
     // current conditions section.
-    if (!section) return [currentConditions count];
+    if (!section) return [currentConditions count] + 1; // plus header
     
     // forecast section.
     return [forecastedConditions[section - 1][1] count] + 1; // plus header

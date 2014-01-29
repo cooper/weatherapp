@@ -33,6 +33,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [textField becomeFirstResponder];
 }
 
@@ -237,14 +238,17 @@
     NSDictionary* info = [aNotification userInfo];
     CGSize kbSize      = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
     
+    // already adjusted this way.
+    if (self.tableView.scrollIndicatorInsets.bottom >= kbSize.height) return;
+    
     // adjust the scrollview insets.
     UIEdgeInsets currentInsets           = self.tableView.contentInset;
     self.tableView.contentInset          =
     self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(
-        0.0             + currentInsets.top,
-        0.0             + currentInsets.left,
-        kbSize.height   + currentInsets.bottom,
-        0.0             + currentInsets.right
+        currentInsets.top,
+        currentInsets.left,
+        currentInsets.bottom + kbSize.height,
+        currentInsets.right
     );
 
     // make sure the text input field is visible.
@@ -260,6 +264,9 @@
 - (void)keyboardWillBeHidden:(NSNotification*)aNotification {
     NSDictionary* info = [aNotification userInfo];
     CGSize kbSize      = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    
+    // not adjusted.
+    if (self.tableView.scrollIndicatorInsets.bottom < kbSize.height) return;
     
     // reset to former insets.
     UIEdgeInsets currentInsets           = self.tableView.contentInset;
