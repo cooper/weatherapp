@@ -13,14 +13,24 @@
 
 @implementation WAConditionDetailTVC
 
+- (id)initWithBackground:(UIImage *)bg location:(WALocation *)location {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.location = location;
+        background    = bg;
+    }
+    return self;
+}
+        
+
 #pragma mark - Table view controller
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.navigationItem.title     = @"Details";
-    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:self.location.background];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:background];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
     currentConditions    = [self detailsForLocation:self.location];
@@ -35,50 +45,72 @@
     
     // temperatures.
     [a addObjectsFromArray:@[
-        @[@"Temperature",       FMT(@"%@ %@", location.temperature, location.tempUnit)],
-        @[@"Feels like",        FMT(@"%@ %@", location.feelsLike,   location.tempUnit)],
-        @[@"Dew point",         FMT(@"%@ %@", location.dewPoint,    location.tempUnit)]
+        @[@"Temperature",       FMT(@"%@ %@", location.temperature, location.tempUnit)      ],
+        @[@"Feels like",        FMT(@"%@ %@", location.feelsLike,   location.tempUnit)      ],
+        @[@"Dew point",         FMT(@"%@ %@", location.dewPoint,    location.tempUnit)      ]
     ]];
     
-    // only show heat index if there is one.
-    if (location.heatIndexF) [a addObject:@[
-        @"Heat index",          FMT(@"%@%@", location.heatIndex, location.tempUnit)
-    ]];
+    // only show heat index and wind chill if there is one.
+    if (location.heatIndexC != TEMP_NONE) [a addObject:
+        @[@"Heat index",        FMT(@"%@ %@", location.heatIndex, location.tempUnit)        ]
+    ];
+    if (location.windchillC != TEMP_NONE) [a addObject:
+        @[@"Windchill",        FMT(@"%@ %@", location.windchill, location.tempUnit)         ]
+    ];
     
     // precipitation in inches.
-    if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches)) [a addObjectsFromArray:@[
-        @[@"Precip. today",     FMT(@"%@ in",       r[@"precip_today_in"])],
-        @[@"Precip. in hour",   FMT(@"%@ in",       r[@"precip_1hr_in"])]
+    if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches) &&
+        [r[@"percip_today_in"] floatValue]) [a addObjectsFromArray:@[
+        @[@"Precip. today",     FMT(@"%@ in",       r[@"precip_today_in"])                  ],
+        @[@"Precip. in hour",   FMT(@"%@ in",       r[@"precip_1hr_in"])                    ]
     ]];
     
     // precipitation in milimeters.
-    else [a addObjectsFromArray:@[
-        @[@"Precip. today",     FMT(@"%@ mm",       r[@"precip_today_metric"])],
-        @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_metric"])]
+    else if ([r[@"percip_today_metric"] floatValue]) [a addObjectsFromArray:@[
+        @[@"Precip. today",     FMT(@"%@ mm",       r[@"precip_today_metric"])              ],
+        @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_metric"])                ]
     ]];
     
     // pressure and humidity.
     // (pressure in both milibars and inches regardless of settings)
     [a addObjectsFromArray:@[
-        @[@"Pressure",          FMT(@"%@ mb / %@ in", r[@"pressure_mb"], r[@"pressure_in"])],
-        @[@"Humidity",          r[@"relative_humidity"]]
+        @[@"Pressure",          FMT(@"%@ mb / %@ in", r[@"pressure_mb"], r[@"pressure_in"]) ],
+        @[@"Humidity",          r[@"relative_humidity"]                                     ]
     ]];
     
-    // wind info and visibility in miles.
-    if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-        @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])],
-        @[@"Gusts speed",       FMT(@"%@ mph",      r[@"wind_gust_mph"])],
-        @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])],
-        @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])]
-    ]];
+    // miles.
+    if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
+        
+        // wind in miles.
+        if ([r[@"wind_mph"] floatValue]) [a addObjectsFromArray:@[
+            @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])                         ],
+            @[@"Gust speed",        FMT(@"%@ mph",      r[@"wind_gust_mph"])                    ],
+            @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])     ],
+        ]];
+        
+        // visibility in miles.
+        if ([r[@"visibility_mi"] floatValue]) [a addObject:
+            @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])                    ]
+        ];
+        
+    }
     
-    // wind info and visibility in kilometers.
-    else [a addObjectsFromArray:@[
-        @[@"Wind speed",        FMT(@"%@ km/hr",    r[@"wind_kph"])],
-        @[@"Gusts speed",       FMT(@"%@ km/hr",    r[@"wind_gust_kph"])],
-        @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])],
-        @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_mi"])]
-    ]];
+    // kilometers.
+    else {
+
+        // wind in kilometers.
+        if ([r[@"wind_kph"] floatValue]) [a addObjectsFromArray:@[
+            @[@"Wind speed",        FMT(@"%@ km/hr",    r[@"wind_kph"])                         ],
+            @[@"Gust speed",        FMT(@"%@ km/hr",    r[@"wind_gust_kph"])                    ],
+            @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])     ],
+        ]];
+        
+        // visibility in kilometers.
+        if ([r[@"visibility_km"] floatValue]) [a addObject:
+            @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_km"])                    ]
+        ];
+        
+    }
     
     return a;
 }
@@ -124,17 +156,36 @@
     
     // other detail cells.
     [a addObjectsFromArray:@[
-        @[@"High temperature", FMT(@"%@ %@", location.temperature, location.tempUnit)],
-        @[@"Low temperature",  FMT(@"%@ %@", location.feelsLike,   location.tempUnit)]
+        @[@"High temperature", FMT(@"%@ %@", location.temperature, location.tempUnit)       ],
+        @[@"Low temperature",  FMT(@"%@ %@", location.feelsLike,   location.tempUnit)       ],
+        @[@"Avg. humidity",    FMT(@"%@%%", f[@"avehumidity"])                              ],
+        @[@"Min. humidity",    FMT(@"%@%%", f[@"minhumidity"])                              ],
+        @[@"Max. humidity",    FMT(@"%@%%", f[@"maxhumidity"])                              ]
     ]];
+    
+    // wind info and visibility in miles.
+    if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
+        @[@"Wind speed",        FMT(@"%@ mph",      f[@"avewind"][@"mph"])                  ],
+        @[@"Gust speed",        FMT(@"%@ mph",      f[@"maxwind"][@"mph"])                  ],
+        @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
+    ]];
+    
+    // wind info and visibility in kilometers.
+    else [a addObjectsFromArray:@[
+        @[@"Wind speed",        FMT(@"%@ km/hr",    f[@"avewind"][@"kph"])                  ],
+        @[@"Gust speed",        FMT(@"%@ km/hr",    f[@"maxwind"][@"kph"])                  ],
+        @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
+    ]];
+    
+    
     
     // forecast description.
     // FIXME: this is completely wrong.
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext"]), @""]];
-    else
-        [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext_metric"]), @""]];
-    
+    //if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+    //    [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext"]), @""]];
+    //else
+    //    [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext_metric"]), @""]];
+    //
     return @[location, a];
 }
 
@@ -153,16 +204,17 @@
     if (!section) return [currentConditions count];
     
     // forecast section.
-    return [forecastedConditions[section - 1] count] + 2; // plus header and footer
+    return [forecastedConditions[section - 1][1] count] + 1; // plus header
     
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    //if (!indexPath.row && !indexPath.section) return 150;
     if (!indexPath.row) return 100;
     
     // description cell.
-    if (indexPath.section && indexPath.row > [forecastedConditions[indexPath.section - 1] count])
-        return 150;
+    //if (indexPath.section && indexPath.row > [forecastedConditions[indexPath.section - 1] count])
+    //    return 150;
     
     return 50;
 }
@@ -172,10 +224,10 @@
     // generic base cell.
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor clearColor];
-    cell.textLabel.textColor       = [UIColor whiteColor];
-    cell.detailTextLabel.textColor = [UIColor whiteColor];
-    cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"navbar.png"]];
+    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];//[UIColor clearColor];
+    //cell.textLabel.textColor       = [UIColor whiteColor];
+    cell.detailTextLabel.textColor = [UIColor blackColor];//[UIColor whiteColor];
+    //cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"navbar.png"]];
     
     // current conditions.
     if (!indexPath.section) {

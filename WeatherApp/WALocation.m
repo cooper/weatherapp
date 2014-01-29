@@ -16,6 +16,21 @@
 
 @implementation WALocation
 
+- (id)init {
+    self = [super init];
+    if (self) {
+        self.degreesC   =
+        self.degreesF   =
+        self.heatIndexC =
+        self.heatIndexF =
+        self.windchillC =
+        self.windchillF =
+        self.feelsLikeC =
+        self.feelsLikeF = TEMP_NONE;
+    }
+    return self;
+}
+
 // create a new dummy location.
 + (id)newDummy {
     WALocation *location = [[self alloc] init];
@@ -70,6 +85,12 @@
             self.longitude    = [loc[@"longitude"] floatValue];
         }
         
+        // reset temperatures.
+        self.degreesC   = self.degreesF   =
+        self.feelsLikeC = self.feelsLikeF =
+        self.heatIndexC = self.heatIndexF =
+        self.windchillC = self.windchillF = TEMP_NONE;
+        
         // temperatures.
         // no longer round temperatures to the nearest whole degree here.
         
@@ -78,18 +99,26 @@
         self.feelsLikeC = [ob[@"feelslike_c"]  floatValue];
         self.feelsLikeF = [ob[@"feelslike_f"]  floatValue];
         
-        if (![ob[@"dewpoint_c"] isMemberOfClass:[NSString class]]) {
+        // dew point.
+        if (ob[@"dewpoint_c"] && ![ob[@"dewpoint_c"] isEqualToString:@"NA"]) {
             self.dewPointC  = [ob[@"dewpoint_c"]   floatValue];
             self.dewPointF  = [ob[@"dewpoint_f"]   floatValue];
-        } else self.heatIndexC = self.heatIndexF = 0;
+        }
         
-        if (![ob[@"head_index_c"] isMemberOfClass:[NSString class]]) {
+        // heat index.
+        if (ob[@"heat_index_c"] && ![ob[@"heat_index_c"] isEqualToString:@"NA"]) {
             self.heatIndexC = [ob[@"heat_index_c"] floatValue];
             self.heatIndexF = [ob[@"heat_index_f"] floatValue];
-        } else self.heatIndexC = self.heatIndexF = 0;
+        }
+        
+        // windchill.
+        if (ob[@"windchill_c"] && ![ob[@"windchill_c"] isEqualToString:@"NA"]) {
+            self.windchillC = [ob[@"windchill_c"] floatValue];
+            self.windchillF = [ob[@"windchill_f"] floatValue];
+        }
         
         // conditions.
-        self.response   = [ob mutableCopy];
+        self.response   = ob;
         self.conditions = ob[@"weather"];
         
         // icon.
@@ -223,7 +252,7 @@
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
-        //NSLog(@"json: %@", jsonData);
+        NSLog(@"json: %@", jsonData);
         
         // update the database.
         [APP_DELEGATE saveLocationsInDatabase];
@@ -279,6 +308,18 @@
 }
 
 - (NSString *)heatIndex {
+    float t;
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        t = self.heatIndexF;
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        t = self.heatIndexC + 273.15;
+    else
+        t = self.heatIndexC;
+    
+    return [NSString stringWithFormat:@"%.f", t];
+}
+
+- (NSString *)windchill {
     float t;
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
         t = self.heatIndexF;

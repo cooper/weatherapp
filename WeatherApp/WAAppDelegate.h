@@ -21,6 +21,7 @@
 // Wunderground API settings.
 
 #define WU_API_KEY          @"ffd9e1544413efef"
+#define TEMP_NONE           -999
 
 // Colors.
 

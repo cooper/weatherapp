@@ -20,6 +20,7 @@
 		A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A71C08EE181ED1B7003488ED /* Images.xcassets */; };
 		A739BFA71866A5220003D323 /* navbar.png in Resources */ = {isa = PBXBuildFile; fileRef = A739BFA61866A5220003D323 /* navbar.png */; };
 		A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A739BFAB1866B8B40003D323 /* BVReorderTableView.m */; };
+		A73D2A6F1898784E00EDE18C /* UIImage+Screenshot.m in Sources */ = {isa = PBXBuildFile; fileRef = A73D2A6E1898784E00EDE18C /* UIImage+Screenshot.m */; };
 		A747819C1864EF00003DCA60 /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = A747819B1864EF00003DCA60 /* backgrounds */; };
 		A747819E18661209003DCA60 /* backgrounds.plist in Resources */ = {isa = PBXBuildFile; fileRef = A747819D18661209003DCA60 /* backgrounds.plist */; };
 		A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786135A1863DA1C0052FCC5 /* WAPageViewController.m */; };
@@ -59,6 +60,8 @@
 		A739BFA61866A5220003D323 /* navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbar.png; sourceTree = "<group>"; };
 		A739BFAA1866B8B40003D323 /* BVReorderTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BVReorderTableView.h; sourceTree = "<group>"; };
 		A739BFAB1866B8B40003D323 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BVReorderTableView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
+		A73D2A6D1898784E00EDE18C /* UIImage+Screenshot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Screenshot.h"; sourceTree = "<group>"; };
+		A73D2A6E1898784E00EDE18C /* UIImage+Screenshot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Screenshot.m"; sourceTree = "<group>"; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
 		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
 		A78613591863DA1C0052FCC5 /* WAPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAPageViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -173,6 +176,7 @@
 				A7164982189078F300205E07 /* Condition detail table vc */,
 				A71C08EE181ED1B7003488ED /* Images.xcassets */,
 				A7CDF03F1891C7360073E76F /* UIImage preload category */,
+				A73D2A701898785300EDE18C /* UIImage screenshot category */,
 				A739BFAD1866B8BA0003D323 /* Reorder table */,
 				A71C08E3181ED1B6003488ED /* Supporting Files */,
 			);
@@ -201,6 +205,15 @@
 				A739BFAB1866B8B40003D323 /* BVReorderTableView.m */,
 			);
 			name = "Reorder table";
+			sourceTree = "<group>";
+		};
+		A73D2A701898785300EDE18C /* UIImage screenshot category */ = {
+			isa = PBXGroup;
+			children = (
+				A73D2A6D1898784E00EDE18C /* UIImage+Screenshot.h */,
+				A73D2A6E1898784E00EDE18C /* UIImage+Screenshot.m */,
+			);
+			name = "UIImage screenshot category";
 			sourceTree = "<group>";
 		};
 		A786135C1863DA230052FCC5 /* Page view controller */ = {
@@ -364,6 +377,7 @@
 				A7164981189078E800205E07 /* WAConditionDetailTVC.m in Sources */,
 				BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */,
 				A71C08E9181ED1B6003488ED /* main.m in Sources */,
+				A73D2A6F1898784E00EDE18C /* UIImage+Screenshot.m in Sources */,
 				A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */,
 				A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */,
 				A70EE9C01823622B00F317A9 /* WANewLocationTVC.m in Sources */,

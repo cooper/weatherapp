@@ -10,6 +10,7 @@
 
 @interface WAWeatherVC : UIViewController <UIGestureRecognizerDelegate> {
     UIBarButtonItem *refreshButton;
+    WAConditionDetailTVC *detailTVC;
 }
 
 @property IBOutlet UILabel *locationTitle;

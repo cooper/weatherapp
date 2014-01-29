@@ -11,6 +11,7 @@
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 #import "WAConditionDetailTVC.h"
+#import "UIImage+Screenshot.h"
 
 @implementation WAWeatherVC
 
@@ -59,9 +60,9 @@
 #pragma mark - Interface actions
 
 - (void)tempTapped {
-    WAConditionDetailTVC *tvc = [[WAConditionDetailTVC alloc] initWithStyle:UITableViewStylePlain];
-    tvc.location = self.location;
-    [self.navigationController pushViewController:tvc animated:YES];
+    //UIImage *screenshot = [UIImage screenshot];
+    detailTVC = [[WAConditionDetailTVC alloc] initWithBackground:self.location.background location:self.location];
+    [self.navigationController pushViewController:detailTVC animated:YES];
 }
 
 #pragma mark - Updates from WALocation

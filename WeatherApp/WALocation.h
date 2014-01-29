@@ -56,11 +56,14 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property float dewPointF;                              // dew point (F)
 @property float heatIndexC;                             // heat index (C)
 @property float heatIndexF;                             // heat index (F)
+@property float windchillC;                             // windchill (C)
+@property float windchillF;                             // windchill (F)
 @property (readonly) NSString *temperature;             // localized temperature string
 @property (readonly) NSString *tempUnit;                // localized temperature unit
 @property (readonly) NSString *feelsLike;               // localized feels like string
 @property (readonly) NSString *dewPoint;                // localized dew point string
 @property (readonly) NSString *heatIndex;               // localized heat index string
+@property (readonly) NSString *windchill;               // localized windchill string
 @property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
 @property BOOL nightTime;                               // is it night time?
 @property NSArray *forecast;

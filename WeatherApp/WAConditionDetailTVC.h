@@ -9,8 +9,11 @@
 @interface WAConditionDetailTVC : UITableViewController {
     NSArray *currentConditions;
     NSArray *forecastedConditions;
+    UIImage *background;
 }
 
 @property WALocation *location;
+
+- (id)initWithBackground:(UIImage *)background location:(WALocation *)location;
 
 @end
