@@ -106,13 +106,13 @@
         }
         
         // heat index. (NSString = NA)
-        if (ob[@"heat_index_c"] && ![ob[@"heat_index_c"] isMemberOfClass:[NSNumber class]]) {
+        if (ob[@"heat_index_c"] && [ob[@"heat_index_c"] isMemberOfClass:[NSNumber class]]) {
             self.heatIndexC = [ob[@"heat_index_c"] floatValue];
             self.heatIndexF = [ob[@"heat_index_f"] floatValue];
         }
         
         // windchill. (NSString = NA)
-        if (ob[@"windchill_c"] && ![ob[@"windchill_c"] isMemberOfClass:[NSNumber class]]) {
+        if (ob[@"windchill_c"] && [ob[@"windchill_c"] isMemberOfClass:[NSNumber class]]) {
             self.windchillC = [ob[@"windchill_c"] floatValue];
             self.windchillF = [ob[@"windchill_f"] floatValue];
         }
