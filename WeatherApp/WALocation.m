@@ -99,20 +99,20 @@
         self.feelsLikeC = [ob[@"feelslike_c"]  floatValue];
         self.feelsLikeF = [ob[@"feelslike_f"]  floatValue];
         
-        // dew point.
-        if (ob[@"dewpoint_c"] && ![ob[@"dewpoint_c"] isEqualToString:@"NA"]) {
+        // dew point. (NSString = NA)
+        if (ob[@"dewpoint_c"] && [ob[@"dewpoint_c"] isMemberOfClass:[NSNumber class]]) {
             self.dewPointC  = [ob[@"dewpoint_c"]   floatValue];
             self.dewPointF  = [ob[@"dewpoint_f"]   floatValue];
         }
         
-        // heat index.
-        if (ob[@"heat_index_c"] && ![ob[@"heat_index_c"] isEqualToString:@"NA"]) {
+        // heat index. (NSString = NA)
+        if (ob[@"heat_index_c"] && ![ob[@"heat_index_c"] isMemberOfClass:[NSNumber class]]) {
             self.heatIndexC = [ob[@"heat_index_c"] floatValue];
             self.heatIndexF = [ob[@"heat_index_f"] floatValue];
         }
         
-        // windchill.
-        if (ob[@"windchill_c"] && ![ob[@"windchill_c"] isEqualToString:@"NA"]) {
+        // windchill. (NSString = NA)
+        if (ob[@"windchill_c"] && ![ob[@"windchill_c"] isMemberOfClass:[NSNumber class]]) {
             self.windchillC = [ob[@"windchill_c"] floatValue];
             self.windchillF = [ob[@"windchill_f"] floatValue];
         }
