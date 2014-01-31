@@ -34,7 +34,7 @@
     // remove the border between cells.
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
-    self.navigationItem.title = L(@"Locations");
+    self.navigationItem.title = @"Locations";
     
     // navigation bar buttons.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
@@ -185,7 +185,7 @@
 
     // location info.
     NSString *city   = [location.city   length] ? location.city   : @"";
-    NSString *region = [location.region length] ? location.region : ([location.longName length] ? location.longName : L(@"Locating..."));
+    NSString *region = [location.region length] ? location.region : ([location.longName length] ? location.longName : @"Locating...");
     NSString *both   = FMT(@"%@ %@", city, region);
 
     // make the city name bold.

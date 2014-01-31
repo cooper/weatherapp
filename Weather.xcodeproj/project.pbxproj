@@ -14,7 +14,6 @@
 		A71C08DD181ED1B6003488ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DC181ED1B6003488ED /* Foundation.framework */; };
 		A71C08DF181ED1B6003488ED /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08DE181ED1B6003488ED /* CoreGraphics.framework */; };
 		A71C08E1181ED1B6003488ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A71C08E0181ED1B6003488ED /* UIKit.framework */; };
-		A71C08E7181ED1B6003488ED /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A71C08E5181ED1B6003488ED /* InfoPlist.strings */; };
 		A71C08E9181ED1B6003488ED /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A71C08E8181ED1B6003488ED /* main.m */; };
 		A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A71C08EC181ED1B6003488ED /* WAAppDelegate.m */; };
 		A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A71C08EE181ED1B7003488ED /* Images.xcassets */; };
@@ -29,7 +28,6 @@
 		A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779718288432004189B0 /* WALocationListTVC.m */; };
 		BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */ = {isa = PBXBuildFile; fileRef = BC1367FA182162920090CAC5 /* UserDefaults.txt */; };
 		BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7CA060184E63BA00AAF520 /* WASettingsConstants.m */; };
-		BC8C143B18216A1E003BA98D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = BC8C143D18216A1E003BA98D /* Localizable.strings */; };
 		BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */ = {isa = PBXBuildFile; fileRef = BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */; };
 		BCA93CD2181EEB2B00516E7E /* WAWeatherVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */; };
 		BCA93CD5181EEC6D00516E7E /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCA93CD4181EEC6D00516E7E /* CoreLocation.framework */; };
@@ -50,7 +48,6 @@
 		A71C08DE181ED1B6003488ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		A71C08E0181ED1B6003488ED /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		A71C08E4181ED1B6003488ED /* Weather-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Weather-Info.plist"; sourceTree = "<group>"; };
-		A71C08E6181ED1B6003488ED /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A71C08E8181ED1B6003488ED /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08EA181ED1B6003488ED /* Weather-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = "Weather-Prefix.pch"; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08EB181ED1B6003488ED /* WAAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAAppDelegate.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -75,7 +72,6 @@
 		BC1367FA182162920090CAC5 /* UserDefaults.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = UserDefaults.txt; sourceTree = "<group>"; };
 		BC7CA05F184E63BA00AAF520 /* WASettingsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WASettingsConstants.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BC7CA060184E63BA00AAF520 /* WASettingsConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WASettingsConstants.m; sourceTree = "<group>"; };
-		BC8C143C18216A1E003BA98D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		BCA93CCE181EEB2B00516E7E /* WAWeatherVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAWeatherVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = WAWeatherVC.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WAWeatherVC.xib; sourceTree = "<group>"; };
@@ -187,12 +183,10 @@
 			isa = PBXGroup;
 			children = (
 				A71C08E4181ED1B6003488ED /* Weather-Info.plist */,
-				A71C08E5181ED1B6003488ED /* InfoPlist.strings */,
 				A71C08E8181ED1B6003488ED /* main.m */,
 				A71C08EA181ED1B6003488ED /* Weather-Prefix.pch */,
 				A739BFA61866A5220003D323 /* navbar.png */,
 				A747819D18661209003DCA60 /* backgrounds.plist */,
-				BC8C143D18216A1E003BA98D /* Localizable.strings */,
 				BC1367FA182162920090CAC5 /* UserDefaults.txt */,
 			);
 			name = "Supporting Files";
@@ -323,6 +317,11 @@
 				TargetAttributes = {
 					A71C08D8181ED1B6003488ED = {
 						DevelopmentTeam = 3382TH9DVM;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -348,9 +347,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC8C143B18216A1E003BA98D /* Localizable.strings in Resources */,
 				BCA93CD2181EEB2B00516E7E /* WAWeatherVC.xib in Resources */,
-				A71C08E7181ED1B6003488ED /* InfoPlist.strings in Resources */,
 				A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */,
 				A739BFA71866A5220003D323 /* navbar.png in Resources */,
 				A70EE9D81827142E00F317A9 /* icons in Resources */,
@@ -386,25 +383,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		A71C08E5181ED1B6003488ED /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A71C08E6181ED1B6003488ED /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		BC8C143D18216A1E003BA98D /* Localizable.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				BC8C143C18216A1E003BA98D /* en */,
-			);
-			name = Localizable.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		A71C0903181ED1B7003488ED /* Debug */ = {

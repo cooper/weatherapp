@@ -60,13 +60,13 @@
     
     // precipitation in inches.
     if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches) &&
-        [r[@"percip_today_in"] floatValue]) [a addObjectsFromArray:@[
+        [r[@"percip_today_in"] floatValue] > 0) [a addObjectsFromArray:@[
         @[@"Precip. today",     FMT(@"%@ in",       r[@"precip_today_in"])                  ],
         @[@"Precip. in hour",   FMT(@"%@ in",       r[@"precip_1hr_in"])                    ]
     ]];
     
     // precipitation in milimeters.
-    else if ([r[@"percip_today_metric"] floatValue]) [a addObjectsFromArray:@[
+    else if ([r[@"percip_today_metric"] floatValue] > 0) [a addObjectsFromArray:@[
         @[@"Precip. today",     FMT(@"%@ mm",       r[@"precip_today_metric"])              ],
         @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_metric"])                ]
     ]];
@@ -82,14 +82,14 @@
     if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
         
         // wind in miles.
-        if ([r[@"wind_mph"] floatValue]) [a addObjectsFromArray:@[
+        if ([r[@"wind_mph"] floatValue] > 0) [a addObjectsFromArray:@[
             @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])                     ],
             @[@"Gust speed",        FMT(@"%@ mph",      r[@"wind_gust_mph"])                ],
             @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"]) ],
         ]];
         
         // visibility in miles.
-        if ([r[@"visibility_mi"] floatValue]) [a addObject:
+        if ([r[@"visibility_mi"] floatValue] > 0) [a addObject:
             @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])    ]
         ];
         
@@ -99,14 +99,14 @@
     else {
 
         // wind in kilometers.
-        if ([r[@"wind_kph"] floatValue]) [a addObjectsFromArray:@[
+        if ([r[@"wind_kph"] floatValue] > 0) [a addObjectsFromArray:@[
             @[@"Wind speed",        FMT(@"%@ km/hr",    r[@"wind_kph"])                         ],
             @[@"Gust speed",        FMT(@"%@ km/hr",    r[@"wind_gust_kph"])                    ],
             @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])     ],
         ]];
         
         // visibility in kilometers.
-        if ([r[@"visibility_km"] floatValue]) [a addObject:
+        if ([r[@"visibility_km"] floatValue] > 0) [a addObject:
             @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_km"])    ]
         ];
         

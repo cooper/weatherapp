@@ -35,7 +35,6 @@
 // Convenience functions.
 
 #define FMT(str, ...)       [NSString stringWithFormat:str, ##__VA_ARGS__]
-#define L(str)              NSLocalizedString(str, nil)
 #define URL_ESC(str)        [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 #define OR(this, otherwise) (this ? this : otherwise)
 #define EQ(a, b)            [a isEqualToString:b]

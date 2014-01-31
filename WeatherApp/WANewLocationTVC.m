@@ -24,7 +24,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
     
-    self.navigationItem.title = L(@"New favorite");
+    self.navigationItem.title = @"New favorite";
 
     // background.
     self.tableView.backgroundColor = TABLE_COLOR;
@@ -65,7 +65,7 @@
 
         textField.keyboardType  = UIKeyboardTypeDefault;
         textField.returnKeyType = UIReturnKeyDefault;
-        textField.placeholder   = L(@"Search locations...");
+        textField.placeholder   = @"Search locations...";
 
         textField.backgroundColor = [UIColor clearColor];
         textField.autocorrectionType = UITextAutocorrectionTypeNo; // no auto correction support
