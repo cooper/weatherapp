@@ -29,7 +29,8 @@
         @[kPercipitationMeasureSetting, @[
             kPercipitationMeasureInches,
             kPercipitationMeasureMilimeters
-        ]]
+        ]],
+        @[kEnableBackgroundSetting]
     ];
     
     self.tableView.backgroundColor = TABLE_COLOR;
@@ -42,25 +43,44 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [settings[section][1] count];
+    if ([settings[section] count] > 1) return [settings[section][1] count];
+    return 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
-    NSString *sectionName = settings[indexPath.section][0];
-    NSString *rowName     = settings[indexPath.section][1][indexPath.row];
+    
+    NSString *sectionName, *rowName;
+    
+    // string option.
+    if ([settings[indexPath.section] count] > 1) {
+        sectionName = settings[indexPath.section][0];
+        rowName     = settings[indexPath.section][1][indexPath.row];
+        
+        // this is the current value?
+        if ([[DEFAULTS objectForKey:sectionName] isEqualToString:rowName])
+            cell.accessoryType  = UITableViewCellAccessoryCheckmark;
+        
+    }
+    
+    // boolean option.
+    else {
+        rowName      = settings[indexPath.section][0];
+        UISwitch *sw = [[UISwitch alloc] init];
+        sw.on        = [DEFAULTS boolForKey:rowName];
+        sw.tag       = indexPath.section;
+        [sw addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
+        cell.accessoryView = sw;
+    }
 
     cell.textLabel.text = rowName;
-    
-    // this is the current value?
-    if ([[DEFAULTS objectForKey:sectionName] isEqualToString:rowName])
-        cell.accessoryType  = UITableViewCellAccessoryCheckmark;
     
     return cell;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    if ([settings[indexPath.section] count] > 1) return YES;
+    return NO;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -86,7 +106,13 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return settings[section][0];
+    if ([settings[section] count] > 1) return settings[section][0];
+    return nil;
+}
+
+- (void)valueChanged:(UISwitch *)sw {
+    NSString *setting = settings[sw.tag][0];
+    [DEFAULTS setBool:sw.on forKey:setting];
 }
 
 @end

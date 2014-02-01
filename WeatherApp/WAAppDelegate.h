@@ -61,6 +61,7 @@ typedef void(^WACallback)(void);    // WALocation's callback type
     CLLocationManager       *coreLocationManager;   // Core Location API manager
     NSUInteger              activityCount;          // reference count for activity indicator
     BOOL                    gotLocation;            // device has been located initially
+    WACallback              onFetchedConditions;    // callback for after fetch.
 }
 
 @property (strong, nonatomic) UIWindow *window;     // the application window

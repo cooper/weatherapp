@@ -19,6 +19,8 @@
 - (id)init {
     self = [super init];
     if (self) {
+        self.highC      =
+        self.highF      =
         self.degreesC   =
         self.degreesF   =
         self.heatIndexC =
@@ -89,7 +91,8 @@
         self.degreesC   = self.degreesF   =
         self.feelsLikeC = self.feelsLikeF =
         self.heatIndexC = self.heatIndexF =
-        self.windchillC = self.windchillF = TEMP_NONE;
+        self.windchillC = self.windchillF =
+        self.highC      = self.highF      = TEMP_NONE;
         
         // temperatures.
         // no longer round temperatures to the nearest whole degree here.
@@ -279,6 +282,18 @@
         t = self.degreesC + 273.15;
     else
         t = self.degreesC;
+    
+    return [NSString stringWithFormat:@"%.f", t];
+}
+
+- (NSString *)highTemp {
+    float t;
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
+        t = self.highF;
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+        t = self.highC + 273.15;
+    else
+        t = self.highC;
     
     return [NSString stringWithFormat:@"%.f", t];
 }

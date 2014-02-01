@@ -137,14 +137,14 @@
     location.initialLoadingComplete = YES;
     
     // temperatures.
-    location.degreesC   = [f[@"high"][@"celsius"]    floatValue];
-    location.degreesF   = [f[@"high"][@"fahrenheit"] floatValue];
-    location.feelsLikeC = [f[@"low"][@"celsius"]     floatValue];
-    location.feelsLikeF = [f[@"low"][@"fahrenheit"]  floatValue];
+    location.degreesC = [f[@"low"][@"celsius"]      floatValue];
+    location.degreesF = [f[@"low"][@"fahrenheit"]   floatValue];
+    location.highC    = [f[@"high"][@"celsius"]     floatValue];
+    location.highF    = [f[@"high"][@"fahrenheit"]  floatValue];
     
     // location (time).
-    location.city       = f[@"date"][@"weekday"];
-    location.region     = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
+    location.city     = f[@"date"][@"weekday"];
+    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
     
     // conditions.
     location.conditions     = f[@"conditions"];

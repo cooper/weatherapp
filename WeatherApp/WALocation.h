@@ -50,6 +50,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSString *conditionsImageName;                // name of image; i.e. "partlycloudy"
 @property float degreesC;                               // current temp (C)
 @property float degreesF;                               // current temp (F)
+@property float highC;                                  // high temp (C)
+@property float highF;                                  // high temp (F)
 @property float feelsLikeC;                             // feels like (C)
 @property float feelsLikeF;                             // feels like (F)
 @property float dewPointC;                              // dew point (C)
@@ -60,6 +62,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property float windchillF;                             // windchill (F)
 @property (readonly) NSString *temperature;             // localized temperature string
 @property (readonly) NSString *tempUnit;                // localized temperature unit
+@property (readonly) NSString *highTemp;                // localized high temperature string
 @property (readonly) NSString *feelsLike;               // localized feels like string
 @property (readonly) NSString *dewPoint;                // localized dew point string
 @property (readonly) NSString *heatIndex;               // localized heat index string

@@ -246,11 +246,19 @@
     
     // make the temperature part of the sublabel bold.
     NSString *tempUnit = SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin) ? @"K" : @"º";
-    NSRange tempRange  = NSMakeRange(0, [location.temperature length] + 1);
+
+    // display high and low temps if necessary.
+    NSString *tempStr;
+    if (location.highC != TEMP_NONE)
+        tempStr = FMT(@"↑%@↓%@", location.highTemp, location.temperature);
+    else
+        tempStr = FMT(@"%@%@", location.temperature, tempUnit);
+    
+    NSRange tempRange  = NSMakeRange(0, [tempStr length] + 1);
     
     // if we have no conditions, leave the sublabel blank.
     if (location.conditionsAsOf) {
-        NSString *tempAndConditions = FMT(@"%@%@ %@", location.temperature, tempUnit, OR(location.conditions, @""));
+        NSString *tempAndConditions = FMT(@"%@ %@", tempStr, OR(location.conditions, @""));
         
         // make the temperature part of the sublabel bold.
         NSMutableAttributedString *sublabel = [[NSMutableAttributedString alloc] initWithString:tempAndConditions];

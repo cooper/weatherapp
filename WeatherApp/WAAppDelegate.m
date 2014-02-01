@@ -20,14 +20,12 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = TABLE_COLOR;
-    
-    // create the location manager and current location view controller.
-    self.locationManager = [[WALocationManager alloc] init];
 
     // set default options if we haven't already.
     [self setDefaults];
     
     // load locations from settings.
+    self.locationManager = [[WALocationManager alloc] init];
     [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
     [self.locationManager fetchLocations];
     
@@ -41,8 +39,37 @@
     // start locating.
     [self startLocating];
 
+    // rain notification background check (every thirty minutes at most).
+    application.minimumBackgroundFetchInterval =
+        [DEFAULTS boolForKey:kEnableBackgroundSetting] ?
+        1800 : UIApplicationBackgroundFetchIntervalNever;
+    
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    NSLog(@"Background fetch!");
+    
+    // background fetch not enabled.
+    if (![DEFAULTS boolForKey:kEnableBackgroundSetting]) {
+        NSLog(@"background fetch without setting enabled");
+        completionHandler(UIBackgroundFetchResultFailed);
+        return;
+    }
+    
+    onFetchedConditions = ^{
+    
+        NSLog(@"GOT CONDITIONS! Now check if rain");
+        completionHandler(UIBackgroundFetchResultNewData);
+        
+        UILocalNotification *notification = [UILocalNotification new];
+        notification.alertBody = @"Conditions updated!";
+        
+        [application scheduleLocalNotification:notification];
+    };
+    gotLocation = NO;
+    [self startLocating];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -78,7 +105,7 @@
 
     // initial condition check.
     NSLog(@"Checking current conditions initially");
-    [self.currentLocation fetchCurrentConditions];
+    [self.currentLocation fetchCurrentConditionsThen:onFetchedConditions];
     
     [coreLocationManager stopUpdatingLocation];    
 }
@@ -184,6 +211,7 @@
     [DEFAULTS setObject:kTemperatureScaleFahrenheit forKey:kTemperatureScaleSetting];
     [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
     [DEFAULTS setObject:kPercipitationMeasureInches forKey:kPercipitationMeasureSetting];
+    [DEFAULTS setBool:YES forKey:kEnableBackgroundSetting];
     
     [DEFAULTS setObject:@{} forKey:@"backgrounds"];
     
