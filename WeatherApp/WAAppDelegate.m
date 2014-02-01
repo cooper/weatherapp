@@ -58,15 +58,50 @@
         return;
     }
     
-    onFetchedConditions = ^{
+    // here's how this works:
+    /*
     
-        NSLog(@"GOT CONDITIONS! Now check if rain");
-        completionHandler(UIBackgroundFetchResultNewData);
+        let's say wunderground says chancerain
+        show the notification with (as of) and set a bool that it's chancerain
         
+        next time we update, if that bool is true, just ignore it.
+     
+        next time we update and it says it's not chancerain, set bool false.
+    
+    */
+    
+    WALocation *location = self.currentLocation;
+    
+    onFetchedConditions = ^{
         UILocalNotification *notification = [UILocalNotification new];
-        notification.alertBody = @"Conditions updated!";
+
+        BOOL rain = [location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound;
+        
+        // chance of rain now, chance of rain before.
+        if (rain && [DEFAULTS boolForKey:@"chance_rain"]) {
+            NSLog(@"Rain, but user already knows");
+            completionHandler(UIBackgroundFetchResultNewData);
+            return;
+        }
+        
+        // chance of rain now, no chance before.
+        if (rain && ![DEFAULTS boolForKey:@"chance_rain"]) {
+            NSLog(@"Rain");
+            notification.alertBody = @"Keep your umbrella handy!";
+            [DEFAULTS setBool:YES forKey:@"chance_rain"];
+        }
+        
+        // no chance of rain.
+        if (!rain && [DEFAULTS boolForKey:@"chance_rain"]) {
+            NSLog(@"No rain");
+            //notification.alertBody = @"Looks like the rain's gone away";
+            [DEFAULTS setBool:NO forKey:@"chance_rain"];
+            return;
+        }
         
         [application scheduleLocalNotification:notification];
+        completionHandler(UIBackgroundFetchResultNewData);
+        
     };
     gotLocation = NO;
     [self startLocating];
