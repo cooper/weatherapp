@@ -11,7 +11,6 @@
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 #import "WAConditionDetailTVC.h"
-#import "UIImage+Screenshot.h"
 
 @implementation WAWeatherVC
 

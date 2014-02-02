@@ -81,10 +81,10 @@
     // miles.
     if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
         
-        // wind in miles.
+        // wind in miles.   (using floatValue forces minimum number of decimals)
         if ([r[@"wind_mph"] floatValue] > 0) [a addObjectsFromArray:@[
-            @[@"Wind speed",        FMT(@"%@ mph",      r[@"wind_mph"])                     ],
-            @[@"Gust speed",        FMT(@"%@ mph",      r[@"wind_gust_mph"])                ],
+            @[@"Wind speed",        FMT(@"%@ mph",      @([r[@"wind_mph"] floatValue]))     ],
+            @[@"Gust speed",        FMT(@"%@ mph",      @([r[@"wind_gust_mph"] floatValue]))],
             @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"]) ],
         ]];
         
@@ -162,36 +162,33 @@
     
     // other detail cells.
     [a addObjectsFromArray:@[
-        @[@"High temperature", FMT(@"%@ %@", location.temperature, location.tempUnit)       ],
-        @[@"Low temperature",  FMT(@"%@ %@", location.feelsLike,   location.tempUnit)       ],
+        @[@"High temperature", FMT(@"%@ %@", location.highTemp,    location.tempUnit)       ],
+        @[@"Low temperature",  FMT(@"%@ %@", location.temperature, location.tempUnit)       ],
         @[@"Avg. humidity",    FMT(@"%@%%", f[@"avehumidity"])                              ],
         @[@"Min. humidity",    FMT(@"%@%%", f[@"minhumidity"])                              ],
         @[@"Max. humidity",    FMT(@"%@%%", f[@"maxhumidity"])                              ]
     ]];
     
-    // wind info and visibility in miles.
-    if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-        @[@"Wind speed",        FMT(@"%@ mph",      f[@"avewind"][@"mph"])                  ],
-        @[@"Gust speed",        FMT(@"%@ mph",      f[@"maxwind"][@"mph"])                  ],
-        @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
-    ]];
     
-    // wind info and visibility in kilometers.
-    else [a addObjectsFromArray:@[
-        @[@"Wind speed",        FMT(@"%@ km/hr",    f[@"avewind"][@"kph"])                  ],
-        @[@"Gust speed",        FMT(@"%@ km/hr",    f[@"maxwind"][@"kph"])                  ],
-        @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
-    ]];
+    // wind.
+    if ([f[@"avewind"][@"kph"] floatValue] > 0) {
+        
+        // wind info in miles.
+        if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
+            @[@"Wind speed",        FMT(@"%@ mph",      f[@"avewind"][@"mph"])                  ],
+            @[@"Gust speed",        FMT(@"%@ mph",      f[@"maxwind"][@"mph"])                  ],
+            @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
+        ]];
+        
+        // wind info in kilometers.
+        else [a addObjectsFromArray:@[
+            @[@"Wind speed",        FMT(@"%@ km/hr",    f[@"avewind"][@"kph"])                  ],
+            @[@"Gust speed",        FMT(@"%@ km/hr",    f[@"maxwind"][@"kph"])                  ],
+            @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
+        ]];
+
+    }
     
-    
-    
-    // forecast description.
-    // FIXME: this is completely wrong.
-    //if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-    //    [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext"]), @""]];
-    //else
-    //    [a addObject:@[FMT(@"%@\n%@", t[@"title"], t[@"fcttext_metric"]), @""]];
-    //
     return @[location, a];
 }
 

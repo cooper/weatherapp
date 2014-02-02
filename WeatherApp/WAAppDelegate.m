@@ -96,6 +96,7 @@
             NSLog(@"No rain");
             //notification.alertBody = @"Looks like the rain's gone away";
             [DEFAULTS setBool:NO forKey:@"chance_rain"];
+            completionHandler(UIBackgroundFetchResultNewData);
             return;
         }
         

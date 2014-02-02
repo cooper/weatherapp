@@ -42,12 +42,20 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 
 #pragma mark - Weather conditions
 
-@property NSDictionary *response;
+@property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
+@property NSDictionary *response;                       // recent conditions response
+
+// times.
 @property NSDate *conditionsAsOf;                       // date of last condition check
 @property NSDate *observationsAsOf;                     // observation unix time
 @property NSString *observationTimeString;              // observation time string
+
+// icons.
 @property UIImage  *conditionsImage;                    // icon image of conditions
 @property NSString *conditionsImageName;                // name of image; i.e. "partlycloudy"
+@property BOOL nightTime;                               // is it night time?
+
+// temperatures.
 @property float degreesC;                               // current temp (C)
 @property float degreesF;                               // current temp (F)
 @property float highC;                                  // high temp (C)
@@ -60,6 +68,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property float heatIndexF;                             // heat index (F)
 @property float windchillC;                             // windchill (C)
 @property float windchillF;                             // windchill (F)
+
+// localized temperatures.
 @property (readonly) NSString *temperature;             // localized temperature string
 @property (readonly) NSString *tempUnit;                // localized temperature unit
 @property (readonly) NSString *highTemp;                // localized high temperature string
@@ -67,10 +77,9 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (readonly) NSString *dewPoint;                // localized dew point string
 @property (readonly) NSString *heatIndex;               // localized heat index string
 @property (readonly) NSString *windchill;               // localized windchill string
-@property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
-@property BOOL nightTime;                               // is it night time?
-@property NSArray *forecast;
-@property NSArray *textForecast;
+
+// forecasts.
+@property NSArray *forecast;                            // recent forecast response
 
 #pragma mark - Backgrounds
 
