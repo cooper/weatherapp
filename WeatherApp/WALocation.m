@@ -48,12 +48,10 @@
 
 // fetches and updates the current weather conditions of the location.
 - (void)fetchCurrentConditionsThen:(WACallback)then {
-    [self fetchThreeDayForecast];
     NSString *q = [self bestLookupMethod:@"conditions"];
     
     // fetch the conditions.
-    // todo: err handling, call endLoading in err.
-    [self beginLoading];
+    // TODO: err handling.
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
         
         NSDictionary *ob  = data[@"current_observation"];
@@ -132,8 +130,6 @@
         self.observationsAsOf = [NSDate dateWithTimeIntervalSince1970:[ob[@"observation_epoch"] doubleValue]];
         self.observationTimeString = [ob[@"observation_time"] stringByReplacingOccurrencesOfString:@"Last Updated on " withString:@""];
         
-        [self endLoading];
-        
         // execute callback.
         if (then) then();
         
@@ -141,12 +137,11 @@
     
 }
 
-// three-day forecast.
-- (void)fetchThreeDayForecast {
-    NSString *q = [self bestLookupMethod:@"forecast"];
+// three-day forecast. TODO: handle errors.
+- (void)fetchForecast {
+    NSString *q = [self bestLookupMethod:@"forecast10day"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
         self.forecast = data[@"forecast"][@"simpleforecast"][@"forecastday"];
-        self.textForecast = data[@"forecast"][@"txt_forecast"][@"forecastday"];
     }];
 }
 
@@ -187,9 +182,9 @@
         NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:ob[@"icon_url"]]];
         [self beginLoading];
         [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+            [self endLoading];
             if (!data) return;
             self.conditionsImage = [UIImage imageWithData:data];
-            [self endLoading];
         }];
     }
     
@@ -225,6 +220,7 @@
 // send a request to the API. runs asynchronously, decodes JSON,
 // and then executes the callback with an dictionary argument in main queue.
 - (void)fetch:(NSString *)page then:(WALocationCallback)callback {
+    [self beginLoading];
     
     // create a request for the weather underground API.
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:FMT(@"http://api.wunderground.com/api/" WU_API_KEY @"/%@", page)]];
@@ -235,6 +231,7 @@
         // an error occurred.
         if (connectionError || !data) {
             NSLog(@"Fetch error: %@", connectionError ? connectionError : @"unknown");
+            [self endLoading];
             return;
         }
         
@@ -244,18 +241,22 @@
         // an error occurred.
         if (error) {
             NSLog(@"Error decoding JSON response: %@", error);
+            [self endLoading];
             return;
         }
         
         // ensure that the data is a dictionary (JSON object).
         if (![jsonData isKindOfClass:[NSDictionary class]]) {
             NSLog(@"JSON response is not of object type.");
+            [self endLoading];
             return;
         }
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
         NSLog(@"json: %@", jsonData);
+
+        [self endLoading];
         
         // update the database.
         [APP_DELEGATE saveLocationsInDatabase];
@@ -429,7 +430,7 @@
 }
 
 - (void)updateBackgroundBoth:(BOOL)both {
-    NSLog(@"update background on %@", self.city);
+
     // in order by priority. the first match wins.
     
     // matching is case-insensitive. night is preferred if it's night time,

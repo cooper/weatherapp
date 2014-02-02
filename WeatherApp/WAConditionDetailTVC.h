@@ -7,13 +7,15 @@
 //
 
 @interface WAConditionDetailTVC : UITableViewController {
-    NSArray *currentConditions;
-    NSArray *forecastedConditions;
-    UIImage *background;
+    NSArray         *currentConditions;
+    NSArray         *forecastedConditions;
+    UIImage         *background;
+    UIBarButtonItem *refreshButton;
 }
 
 @property WALocation *location;
 
-- (id)initWithBackground:(UIImage *)background location:(WALocation *)location;
+- (id)initWithLocation:(WALocation *)location;
+- (void)update;
 
 @end

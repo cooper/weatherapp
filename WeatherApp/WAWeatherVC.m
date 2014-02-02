@@ -59,9 +59,18 @@
 #pragma mark - Interface actions
 
 - (void)tempTapped {
-    //UIImage *screenshot = [UIImage screenshot];
-    detailTVC = [[WAConditionDetailTVC alloc] initWithBackground:self.location.background location:self.location];
+
+    // no forecast fetched yet; do so.
+    if (!self.location.forecast)
+        [self.location fetchForecast];
+
+    // load the forecast view controller.
+    if (!detailTVC)
+        detailTVC = [[WAConditionDetailTVC alloc] initWithLocation:self.location];
+    
+    // push.
     [self.navigationController pushViewController:detailTVC animated:YES];
+    
 }
 
 #pragma mark - Updates from WALocation
@@ -85,6 +94,9 @@
     if (![self.location.temperature isEqualToString:self.location.feelsLike])
         self.feelsLikeLabel.text  = FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit);
     else self.feelsLikeLabel.text = @"";
+    
+    // update the detail table.
+    if (detailTVC) [detailTVC update];
 
 }
 

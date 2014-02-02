@@ -96,7 +96,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 
 - (void)fetchCurrentConditions;
 - (void)fetchCurrentConditionsThen:(WACallback)then;
-- (void)fetchThreeDayForecast;
+- (void)fetchForecast;
 - (void)fetchIcon;
 
 #pragma mark - User defaults

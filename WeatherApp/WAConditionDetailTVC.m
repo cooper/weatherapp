@@ -13,12 +13,9 @@
 
 @implementation WAConditionDetailTVC
 
-- (id)initWithBackground:(UIImage *)bg location:(WALocation *)location {
+- (id)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        self.location = location;
-        background    = bg;
-    }
+    if (self) self.location = location;
     return self;
 }
         
@@ -29,15 +26,45 @@
     [super viewDidLoad];
     
     self.navigationItem.title     = @"Details";
-    self.tableView.backgroundView = [[UIImageView alloc] initWithImage:background];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
-    currentConditions    = [self detailsForLocation:self.location];
-    forecastedConditions = [self forecastForLocation:self.location];
+    // refresh button.
+    refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
+    self.navigationItem.rightBarButtonItem = refreshButton;
+
+    [self update];
 }
 
 #pragma mark - Weather info
+
+- (void)update {
+
+    // generate new cell information.
+    currentConditions    = [self detailsForLocation:self.location];
+    forecastedConditions = [self forecastForLocation:self.location];
+    
+    // update table.
+    [self.tableView reloadData];
+    
+    // update the background if necessary.
+    if (background != self.location.background)
+        self.tableView.backgroundView = [[UIImageView alloc] initWithImage:self.location.background];
+    background = self.location.background;
+    
+    // loading and refresh button is visible.
+    if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        [indicator startAnimating];
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
+        [self.navigationItem setRightBarButtonItem:item animated:YES];
+    }
+    
+    // not loading and refresh button is not visible.
+    else if (!self.location.loading && self.navigationItem.rightBarButtonItem != refreshButton)
+        [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
+    
+}
 
 - (NSArray *)detailsForLocation:(WALocation *)location {
     NSMutableArray *a = [NSMutableArray array];
@@ -123,12 +150,21 @@
 
 - (NSArray *)forecastForLocation:(WALocation *)location {
     NSMutableArray *a = [NSMutableArray array];
-    for (NSUInteger i = 0; i < [location.forecast count]; i ++)
-        [a addObject:[self forecastForDay:location.forecast[i] text:location.textForecast[i]]];
+    
+    // what is the date?
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
+    NSNumber *today = @(dateComponents.hour);
+    
+    // add each day that is not today.
+    for (NSDictionary *day in self.location.forecast)
+        if (![day[@"date"][@"day"] isEqualToNumber:today])
+        [a addObject:[self forecastForDay:day]];
+    
     return a;
 }
 
-- (NSArray *)forecastForDay:(NSDictionary *)f text:(NSDictionary *)t {
+- (NSArray *)forecastForDay:(NSDictionary *)f {
     NSMutableArray *a    = [NSMutableArray array];
 
     // create a fake location for the cell.
@@ -160,13 +196,10 @@
     // cell background.
     [location updateBackgroundBoth:NO];
     
-    // other detail cells.
+    // other detail cells.↑%@↓
     [a addObjectsFromArray:@[
-        @[@"High temperature", FMT(@"%@ %@", location.highTemp,    location.tempUnit)       ],
-        @[@"Low temperature",  FMT(@"%@ %@", location.temperature, location.tempUnit)       ],
-        @[@"Avg. humidity",    FMT(@"%@%%", f[@"avehumidity"])                              ],
-        @[@"Min. humidity",    FMT(@"%@%%", f[@"minhumidity"])                              ],
-        @[@"Max. humidity",    FMT(@"%@%%", f[@"maxhumidity"])                              ]
+        @[@"Temperature",  FMT(@"↑%@%@ ↓%@%@", location.highTemp, location.tempUnit, location.temperature, location.tempUnit)],
+        @[@"Humidity",     FMT(@"~%@%% ↑%@%% ↓%@%%", f[@"avehumidity"], f[@"maxhumidity"], f[@"minhumidity"])],
     ]];
     
     
@@ -175,16 +208,14 @@
         
         // wind info in miles.
         if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-            @[@"Wind speed",        FMT(@"%@ mph",      f[@"avewind"][@"mph"])                  ],
-            @[@"Gust speed",        FMT(@"%@ mph",      f[@"maxwind"][@"mph"])                  ],
-            @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
+            @[@"Wind",  FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"mph"])],
+            @[@"Gusts", FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"mph"])]
         ]];
         
         // wind info in kilometers.
         else [a addObjectsFromArray:@[
-            @[@"Wind speed",        FMT(@"%@ km/hr",    f[@"avewind"][@"kph"])                  ],
-            @[@"Gust speed",        FMT(@"%@ km/hr",    f[@"maxwind"][@"kph"])                  ],
-            @[@"Wind direction",    FMT(@"%@ %@º",      f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"])   ],
+            @[@"Wind",  FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"kph"])],
+            @[@"Gusts", FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"kph"])]
         ]];
 
     }
@@ -265,5 +296,29 @@
     
     return cell;
 }
+
+// disable selection of cells.
+- (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NO;
+}
+
+#pragma mark - Interface actions
+
+- (void)refreshButtonTapped {
+
+    // fetch most recent data.
+    [self.location fetchCurrentConditions];
+    [self.location fetchForecast];
+
+    // loading and refresh button is visible.
+    if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {
+        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        [indicator startAnimating];
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:indicator];
+        [self.navigationItem setRightBarButtonItem:item animated:YES];
+    }
+    
+}
+
 
 @end
