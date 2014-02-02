@@ -30,7 +30,11 @@
             kPercipitationMeasureInches,
             kPercipitationMeasureMilimeters
         ]],
-        @[kEnableBackgroundSetting]
+        @[
+            kEnableBackgroundSetting,
+            kEnableFullLocationNameSetting,
+            kEnableLongitudeLatitudeSetting
+        ]
     ];
     
     self.tableView.backgroundColor = TABLE_COLOR;
@@ -43,8 +47,8 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if ([settings[section] count] > 1) return [settings[section][1] count];
-    return 1;
+    if (section < [settings count] - 1) return [settings[section][1] count];
+    return [settings[section] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -53,7 +57,7 @@
     NSString *sectionName, *rowName;
     
     // string option.
-    if ([settings[indexPath.section] count] > 1) {
+    if (indexPath.section < [settings count] - 1) {
         sectionName = settings[indexPath.section][0];
         rowName     = settings[indexPath.section][1][indexPath.row];
         
@@ -65,10 +69,10 @@
     
     // boolean option.
     else {
-        rowName      = settings[indexPath.section][0];
+        rowName      = settings[indexPath.section][indexPath.row];
         UISwitch *sw = [[UISwitch alloc] init];
-        sw.on        = [DEFAULTS boolForKey:rowName];
-        sw.tag       = indexPath.section;
+        sw.on        = SETTING(rowName);
+        sw.tag       = indexPath.row;
         [sw addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = sw;
     }
@@ -79,7 +83,7 @@
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([settings[indexPath.section] count] > 1) return YES;
+    if (indexPath.section < [settings count] - 1) return YES;
     return NO;
 }
 
@@ -106,12 +110,14 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if ([settings[section] count] > 1) return settings[section][0];
+    if (section < [settings count] - 1) return settings[section][0];
     return nil;
 }
 
+#pragma mark - Interface actions
+
 - (void)valueChanged:(UISwitch *)sw {
-    NSString *setting = settings[sw.tag][0];
+    NSString *setting = [settings lastObject][sw.tag];
     [DEFAULTS setBool:sw.on forKey:setting];
 }
 

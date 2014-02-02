@@ -21,3 +21,5 @@ FOUNDATION_EXPORT NSString * const kPercipitationMeasureInches;
 FOUNDATION_EXPORT NSString * const kPercipitationMeasureMilimeters;
 
 FOUNDATION_EXPORT NSString * const kEnableBackgroundSetting;
+FOUNDATION_EXPORT NSString * const kEnableFullLocationNameSetting;
+FOUNDATION_EXPORT NSString * const kEnableLongitudeLatitudeSetting;

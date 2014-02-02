@@ -4,6 +4,31 @@
 <array>
 	<dict>
 		<key>name</key>
+		<string>smoke</string>
+		<key>conditions</key>
+		<string>smoke</string>
+		<key>day</key>
+		<array>
+			<string>smoke</string>
+			<string>smoke2</string>
+		</array>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>haze</string>
+		<key>icon</key>
+		<string>fog</string>
+		<key>conditions</key>
+		<string>haze</string>
+		<key>day</key>
+		<array>
+			<string>haze</string>
+			<string>haze2</string>
+			<string>haze3</string>
+		</array>
+	</dict>
+	<dict>
+		<key>name</key>
 		<string>snow</string>
 		<key>icon</key>
 		<string>snow</string>
@@ -22,20 +47,6 @@
 			<string>snow-night2</string>
 			<string>snow-night3</string>
 			<string>snow-night4</string>
-		</array>
-	</dict>
-	<dict>
-		<key>name</key>
-		<string>haze</string>
-		<key>icon</key>
-		<string>fog</string>
-		<key>conditions</key>
-		<string>haze</string>
-		<key>day</key>
-		<array>
-			<string>haze</string>
-			<string>haze2</string>
-			<string>haze3</string>
 		</array>
 	</dict>
 	<dict>
@@ -67,17 +78,6 @@
 		<array>
 			<string>overcast2</string>
 			<string>overcast</string>
-		</array>
-	</dict>
-	<dict>
-		<key>name</key>
-		<string>smoke</string>
-		<key>conditions</key>
-		<string>smoke</string>
-		<key>day</key>
-		<array>
-			<string>smoke</string>
-			<string>smoke2</string>
 		</array>
 	</dict>
 	<dict>

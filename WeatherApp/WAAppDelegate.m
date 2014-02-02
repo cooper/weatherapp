@@ -41,7 +41,7 @@
 
     // rain notification background check (every thirty minutes at most).
     application.minimumBackgroundFetchInterval =
-        [DEFAULTS boolForKey:kEnableBackgroundSetting] ?
+        SETTING(kEnableBackgroundSetting) ?
         1800 : UIApplicationBackgroundFetchIntervalNever;
     
     [self.window makeKeyAndVisible];
@@ -52,7 +52,7 @@
     NSLog(@"Background fetch!");
     
     // background fetch not enabled.
-    if (![DEFAULTS boolForKey:kEnableBackgroundSetting]) {
+    if (!SETTING(kEnableBackgroundSetting)) {
         NSLog(@"background fetch without setting enabled");
         completionHandler(UIBackgroundFetchResultFailed);
         return;
@@ -78,21 +78,21 @@
         BOOL rain = [location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound;
         
         // chance of rain now, chance of rain before.
-        if (rain && [DEFAULTS boolForKey:@"chance_rain"]) {
+        if (rain && SETTING(@"chance_rain")) {
             NSLog(@"Rain, but user already knows");
             completionHandler(UIBackgroundFetchResultNewData);
             return;
         }
         
         // chance of rain now, no chance before.
-        if (rain && ![DEFAULTS boolForKey:@"chance_rain"]) {
+        if (rain && !SETTING(@"chance_rain")) {
             NSLog(@"Rain");
             notification.alertBody = @"Keep your umbrella handy!";
             [DEFAULTS setBool:YES forKey:@"chance_rain"];
         }
         
         // no chance of rain.
-        if (!rain && [DEFAULTS boolForKey:@"chance_rain"]) {
+        if (!rain && SETTING(@"chance_rain")) {
             NSLog(@"No rain");
             //notification.alertBody = @"Looks like the rain's gone away";
             [DEFAULTS setBool:NO forKey:@"chance_rain"];
@@ -247,7 +247,11 @@
     [DEFAULTS setObject:kTemperatureScaleFahrenheit forKey:kTemperatureScaleSetting];
     [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
     [DEFAULTS setObject:kPercipitationMeasureInches forKey:kPercipitationMeasureSetting];
+    
+    // default booleans.
     [DEFAULTS setBool:YES forKey:kEnableBackgroundSetting];
+    [DEFAULTS setBool:NO  forKey:kEnableFullLocationNameSetting];
+    [DEFAULTS setBool:NO  forKey:kEnableLongitudeLatitudeSetting];
     
     [DEFAULTS setObject:@{} forKey:@"backgrounds"];
     

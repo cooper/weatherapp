@@ -12,6 +12,7 @@
 #import "WANavigationController.h"
 #import "WALocationListTVC.h"
 #import "WAPageViewController.h"
+#import "WAConditionDetailTVC.h"
 #import "UIImage+Preload.h"
 
 @implementation WALocation
@@ -51,7 +52,6 @@
     NSString *q = [self bestLookupMethod:@"conditions"];
     
     // fetch the conditions.
-    // TODO: err handling.
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
         
         NSDictionary *ob  = data[@"current_observation"];
@@ -231,7 +231,7 @@
         // an error occurred.
         if (connectionError || !data) {
             NSLog(@"Fetch error: %@", connectionError ? connectionError : @"unknown");
-            [self endLoading];
+            [self handleError:connectionError.localizedDescription];
             return;
         }
         
@@ -241,20 +241,20 @@
         // an error occurred.
         if (error) {
             NSLog(@"Error decoding JSON response: %@", error);
-            [self endLoading];
+            [self handleError:@"Error decoding JSON response: %@"];
             return;
         }
         
         // ensure that the data is a dictionary (JSON object).
         if (![jsonData isKindOfClass:[NSDictionary class]]) {
             NSLog(@"JSON response is not of object type.");
-            [self endLoading];
+            [self handleError:@"JSON response is not of object type."];
             return;
         }
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
-        NSLog(@"json: %@", jsonData);
+        //NSLog(@"json: %@", jsonData);
 
         [self endLoading];
         
@@ -421,6 +421,14 @@
     // (replace loading indicator with refresh button)
     if (APP_DELEGATE.pageVC) [APP_DELEGATE.pageVC updateNavigationBar];
     
+}
+
+
+// handle an error.
+- (void)handleError:(NSString *)errstr {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:FMT(@"%@ error", OR(self.city, @"Location")) message:errstr delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+    [alert show];
+    [self endLoading];
 }
 
 #pragma mark - Backgrounds

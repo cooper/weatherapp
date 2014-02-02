@@ -117,7 +117,7 @@
         
         // visibility in miles.
         if ([r[@"visibility_mi"] floatValue] > 0) [a addObject:
-            @[@"Visibility",        FMT(@"%@ mi",       r[@"visibility_mi"])    ]
+            @[@"Visibility", FMT(@"%@ mi", r[@"visibility_mi"]) ]
         ];
         
     }
@@ -127,22 +127,30 @@
 
         // wind in kilometers.
         if ([r[@"wind_kph"] floatValue] > 0) [a addObjectsFromArray:@[
-            @[@"Wind speed",        FMT(@"%@ km/hr",    r[@"wind_kph"])                         ],
-            @[@"Gust speed",        FMT(@"%@ km/hr",    r[@"wind_gust_kph"])                    ],
-            @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"])     ],
+            @[@"Wind speed",     FMT(@"%@ km/hr",    r[@"wind_kph"])      ],
+            @[@"Gust speed",     FMT(@"%@ km/hr",    r[@"wind_gust_kph"]) ],
+            @[@"Wind direction", FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"]) ],
         ]];
         
         // visibility in kilometers.
         if ([r[@"visibility_km"] floatValue] > 0) [a addObject:
-            @[@"Visibility",        FMT(@"%@ km",       r[@"visibility_km"])    ]
+            @[@"Visibility", FMT(@"%@ km", r[@"visibility_km"]) ]
         ];
         
     }
     
-    // coordinates.
+
+    // determine time string.
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    [fmt setTimeZone:[NSTimeZone localTimeZone]];
+    [fmt setDateFormat:@"h:mm a"];
+    NSString *asOf = [fmt stringFromDate:self.location.observationsAsOf];
+
+    // coordinates and date.
     [a addObjectsFromArray:@[
-        @[@"Latitude",          FMT(@"%f", self.location.latitude)  ],
-        @[@"Longitude",         FMT(@"%f", self.location.longitude) ]
+        @[@"Latitude",     FMT(@"%f", self.location.latitude)  ],
+        @[@"Longitude",    FMT(@"%f", self.location.longitude) ],
+        @[@"Last updated", FMT(@"%@", asOf) ]
     ]];
     
     return a;
@@ -150,17 +158,8 @@
 
 - (NSArray *)forecastForLocation:(WALocation *)location {
     NSMutableArray *a = [NSMutableArray array];
-    
-    // what is the date?
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
-    NSNumber *today = @(dateComponents.hour);
-    
-    // add each day that is not today.
     for (NSDictionary *day in self.location.forecast)
-        if (![day[@"date"][@"day"] isEqualToNumber:today])
         [a addObject:[self forecastForDay:day]];
-    
     return a;
 }
 
@@ -178,10 +177,15 @@
     location.highC    = [f[@"high"][@"celsius"]     floatValue];
     location.highF    = [f[@"high"][@"fahrenheit"]  floatValue];
     
-    // location (time).
-    location.city     = f[@"date"][@"weekday"];
-    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
+    // is this today?
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
+    BOOL today = dateComponents.day == [f[@"date"][@"day"] integerValue];
     
+    // location (time).
+    location.city     = today ? @"Today" : f[@"date"][@"weekday"];
+    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
+
     // conditions.
     location.conditions     = f[@"conditions"];
     location.conditionsAsOf = [NSDate date];

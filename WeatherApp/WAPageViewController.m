@@ -72,7 +72,7 @@
 #pragma mark - Page view controller delegate
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
-    WAWeatherVC *toVC = pendingViewControllers[0];
+    WAWeatherVC *toVC = pendingViewControllers[0];NSLog(@"going %@", goingDown?@"down":@"up");
     NSUInteger i      = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
     
     WALocation *locationBefore = APP_DELEGATE.locationManager.locations[i];
@@ -131,7 +131,7 @@
 
 // gradually fade the background with scrolling.
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    CGFloat x = scrollView.contentOffset.y / (568./100.);
+    CGFloat x = scrollView.contentOffset.y / (self.view.bounds.size.height / 100.);
     
     // up or down?
     if (x > 100.) goingDown = YES;

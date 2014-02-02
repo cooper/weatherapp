@@ -23,3 +23,5 @@ NSString * const kPercipitationMeasureInches        = @"Inches";
 NSString * const kPercipitationMeasureMilimeters    = @"Milimeters";
 
 NSString * const kEnableBackgroundSetting           = @"Enable rain notifications";
+NSString * const kEnableFullLocationNameSetting     = @"Enable full location names";
+NSString * const kEnableLongitudeLatitudeSetting    = @"Enable global coordinates";

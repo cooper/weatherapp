@@ -44,12 +44,13 @@
     [self.view addGestureRecognizer:recognizer];
     
     // update with current information.
-    [self update];
+    [self updateInterface];
     
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self update];
+    [self updateInterface];
+    if (detailTVC) detailTVC = nil;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -65,8 +66,7 @@
         [self.location fetchForecast];
 
     // load the forecast view controller.
-    if (!detailTVC)
-        detailTVC = [[WAConditionDetailTVC alloc] initWithLocation:self.location];
+    detailTVC = [[WAConditionDetailTVC alloc] initWithLocation:self.location];
     
     // push.
     [self.navigationController pushViewController:detailTVC animated:YES];
@@ -76,6 +76,11 @@
 #pragma mark - Updates from WALocation
 
 - (void)update {
+    [self updateInterface];
+    if (detailTVC) [detailTVC update];
+}
+
+- (void)updateInterface {
     
     // info.
     self.locationTitle.text     = self.location.city;
@@ -90,14 +95,19 @@
     // localized temperature.
     self.temperature.text = self.location.temperature;
     
-    // feels like differs from actual.
-    if (![self.location.temperature isEqualToString:self.location.feelsLike])
+    // feels like, windchill, and heat index.
+    if (self.location.windchillC != TEMP_NONE)
+        self.feelsLikeLabel.text = FMT(@"Windchill %@%@", self.location.windchill, self.location.tempUnit);
+    else if (self.location.heatIndexC != TEMP_NONE)
+        self.feelsLikeLabel.text = FMT(@"Heat index %@%@", self.location.heatIndex, self.location.tempUnit);
+    else if (![self.location.temperature isEqualToString:self.location.feelsLike])
         self.feelsLikeLabel.text  = FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit);
     else self.feelsLikeLabel.text = @"";
-    
-    // update the detail table.
-    if (detailTVC) [detailTVC update];
 
+    // hide labels if necessary.
+    self.coordinateLabel.alpha   = SETTING(kEnableLongitudeLatitudeSetting) ? 1 : 0;
+    self.fullLocationLabel.alpha = SETTING(kEnableFullLocationNameSetting ) ? 1 : 0;
+    
 }
 
 @end

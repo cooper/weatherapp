@@ -37,6 +37,7 @@
 #define FMT(str, ...)       [NSString stringWithFormat:str, ##__VA_ARGS__]
 #define URL_ESC(str)        [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
 #define OR(this, otherwise) (this ? this : otherwise)
+#define SETTING(setting)    [DEFAULTS boolForKey:setting]
 #define SETTING_IS(setting, value) [[DEFAULTS objectForKey:setting] isEqualToString:value]
 
 // Types.
