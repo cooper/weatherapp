@@ -24,7 +24,7 @@
 }
 
 - (void)setViewController:(WAWeatherVC *)weatherVC {
-    [APP_DELEGATE.pageVC setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+    [appDelegate.pageVC setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
     self.location = weatherVC.location;
     [self updateNavigationBar];
 }
@@ -75,7 +75,7 @@
     WAWeatherVC *toVC = pendingViewControllers[0];
     NSUInteger i      = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
     
-    WALocation *locationBefore = APP_DELEGATE.locationManager.locations[i];
+    WALocation *locationBefore = appDelegate.locationManager.locations[i];
     background.image = locationBefore.background;
     background.frame = self.view.bounds;
     

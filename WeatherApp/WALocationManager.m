@@ -129,7 +129,7 @@
 - (void)focusLocationAtIndex:(NSUInteger)index {
     if (index >= [self.locations count]) return;
     WALocation *location = self.locations[index];
-    [APP_DELEGATE.pageVC setViewController:location.viewController];
+    [appDelegate.pageVC setViewController:location.viewController];
 }
 
 @end

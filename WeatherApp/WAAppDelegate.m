@@ -13,11 +13,15 @@
 #import "WAPageViewController.h"
 #import "WALocationListTVC.h"
 
+WAAppDelegate *appDelegate = nil;
+
 @implementation WAAppDelegate
 
 #pragma mark - Application delegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    appDelegate = self;
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = TABLE_COLOR;
 
@@ -141,12 +145,16 @@
 
     // stop locating.
     NSLog(@"It's been 3 seconds since first location update; assuming accuracy is good enough");
-    [coreLocationManager stopUpdatingLocation];    
+    [coreLocationManager stopUpdatingLocation];
+    NSLog(@"Stopped location services");
 
     // initial condition check.
-    NSLog(@"Checking current conditions initially");
+    NSLog(@"Checking current conditions");
     [self.currentLocation fetchCurrentConditionsThen:onFetchedConditions];
+    
+    // reset these for the next update.
     onFetchedConditions = nil;
+    gotLocation         = NO;
     
 }
 

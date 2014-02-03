@@ -351,16 +351,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,
+				A71C08E9181ED1B6003488ED /* main.m in Sources */,
 				A70EE9D11826C1CD00F317A9 /* WASettingsTVC.m in Sources */,
 				A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */,
 				BCA93CDC181F048400516E7E /* WALocationManager.m in Sources */,
 				BCA93CE0181F0A9100516E7E /* WALocation.m in Sources */,
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,
-				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,
 				A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */,
 				A7164981189078E800205E07 /* WAConditionDetailTVC.m in Sources */,
 				BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */,
-				A71C08E9181ED1B6003488ED /* main.m in Sources */,
 				A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */,
 				A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */,
 				A70EE9C01823622B00F317A9 /* WANewLocationTVC.m in Sources */,

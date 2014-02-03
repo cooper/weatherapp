@@ -63,13 +63,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [APP_DELEGATE.locationManager.locations count];
+    return [appDelegate.locationManager.locations count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
 
     // find the location object.
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     
     // is this a dummy cell?
     // dummy cells take of a cell being dragged.
@@ -109,7 +109,7 @@
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
 
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (!location.initialLoadingComplete) return NO;
     
     return YES;
@@ -117,7 +117,7 @@
 
 // prevent editing of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (location.isCurrentLocation) return NO;
     return YES;
 }
@@ -128,27 +128,27 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (location.isCurrentLocation) return;
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [APP_DELEGATE.locationManager destroyLocation:location];
+        [appDelegate.locationManager destroyLocation:location];
         [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
-    [APP_DELEGATE saveLocationsInDatabase];
+    [appDelegate saveLocationsInDatabase];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     // initial load not complete.
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
+    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (!location.initialLoadingComplete) return;
     
     // set current page to this location, and dismiss the nc.
-    [APP_DELEGATE.locationManager focusLocationAtIndex:indexPath.row];
-    [self.navigationController pushViewController:APP_DELEGATE.pageVC animated:YES];
+    [appDelegate.locationManager focusLocationAtIndex:indexPath.row];
+    [self.navigationController pushViewController:appDelegate.pageVC animated:YES];
     
     // update database for reorder and deletion.
-    [APP_DELEGATE saveLocationsInDatabase];
+    [appDelegate saveLocationsInDatabase];
 
 }
 
@@ -158,12 +158,12 @@
     // switch the locations.
     NSUInteger from = sourceIndexPath.row;
     NSUInteger to    = destinationIndexPath.row;
-    WALocation *loc1 = APP_DELEGATE.locationManager.locations[from];
-    WALocation *loc2 = APP_DELEGATE.locationManager.locations[to];
-    APP_DELEGATE.locationManager.locations[to]   = loc1;
-    APP_DELEGATE.locationManager.locations[from] = loc2;
+    WALocation *loc1 = appDelegate.locationManager.locations[from];
+    WALocation *loc2 = appDelegate.locationManager.locations[to];
+    appDelegate.locationManager.locations[to]   = loc1;
+    appDelegate.locationManager.locations[from] = loc2;
     
-    [APP_DELEGATE saveLocationsInDatabase];
+    [appDelegate saveLocationsInDatabase];
 
 }
 
@@ -294,8 +294,8 @@
 #pragma mark - Reorderable table delegate
 
 - (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
-    WALocation *location = APP_DELEGATE.locationManager.locations[indexPath.row];
-    [APP_DELEGATE.locationManager.locations replaceObjectAtIndex:indexPath.row withObject:[WALocation newDummy]];
+    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
+    [appDelegate.locationManager.locations replaceObjectAtIndex:indexPath.row withObject:[WALocation newDummy]];
     return location;
 }
 
@@ -310,8 +310,8 @@
 // object you returned in saveObjectAndInsertBlankRowAtIndexPath:. Simply update the data source so the
 // object is in its new position. You should do any saving/cleanup here.
 - (void)finishReorderingWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
-    APP_DELEGATE.locationManager.locations[indexPath.row] = object;
-    [APP_DELEGATE saveLocationsInDatabase];
+    appDelegate.locationManager.locations[indexPath.row] = object;
+    [appDelegate saveLocationsInDatabase];
 }
 
 @end

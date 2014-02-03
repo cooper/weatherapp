@@ -258,7 +258,7 @@
         [self endLoading];
         
         // update the database.
-        [APP_DELEGATE saveLocationsInDatabase];
+        [appDelegate saveLocationsInDatabase];
         
     }];
 }
@@ -385,11 +385,11 @@
     self.loading = YES;
     
     // start status bar indicator.
-    [APP_DELEGATE beginActivity];
+    [appDelegate beginActivity];
     
     // if pageVC exists, update its navigation bar.
     // (to add indicator in place of refresh button)
-    if (APP_DELEGATE.pageVC) [APP_DELEGATE.pageVC updateNavigationBar];
+    if (appDelegate.pageVC) [appDelegate.pageVC updateNavigationBar];
     
 }
 
@@ -406,19 +406,19 @@
     }
     
     // stop the status bar indicator.
-    [APP_DELEGATE endActivity];
+    [appDelegate endActivity];
     
     // update the weather view controller's info.
     [self updateBackground];
     [self.viewController update];
     
     // if the location list TVC exists, update the cell for this location.
-    WANavigationController *nc = APP_DELEGATE.nc;
+    WANavigationController *nc = appDelegate.nc;
     if (nc && nc.tvc) [nc.tvc updateLocationAtIndex:self.index];
     
     // if the pageVC exists, update the navigation bar.
     // (replace loading indicator with refresh button)
-    if (APP_DELEGATE.pageVC) [APP_DELEGATE.pageVC updateNavigationBar];
+    if (appDelegate.pageVC) [appDelegate.pageVC updateNavigationBar];
     
 }
 

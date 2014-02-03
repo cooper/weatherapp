@@ -15,7 +15,6 @@
 
 // Commonly-accessed properties.
 
-#define APP_DELEGATE ((WAAppDelegate *)([UIApplication sharedApplication].delegate))
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
 
 // Wunderground API settings.
@@ -75,3 +74,5 @@ typedef void(^WACallback)(void);    // WALocation's callback type
 - (void)endActivity;                // decrease activity counter
 
 @end
+
+extern WAAppDelegate *appDelegate;

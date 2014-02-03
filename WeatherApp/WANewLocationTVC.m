@@ -118,12 +118,12 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    WALocation *location = [APP_DELEGATE.locationManager createLocationFromDictionary:results[indexPath.row]];
+    WALocation *location = [appDelegate.locationManager createLocationFromDictionary:results[indexPath.row]];
     
     // fetch the conditions. then, update the sections if something changed.
     //NSString *before = results[indexPath.row][@"longName"];
     [location fetchCurrentConditions];
-    [APP_DELEGATE.nc popToRootViewControllerAnimated:YES];
+    [appDelegate.nc popToRootViewControllerAnimated:YES];
 }
 
 #pragma mark - Suggestion lookups
@@ -145,9 +145,9 @@
     
     // send the request asynchronously.
     NSDate *date = [NSDate date];
-    [APP_DELEGATE beginActivity];
+    [appDelegate beginActivity];
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        [APP_DELEGATE endActivity];
+        [appDelegate endActivity];
 
     
         // the user already selected something, so just forget about this request.
