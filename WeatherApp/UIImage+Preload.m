@@ -10,9 +10,7 @@
 
 @implementation UIImage (Preload)
 
-// preload an image.
-- (UIImage *)preloadedImage {
-    CGImageRef image = self.CGImage;
+CGImageRef preload_image(CGImageRef image) {
     
     size_t width  = CGImageGetWidth(image);
     size_t height = CGImageGetHeight(image);
@@ -25,14 +23,19 @@
     
     CGColorSpaceRelease(colourSpace);
     CGContextDrawImage(imageContext, CGRectMake(0, 0, width, height), image);
+    
     CGImageRef outputImage = CGBitmapContextCreateImage(imageContext);
-    
-    UIImage *cachedImage = [UIImage imageWithCGImage:outputImage];
-    
-    CGImageRelease(outputImage);
     CGContextRelease(imageContext);
     
-    return cachedImage;
+    return outputImage;
+}
+
+// preload an image.
+- (UIImage *)preloadedImage {
+    CGImageRef image = preload_image(self.CGImage);
+    UIImage *uiimage = [UIImage imageWithCGImage:image];
+    CGImageRelease(image);
+    return uiimage;
 }
 
 @end

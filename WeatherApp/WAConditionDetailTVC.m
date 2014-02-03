@@ -15,7 +15,10 @@
 
 - (id)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) self.location = location;
+    if (self) {
+        self.location = location;
+        fakeLocations = self.location.fakeLocations;
+    }
     return self;
 }
         
@@ -158,16 +161,21 @@
 
 - (NSArray *)forecastForLocation:(WALocation *)location {
     NSMutableArray *a = [NSMutableArray array];
-    for (NSDictionary *day in self.location.forecast)
-        [a addObject:[self forecastForDay:day]];
+    for (unsigned int i = 0; i < [self.location.forecast count]; i++)
+        [a addObject:[self forecastForDay:self.location.forecast[i] index:i]];
     return a;
 }
 
-- (NSArray *)forecastForDay:(NSDictionary *)f {
+- (NSArray *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
     NSMutableArray *a    = [NSMutableArray array];
 
     // create a fake location for the cell.
-    WALocation *location = [[WALocation alloc] init];
+    WALocation *location;
+    if ([fakeLocations count] >= i + 1)
+        location = fakeLocations[i];
+    else
+        location = fakeLocations[i] = [[WALocation alloc] init];
+    
     location.loading     = NO;
     location.initialLoadingComplete = YES;
     

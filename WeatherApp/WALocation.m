@@ -254,7 +254,6 @@
         
         // everything looks well; go ahead and fire the callback.
         callback(response, jsonData, connectionError);
-        //NSLog(@"json: %@", jsonData);
 
         [self endLoading];
         
@@ -523,20 +522,15 @@
     self.currentBackgroundConditions = self.conditions;
     self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
     
-    // UIImage is not thread-safe, so we have to load these in the main queue.
-    //dispatch_async(dispatch_get_main_queue(), ^{
+    // load the full-size background as well.
+    if (both) {
+        NSString *backgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
+        self.background = [[UIImage imageWithContentsOfFile:backgroundFile] preloadedImage];
+    }
+
+    NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
+    self.cellBackground = [[UIImage imageWithContentsOfFile:cellBackgroundFile] preloadedImage];
     
-        // load the full-size background as well.
-        if (both) {
-            NSString *backgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/%@", chosenBackground) ofType:@"jpg"];
-            self.background = [[UIImage imageWithContentsOfFile:backgroundFile] preloadedImage];
-        }
-
-        NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
-        self.cellBackground = [[UIImage imageWithContentsOfFile:cellBackgroundFile] preloadedImage];
-
-    //});
-
 }
 
 @end

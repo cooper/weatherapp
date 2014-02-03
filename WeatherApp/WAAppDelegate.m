@@ -53,7 +53,7 @@
     
     // background fetch not enabled.
     if (!SETTING(kEnableBackgroundSetting)) {
-        NSLog(@"background fetch without setting enabled");
+        NSLog(@"Background fetch without setting enabled");
         completionHandler(UIBackgroundFetchResultFailed);
         return;
     }
@@ -167,7 +167,7 @@
     // already got the location.
     if (gotLocation) return;
     
-    NSLog(@"updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
+    NSLog(@"Updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
     
     // set our current location.
     self.currentLocation.latitude     = recentLocation.coordinate.latitude;
@@ -181,11 +181,13 @@
 }
 
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
-    NSLog(@"resumed location updates");
+    NSLog(@"Resumed location updates");
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
-    NSLog(@"location error: %@", error);
+    NSLog(@"Location error: %@", error);
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Location services error" message:[error localizedDescription] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+    [alert show];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {

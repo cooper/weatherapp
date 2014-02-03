@@ -310,7 +310,6 @@
 // object you returned in saveObjectAndInsertBlankRowAtIndexPath:. Simply update the data source so the
 // object is in its new position. You should do any saving/cleanup here.
 - (void)finishReorderingWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"%@, %ld, %ld", object, (long)indexPath.section, (long)indexPath.row);
     APP_DELEGATE.locationManager.locations[indexPath.row] = object;
     [APP_DELEGATE saveLocationsInDatabase];
 }

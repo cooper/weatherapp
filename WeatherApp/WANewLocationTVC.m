@@ -118,7 +118,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"selected: %@", results[indexPath.row]);
     WALocation *location = [APP_DELEGATE.locationManager createLocationFromDictionary:results[indexPath.row]];
     
     // fetch the conditions. then, update the sections if something changed.
@@ -218,7 +217,6 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     lastTypeDate = [NSDate date];
-    NSLog(@"Should change characters");
     [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:0.5];
     return YES;
 }

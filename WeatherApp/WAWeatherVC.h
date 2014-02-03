@@ -9,8 +9,8 @@
 #import <CoreLocation/CoreLocation.h>
 
 @interface WAWeatherVC : UIViewController <UIGestureRecognizerDelegate> {
-    UIBarButtonItem *refreshButton;
-    WAConditionDetailTVC *detailTVC;
+    UIBarButtonItem         *refreshButton;
+    WAConditionDetailTVC    *detailTVC;
 }
 
 @property IBOutlet UILabel *locationTitle;

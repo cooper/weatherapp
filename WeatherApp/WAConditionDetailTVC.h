@@ -11,6 +11,7 @@
     NSArray         *forecastedConditions;
     UIImage         *background;
     UIBarButtonItem *refreshButton;
+    NSMutableArray  *fakeLocations;
 }
 
 @property WALocation *location;

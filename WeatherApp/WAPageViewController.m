@@ -72,7 +72,7 @@
 #pragma mark - Page view controller delegate
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
-    WAWeatherVC *toVC = pendingViewControllers[0];NSLog(@"going %@", goingDown?@"down":@"up");
+    WAWeatherVC *toVC = pendingViewControllers[0];
     NSUInteger i      = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
     
     WALocation *locationBefore = APP_DELEGATE.locationManager.locations[i];
@@ -87,7 +87,7 @@
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     WAWeatherVC *weatherVC = self.viewControllers[0];
-    NSLog(@"Setting city from %@ to %@", self.location.city, weatherVC.location.city);
+    NSLog(@"Setting current city from %@ to %@", self.location.city, weatherVC.location.city);
     self.location = weatherVC.location;
     if (completed) [self updateNavigationBar]; // fixes it.
 }
