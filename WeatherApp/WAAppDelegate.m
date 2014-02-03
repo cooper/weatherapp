@@ -139,11 +139,15 @@
 
 - (void)stopLocating {
 
+    // stop locating.
+    NSLog(@"It's been 3 seconds since first location update; assuming accuracy is good enough");
+    [coreLocationManager stopUpdatingLocation];    
+
     // initial condition check.
     NSLog(@"Checking current conditions initially");
     [self.currentLocation fetchCurrentConditionsThen:onFetchedConditions];
+    onFetchedConditions = nil;
     
-    [coreLocationManager stopUpdatingLocation];    
 }
 
 #pragma mark - Activity
@@ -164,8 +168,8 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     CLLocation *recentLocation = [locations lastObject];
     
-    // already got the location.
-    if (gotLocation) return;
+    // first update - start the ticker.
+    if (!gotLocation) [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
     
     NSLog(@"Updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
     
@@ -174,8 +178,6 @@
     self.currentLocation.longitude    = recentLocation.coordinate.longitude;
     self.currentLocation.locationAsOf = [NSDate date];
     
-    // stop updating location.
-    [self stopLocating];
     gotLocation = YES;
 
 }
@@ -191,15 +193,15 @@
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    if (status != kCLAuthorizationStatusAuthorized) return;
+    if (status != kCLAuthorizationStatusAuthorized) {
+        // TODO: alert
+        return;
+    }
     
     // only start updating location if we're able to.
     if ([CLLocationManager locationServicesEnabled]) {
         [coreLocationManager startUpdatingLocation];
-        
-        // initial lookup after 3 seconds.
-        //[self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
-        
+        NSLog(@"Location services enabled");
     }
     
 }
