@@ -452,11 +452,13 @@
     
     // if the icon and conditions haven't changed, don't waste energy analyzing backgrounds.
     unsigned int i = 0; NSDictionary *selection;
-    if ([self.currentBackgroundIcon isEqualToString:self.conditionsImageName] && [self.currentBackgroundConditions isEqualToString:self.conditions])
-        NSLog(@"Icon and conditions not changed. Background is same");
+    if (![self.currentBackgroundIcon isEqualToString:self.conditionsImageName] ||
+        ![self.currentBackgroundConditions isEqualToString:self.conditions])
+        
+    // one or both have changed.
+    for (NSDictionary *bg in backgrounds) {
     
-    // find a background.
-    else for (NSDictionary *bg in backgrounds) {
+        // search for matches.
         BOOL matchesIcon = bg[@"icon"] && [self.conditionsImageName rangeOfString:bg[@"icon"] options:NSCaseInsensitiveSearch].location != NSNotFound;
         BOOL matchesConditions = bg[@"conditions"] && [self.conditions rangeOfString:bg[@"conditions"] options:NSCaseInsensitiveSearch].location != NSNotFound;
         

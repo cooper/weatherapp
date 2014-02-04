@@ -15,6 +15,19 @@
 	</dict>
 	<dict>
 		<key>name</key>
+		<string>tstorm</string>
+		<key>icon</key>
+		<string>tstorm</string>
+		<key>day</key>
+		<array>
+			<string>tstorm</string>
+			<string>tstorm2</string>
+			<string>tstorm3</string>
+			<string>tstorm4</string>
+		</array>
+	</dict>
+	<dict>
+		<key>name</key>
 		<string>haze</string>
 		<key>icon</key>
 		<string>fog</string>

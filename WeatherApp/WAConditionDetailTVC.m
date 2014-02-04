@@ -17,6 +17,8 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.location = location;
+        if (!self.location.fakeLocations)
+            self.location.fakeLocations = [NSMutableArray array];
         fakeLocations = self.location.fakeLocations;
     }
     return self;
