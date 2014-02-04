@@ -202,7 +202,8 @@ WAAppDelegate *appDelegate = nil;
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     if (status != kCLAuthorizationStatusAuthorized) {
-        // TODO: alert
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Location permissions" message:@"Please enable location services for this app in the Settings app." delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+        [alert show];
         return;
     }
     

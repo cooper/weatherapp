@@ -34,6 +34,12 @@
             kEnableBackgroundSetting,
             kEnableFullLocationNameSetting,
             kEnableLongitudeLatitudeSetting
+        ],
+        @[
+            @[@"Icons",                 @"Mitchell Cooper"      ],
+            @[@"Other images",          @"Public domain"        ],
+            @[@"Weather data",          @"WeatherUnderground"   ],
+            @""
         ]
     ];
     
@@ -42,22 +48,26 @@
 
 #pragma mark - Table view data source
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 50;
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return [settings count];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section < [settings count] - 1) return [settings[section][1] count];
+    if (section < [settings count] - 2) return [settings[section][1] count];
     return [settings[section] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
     
     NSString *sectionName, *rowName;
     
     // string option.
-    if (indexPath.section < [settings count] - 1) {
+    if (indexPath.section < [settings count] - 2) {
         sectionName = settings[indexPath.section][0];
         rowName     = settings[indexPath.section][1][indexPath.row];
         
@@ -68,7 +78,7 @@
     }
     
     // boolean option.
-    else {
+    else if (indexPath.section < [settings count] - 1) {
         rowName      = settings[indexPath.section][indexPath.row];
         UISwitch *sw = [[UISwitch alloc] init];
         sw.on        = SETTING(rowName);
@@ -77,13 +87,31 @@
         cell.accessoryView = sw;
     }
 
+    // credits.
+    else {
+    
+        // wunderground icon.
+        if (settings[indexPath.section][indexPath.row] == [settings[indexPath.section] lastObject]) {
+            UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"wunderground"]];
+            imageView.center = [cell.contentView convertPoint:cell.contentView.center fromView:cell.contentView.superview];
+            [cell.contentView addSubview:imageView];
+        }
+        
+        // other credit.
+        else {
+            rowName = settings[indexPath.section][indexPath.row][0];
+            cell.detailTextLabel.text = settings[indexPath.section][indexPath.row][1];
+        }
+        
+    }
+
     cell.textLabel.text = rowName;
     
     return cell;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section < [settings count] - 1) return YES;
+    if (indexPath.section < [settings count] - 2) return YES;
     return NO;
 }
 
@@ -110,14 +138,15 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section < [settings count] - 1) return settings[section][0];
-    return nil;
+    if (section == [settings count] - 2) return @"Options";
+    if (section == [settings count] - 1) return @"Credits";
+    return settings[section][0];
 }
 
 #pragma mark - Interface actions
 
 - (void)valueChanged:(UISwitch *)sw {
-    NSString *setting = [settings lastObject][sw.tag];
+    NSString *setting = settings[ [settings count] - 2 ][sw.tag];
     [DEFAULTS setBool:sw.on forKey:setting];
 }
 

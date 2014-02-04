@@ -472,7 +472,7 @@
             // here's our winning list.
             selection = @{
                 @"index": @(i),
-                @"name":  bg[@"name"],
+                @"name":  bg[@"inherit"] ? bg[@"inherit"] : bg[@"name"],
                 @"night": @(nightTime)
             };
             break;

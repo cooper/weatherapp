@@ -21,6 +21,8 @@
 		A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A739BFAB1866B8B40003D323 /* BVReorderTableView.m */; };
 		A747819C1864EF00003DCA60 /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = A747819B1864EF00003DCA60 /* backgrounds */; };
 		A747819E18661209003DCA60 /* backgrounds.plist in Resources */ = {isa = PBXBuildFile; fileRef = A747819D18661209003DCA60 /* backgrounds.plist */; };
+		A76A07BC18A0767900C813B5 /* wunderground.png in Resources */ = {isa = PBXBuildFile; fileRef = A76A07BB18A0767900C813B5 /* wunderground.png */; };
+		A76A07BE18A0789400C813B5 /* wunderground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A76A07BD18A0789400C813B5 /* wunderground@2x.png */; };
 		A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786135A1863DA1C0052FCC5 /* WAPageViewController.m */; };
 		A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */; };
 		A7E9779518288423004189B0 /* WANavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779418288423004189B0 /* WANavigationController.m */; };
@@ -58,6 +60,8 @@
 		A739BFAB1866B8B40003D323 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BVReorderTableView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
 		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
+		A76A07BB18A0767900C813B5 /* wunderground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wunderground.png; sourceTree = "<group>"; };
+		A76A07BD18A0789400C813B5 /* wunderground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "wunderground@2x.png"; sourceTree = "<group>"; };
 		A78613591863DA1C0052FCC5 /* WAPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAPageViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A786135A1863DA1C0052FCC5 /* WAPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAPageViewController.m; sourceTree = "<group>"; };
 		A7CDF03C1891C6E50073E76F /* UIImage+Preload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Preload.h"; sourceTree = "<group>"; };
@@ -182,6 +186,8 @@
 				A71C08E8181ED1B6003488ED /* main.m */,
 				A71C08EA181ED1B6003488ED /* Weather-Prefix.pch */,
 				A739BFA61866A5220003D323 /* navbar.png */,
+				A76A07BB18A0767900C813B5 /* wunderground.png */,
+				A76A07BD18A0789400C813B5 /* wunderground@2x.png */,
 				A747819D18661209003DCA60 /* backgrounds.plist */,
 				BC1367FA182162920090CAC5 /* UserDefaults.txt */,
 			);
@@ -336,11 +342,13 @@
 			files = (
 				BCA93CD2181EEB2B00516E7E /* WAWeatherVC.xib in Resources */,
 				A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */,
+				A76A07BE18A0789400C813B5 /* wunderground@2x.png in Resources */,
 				A739BFA71866A5220003D323 /* navbar.png in Resources */,
 				A70EE9D81827142E00F317A9 /* icons in Resources */,
 				A747819C1864EF00003DCA60 /* backgrounds in Resources */,
 				A747819E18661209003DCA60 /* backgrounds.plist in Resources */,
 				BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */,
+				A76A07BC18A0767900C813B5 /* wunderground.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -42,6 +42,14 @@
 	</dict>
 	<dict>
 		<key>name</key>
+		<string>sleet</string>
+		<key>icon</key>
+		<string>sleet</string>
+		<key>inherit</key>
+		<string>snow</string>
+	</dict>
+	<dict>
+		<key>name</key>
 		<string>snow</string>
 		<key>icon</key>
 		<string>snow</string>
