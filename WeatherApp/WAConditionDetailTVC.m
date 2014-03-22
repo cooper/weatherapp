@@ -10,17 +10,13 @@
 #import "WALocation.h"
 #import "WALocationListTVC.h"
 #import "WAPageViewController.h"
+#import "UITableView+Reload.h"
 
 @implementation WAConditionDetailTVC
 
 - (id)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        self.location = location;
-        if (!self.location.fakeLocations)
-            self.location.fakeLocations = [NSMutableArray array];
-        fakeLocations = self.location.fakeLocations;
-    }
+    if (self) self.location = location;
     return self;
 }
         
@@ -38,19 +34,22 @@
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
 
-    [self update];
+    [self update:YES];
 }
 
 #pragma mark - Weather info
 
 - (void)update {
+    [self update:NO];
+}
+
+- (void)update:(BOOL)firstTime {
 
     // generate new cell information.
     currentConditions    = [self detailsForLocation:self.location];
-    forecastedConditions = [self forecastForLocation:self.location];
     
     // update table.
-    [self.tableView reloadData];
+    [self.tableView reloadData:!firstTime];
     
     // update the background if necessary.
     if (background != self.location.background)
@@ -161,109 +160,18 @@
     return a;
 }
 
-- (NSArray *)forecastForLocation:(WALocation *)location {
-    NSMutableArray *a = [NSMutableArray array];
-    for (unsigned int i = 0; i < [self.location.forecast count]; i++)
-        [a addObject:[self forecastForDay:self.location.forecast[i] index:i]];
-    return a;
-}
-
-- (NSArray *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
-    NSMutableArray *a    = [NSMutableArray array];
-
-    // create a fake location for the cell.
-    WALocation *location;
-    if ([fakeLocations count] >= i + 1)
-        location = fakeLocations[i];
-    else
-        location = fakeLocations[i] = [[WALocation alloc] init];
-    
-    location.loading     = NO;
-    location.initialLoadingComplete = YES;
-    
-    // temperatures.
-    location.degreesC = [f[@"low"][@"celsius"]      floatValue];
-    location.degreesF = [f[@"low"][@"fahrenheit"]   floatValue];
-    location.highC    = [f[@"high"][@"celsius"]     floatValue];
-    location.highF    = [f[@"high"][@"fahrenheit"]  floatValue];
-    
-    // is this today?
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
-    BOOL today = dateComponents.day == [f[@"date"][@"day"] integerValue];
-    
-    // location (time).
-    location.city     = today ? @"Today" : f[@"date"][@"weekday"];
-    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
-
-    // conditions.
-    location.conditions     = f[@"conditions"];
-    location.conditionsAsOf = [NSDate date];
-    
-    // icon.
-    location.response = @{
-        @"icon":        f[@"icon"],
-        @"icon_url":    f[@"icon_url"]
-    };
-    [location fetchIcon];
-    
-    // cell background.
-    [location updateBackgroundBoth:NO];
-    
-    // other detail cells.↑%@↓
-    [a addObjectsFromArray:@[
-        @[@"Temperature",  FMT(@"↑%@%@ ↓%@%@", location.highTemp, location.tempUnit, location.temperature, location.tempUnit)],
-        @[@"Humidity",     FMT(@"~%@%% ↑%@%% ↓%@%%", f[@"avehumidity"], f[@"maxhumidity"], f[@"minhumidity"])],
-    ]];
-    
-    
-    // wind.
-    if ([f[@"avewind"][@"kph"] floatValue] > 0) {
-        
-        // wind info in miles.
-        if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-            @[@"Wind",  FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"mph"])],
-            @[@"Gusts", FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"mph"])]
-        ]];
-        
-        // wind info in kilometers.
-        else [a addObjectsFromArray:@[
-            @[@"Wind",  FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"kph"])],
-            @[@"Gusts", FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"kph"])]
-        ]];
-
-    }
-    
-    return @[location, a];
-}
-
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-
-    // number of forecasts + the current conditions.
-    return [self.location.forecast count] + 1;
-    
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-
-    // current conditions section.
-    if (!section) return [currentConditions count] + 1; // plus header
-    
-    // forecast section.
-    return [forecastedConditions[section - 1][1] count] + 1; // plus header
-    
+    return [currentConditions count] + 1; // plus header
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    //if (!indexPath.row && !indexPath.section) return 150;
     if (!indexPath.row) return 100;
-    
-    // description cell.
-    //if (indexPath.section && indexPath.row > [forecastedConditions[indexPath.section - 1] count])
-    //    return 150;
-    
     return 50;
 }
 
@@ -272,41 +180,20 @@
     // generic base cell.
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];//[UIColor clearColor];
-    //cell.textLabel.textColor       = [UIColor whiteColor];
-    cell.detailTextLabel.textColor = [UIColor blackColor];//[UIColor whiteColor];
-    //cell.backgroundView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"navbar.png"]];
-    
-    // current conditions.
-    if (!indexPath.section) {
-    
-        // show the location cell for this location.
-        if (!indexPath.row) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
-            [WALocationListTVC applyWeatherInfo:self.location toCell:cell];
-            cell.backgroundView = nil;
-            return cell;
-        }
-    
-        // detail for current conditions.
-        cell.textLabel.text = currentConditions[indexPath.row - 1][0];
-        cell.detailTextLabel.text = currentConditions[indexPath.row - 1][1];
-        return cell;
-        
-    }
-    
-    // artificial location row of a future day.
+    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
+    cell.detailTextLabel.textColor = [UIColor blackColor];
+
+    // show the location cell for this location.
     if (!indexPath.row) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
-        WALocation *location = forecastedConditions[indexPath.section - 1][0];
-        [WALocationListTVC applyWeatherInfo:location toCell:cell];
+        [WALocationListTVC applyWeatherInfo:self.location toCell:cell];
+        cell.backgroundView = nil;
         return cell;
     }
-    
-    // detail label on a forecast.
-    cell.textLabel.text          = forecastedConditions[indexPath.section - 1][1][indexPath.row - 1][0];
-    cell.detailTextLabel.text    = forecastedConditions[indexPath.section - 1][1][indexPath.row - 1][1];
-    cell.textLabel.numberOfLines = 0;
+
+    // detail for current conditions.
+    cell.textLabel.text = currentConditions[indexPath.row - 1][0];
+    cell.detailTextLabel.text = currentConditions[indexPath.row - 1][1];
     
     return cell;
 }

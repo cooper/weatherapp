@@ -54,7 +54,9 @@ typedef void(^WACallback)(void);    // WALocation's callback type
     WANewLocationTVC,
     WASettingsTVC,
     WAWeatherVC,
-    WAConditionDetailTVC;
+    WAConditionDetailTVC,
+    WADailyForecastTVC,
+    WAHourlyForecastTVC;
 
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;   // Core Location API manager

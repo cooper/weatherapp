@@ -35,6 +35,7 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
     self.navigationItem.title = @"Locations";
+    self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Overview" image:[[UIImage alloc] init] selectedImage:[[UIImage alloc] init]];
     
     // navigation bar buttons.
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
@@ -142,7 +143,7 @@
     // initial load not complete.
     WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (!location.initialLoadingComplete) return;
-    
+
     // set current page to this location, and dismiss the nc.
     [appDelegate.locationManager focusLocationAtIndex:indexPath.row];
     [self.navigationController pushViewController:appDelegate.pageVC animated:YES];

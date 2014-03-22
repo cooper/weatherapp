@@ -1,7 +1,7 @@
 //
 //  BVReorderTableView.m
 //
-//  Copyright (c) 2013-14 Ben Vogelzang.
+//  Copyright (c) 2013 Ben Vogelzang.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@
     [self addGestureRecognizer:longPress];
     
     self.canReorder = YES;
-    self.draggingViewOpacity = 0.8;
+    self.draggingViewOpacity = 1.0;
 }
 
 
@@ -141,13 +141,8 @@
             CGRect rect = [self rectForRowAtIndexPath:indexPath];
             draggingView.frame = CGRectOffset(draggingView.bounds, rect.origin.x, rect.origin.y);
             
-//            // add drop shadow to image and lower opacity
-//            draggingView.layer.masksToBounds = NO;
-//            draggingView.layer.shadowColor = [[UIColor blackColor] CGColor];
-//            draggingView.layer.shadowOffset = CGSizeMake(0, 0);
-//            draggingView.layer.shadowRadius = 4.0;
-//            draggingView.layer.shadowOpacity = 0.7;
-//            draggingView.layer.opacity = self.draggingViewOpacity;
+            // add drop shadow to image and lower opacity
+            draggingView.layer.opacity = self.draggingViewOpacity;
             
             // zoom image towards user
             [UIView beginAnimations:@"zoom" context:nil];
@@ -223,6 +218,8 @@
                              draggingView.transform = CGAffineTransformIdentity;
                              draggingView.frame = CGRectOffset(draggingView.bounds, rect.origin.x, rect.origin.y);
                          } completion:^(BOOL finished) {
+                             [draggingView removeFromSuperview];
+                             
                              [self beginUpdates];
                              [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
                              [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
@@ -242,6 +239,7 @@
                              [self reloadRowsAtIndexPaths:visibleRows withRowAnimation:UITableViewRowAnimationNone];
                              
                              self.currentLocationIndexPath = nil;
+                             self.draggingView = nil;
                          }];
     }
 }
@@ -307,17 +305,6 @@
 - (void)cancelGesture {
     longPress.enabled = NO;
     longPress.enabled = YES;
-}
-
-// this is my own edit to wait 0.3 seconds until removing the image.
-- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
-    if (draggingView) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [draggingView removeFromSuperview];
-             self.draggingView = nil;
-        });
-    }
-    [super reloadRowsAtIndexPaths:indexPaths withRowAnimation:animation];
 }
 
 @end

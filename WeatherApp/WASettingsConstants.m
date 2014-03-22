@@ -26,4 +26,4 @@ NSString * const kEnableBackgroundSetting           = @"Enable rain notification
 NSString * const kEnableFullLocationNameSetting     = @"Enable full location names";
 NSString * const kEnableLongitudeLatitudeSetting    = @"Enable global coordinates";
 
-NSString * const kChangeRainKey                     = @"chance_rain";
+NSString * const kChanceRainKey                     = @"chance_rain";

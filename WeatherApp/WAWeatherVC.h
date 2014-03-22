@@ -8,18 +8,18 @@
 
 #import <CoreLocation/CoreLocation.h>
 
-@interface WAWeatherVC : UIViewController <UIGestureRecognizerDelegate> {
+@interface WAWeatherVC : UIViewController {
     UIBarButtonItem         *refreshButton;
-    WAConditionDetailTVC    *detailTVC;
 }
 
 @property IBOutlet UILabel *locationTitle;
 @property IBOutlet UILabel *temperature;
-@property IBOutlet UILabel *fullLocationLabel;
+@property IBOutlet UILabel *regionLabel;
 @property IBOutlet UILabel *coordinateLabel;
 @property IBOutlet UILabel *conditionsLabel;
 @property IBOutlet UILabel *feelsLikeLabel;
 @property IBOutlet UIImageView *conditionsImageView;
+
 @property (weak) WALocation *location;
 
 // these methods are for communication between the location object and
@@ -27,6 +27,7 @@
 // changes by keeping all interface code within the view controller
 // and all functionality code within the location object.
 
+- (id)initWithLocation:(WALocation *)location;
 - (void)update;
 
 @end

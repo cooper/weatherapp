@@ -18,13 +18,16 @@
 		A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A71C08EC181ED1B6003488ED /* WAAppDelegate.m */; };
 		A71C08EF181ED1B7003488ED /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A71C08EE181ED1B7003488ED /* Images.xcassets */; };
 		A739BFA71866A5220003D323 /* navbar.png in Resources */ = {isa = PBXBuildFile; fileRef = A739BFA61866A5220003D323 /* navbar.png */; };
-		A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A739BFAB1866B8B40003D323 /* BVReorderTableView.m */; };
 		A747819C1864EF00003DCA60 /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = A747819B1864EF00003DCA60 /* backgrounds */; };
 		A747819E18661209003DCA60 /* backgrounds.plist in Resources */ = {isa = PBXBuildFile; fileRef = A747819D18661209003DCA60 /* backgrounds.plist */; };
+		A75636D518DE0E9200273EAE /* WADailyForecastTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A75636D418DE0E9200273EAE /* WADailyForecastTVC.m */; };
+		A75636D818DE0EDD00273EAE /* WAHourlyForecastTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A75636D718DE0EDD00273EAE /* WAHourlyForecastTVC.m */; };
+		A75636DD18DE165300273EAE /* UITableView+Reload.m in Sources */ = {isa = PBXBuildFile; fileRef = A75636DC18DE165300273EAE /* UITableView+Reload.m */; };
 		A76A07BC18A0767900C813B5 /* wunderground.png in Resources */ = {isa = PBXBuildFile; fileRef = A76A07BB18A0767900C813B5 /* wunderground.png */; };
 		A76A07BE18A0789400C813B5 /* wunderground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A76A07BD18A0789400C813B5 /* wunderground@2x.png */; };
 		A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786135A1863DA1C0052FCC5 /* WAPageViewController.m */; };
 		A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */; };
+		A7D84FED18DE472F005F30E2 /* BVReorderTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D84FEC18DE472F005F30E2 /* BVReorderTableView.m */; };
 		A7E9779518288423004189B0 /* WANavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779418288423004189B0 /* WANavigationController.m */; };
 		A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779718288432004189B0 /* WALocationListTVC.m */; };
 		BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */ = {isa = PBXBuildFile; fileRef = BC1367FA182162920090CAC5 /* UserDefaults.txt */; };
@@ -56,16 +59,22 @@
 		A71C08EE181ED1B7003488ED /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A71C08F5181ED1B7003488ED /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		A739BFA61866A5220003D323 /* navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbar.png; sourceTree = "<group>"; };
-		A739BFAA1866B8B40003D323 /* BVReorderTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BVReorderTableView.h; sourceTree = "<group>"; };
-		A739BFAB1866B8B40003D323 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BVReorderTableView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
 		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
+		A75636D318DE0E9200273EAE /* WADailyForecastTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WADailyForecastTVC.h; sourceTree = "<group>"; };
+		A75636D418DE0E9200273EAE /* WADailyForecastTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WADailyForecastTVC.m; sourceTree = "<group>"; };
+		A75636D618DE0EDD00273EAE /* WAHourlyForecastTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WAHourlyForecastTVC.h; sourceTree = "<group>"; };
+		A75636D718DE0EDD00273EAE /* WAHourlyForecastTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAHourlyForecastTVC.m; sourceTree = "<group>"; };
+		A75636DB18DE165300273EAE /* UITableView+Reload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITableView+Reload.h"; sourceTree = "<group>"; };
+		A75636DC18DE165300273EAE /* UITableView+Reload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITableView+Reload.m"; sourceTree = "<group>"; };
 		A76A07BB18A0767900C813B5 /* wunderground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wunderground.png; sourceTree = "<group>"; };
 		A76A07BD18A0789400C813B5 /* wunderground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "wunderground@2x.png"; sourceTree = "<group>"; };
 		A78613591863DA1C0052FCC5 /* WAPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAPageViewController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A786135A1863DA1C0052FCC5 /* WAPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WAPageViewController.m; sourceTree = "<group>"; };
 		A7CDF03C1891C6E50073E76F /* UIImage+Preload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Preload.h"; sourceTree = "<group>"; };
 		A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Preload.m"; sourceTree = "<group>"; };
+		A7D84FEB18DE472F005F30E2 /* BVReorderTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BVReorderTableView.h; sourceTree = "<group>"; };
+		A7D84FEC18DE472F005F30E2 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BVReorderTableView.m; sourceTree = "<group>"; };
 		A7E9779318288423004189B0 /* WANavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WANavigationController.h; path = WeatherApp/WANavigationController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A7E9779418288423004189B0 /* WANavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = WANavigationController.m; path = WeatherApp/WANavigationController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7E9779618288432004189B0 /* WALocationListTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WALocationListTVC.h; path = WeatherApp/WALocationListTVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -98,13 +107,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A70EE9C11823623100F317A9 /* New location table view controller */ = {
+		A70EE9C11823623100F317A9 /* New location table */ = {
 			isa = PBXGroup;
 			children = (
 				A70EE9BE1823622B00F317A9 /* WANewLocationTVC.h */,
 				A70EE9BF1823622B00F317A9 /* WANewLocationTVC.m */,
 			);
-			name = "New location table view controller";
+			name = "New location table";
 			sourceTree = "<group>";
 		};
 		A70EE9D21826C1D100F317A9 /* Settings table view controller */ = {
@@ -118,13 +127,13 @@
 			name = "Settings table view controller";
 			sourceTree = "<group>";
 		};
-		A7164982189078F300205E07 /* Condition detail table vc */ = {
+		A7164982189078F300205E07 /* Condition detail table */ = {
 			isa = PBXGroup;
 			children = (
 				A716497F189078E800205E07 /* WAConditionDetailTVC.h */,
 				A7164980189078E800205E07 /* WAConditionDetailTVC.m */,
 			);
-			name = "Condition detail table vc";
+			name = "Condition detail table";
 			sourceTree = "<group>";
 		};
 		A71C08D0181ED1B6003488ED = {
@@ -159,22 +168,19 @@
 		A71C08E2181ED1B6003488ED /* WeatherApp */ = {
 			isa = PBXGroup;
 			children = (
-				A70EE9D71827142E00F317A9 /* icons */,
-				A747819B1864EF00003DCA60 /* backgrounds */,
 				BC1367F9182091CC0090CAC5 /* Application delegate */,
 				BCA93CDD181F048D00516E7E /* Location manager */,
 				BCA93CE1181F0A9500516E7E /* Location */,
 				A786135C1863DA230052FCC5 /* Page view controller */,
 				BC136803182167D90090CAC5 /* Navigation controller */,
-				BC64C8C81822CF2800C59F00 /* Location list table view controller */,
-				A70EE9C11823623100F317A9 /* New location table view controller */,
+				BC64C8C81822CF2800C59F00 /* Location list table */,
+				A70EE9C11823623100F317A9 /* New location table */,
 				A70EE9D21826C1D100F317A9 /* Settings table view controller */,
 				BCA93CD3181EEB2F00516E7E /* Location view controller */,
-				A7164982189078F300205E07 /* Condition detail table vc */,
-				A71C08EE181ED1B7003488ED /* Images.xcassets */,
-				A7CDF03F1891C7360073E76F /* UIImage preload category */,
-				A739BFAD1866B8BA0003D323 /* Reorder table */,
+				A7D84FEF18DE47E4005F30E2 /* Extensions and categories */,
 				A71C08E3181ED1B6003488ED /* Supporting Files */,
+				A70EE9D71827142E00F317A9 /* icons */,
+				A747819B1864EF00003DCA60 /* backgrounds */,
 			);
 			path = WeatherApp;
 			sourceTree = "<group>";
@@ -182,6 +188,7 @@
 		A71C08E3181ED1B6003488ED /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				A71C08EE181ED1B7003488ED /* Images.xcassets */,
 				A71C08E4181ED1B6003488ED /* Weather-Info.plist */,
 				A71C08E8181ED1B6003488ED /* main.m */,
 				A71C08EA181ED1B6003488ED /* Weather-Prefix.pch */,
@@ -194,13 +201,31 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		A739BFAD1866B8BA0003D323 /* Reorder table */ = {
+		A75636D218DE0DE000273EAE /* Daily forecast table */ = {
 			isa = PBXGroup;
 			children = (
-				A739BFAA1866B8B40003D323 /* BVReorderTableView.h */,
-				A739BFAB1866B8B40003D323 /* BVReorderTableView.m */,
+				A75636D318DE0E9200273EAE /* WADailyForecastTVC.h */,
+				A75636D418DE0E9200273EAE /* WADailyForecastTVC.m */,
 			);
-			name = "Reorder table";
+			name = "Daily forecast table";
+			sourceTree = "<group>";
+		};
+		A75636D918DE0EE100273EAE /* Hourly forecast table */ = {
+			isa = PBXGroup;
+			children = (
+				A75636D618DE0EDD00273EAE /* WAHourlyForecastTVC.h */,
+				A75636D718DE0EDD00273EAE /* WAHourlyForecastTVC.m */,
+			);
+			name = "Hourly forecast table";
+			sourceTree = "<group>";
+		};
+		A75636DA18DE162F00273EAE /* UITableView reload category */ = {
+			isa = PBXGroup;
+			children = (
+				A75636DB18DE165300273EAE /* UITableView+Reload.h */,
+				A75636DC18DE165300273EAE /* UITableView+Reload.m */,
+			);
+			name = "UITableView reload category";
 			sourceTree = "<group>";
 		};
 		A786135C1863DA230052FCC5 /* Page view controller */ = {
@@ -219,6 +244,25 @@
 				A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */,
 			);
 			name = "UIImage preload category";
+			sourceTree = "<group>";
+		};
+		A7D84FEE18DE47D0005F30E2 /* Reorder table view */ = {
+			isa = PBXGroup;
+			children = (
+				A7D84FEB18DE472F005F30E2 /* BVReorderTableView.h */,
+				A7D84FEC18DE472F005F30E2 /* BVReorderTableView.m */,
+			);
+			name = "Reorder table view";
+			sourceTree = "<group>";
+		};
+		A7D84FEF18DE47E4005F30E2 /* Extensions and categories */ = {
+			isa = PBXGroup;
+			children = (
+				A75636DA18DE162F00273EAE /* UITableView reload category */,
+				A7CDF03F1891C7360073E76F /* UIImage preload category */,
+				A7D84FEE18DE47D0005F30E2 /* Reorder table view */,
+			);
+			name = "Extensions and categories";
 			sourceTree = "<group>";
 		};
 		BC1367F9182091CC0090CAC5 /* Application delegate */ = {
@@ -240,13 +284,13 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
-		BC64C8C81822CF2800C59F00 /* Location list table view controller */ = {
+		BC64C8C81822CF2800C59F00 /* Location list table */ = {
 			isa = PBXGroup;
 			children = (
 				A7E9779618288432004189B0 /* WALocationListTVC.h */,
 				A7E9779718288432004189B0 /* WALocationListTVC.m */,
 			);
-			name = "Location list table view controller";
+			name = "Location list table";
 			path = ..;
 			sourceTree = "<group>";
 		};
@@ -256,6 +300,9 @@
 				BCA93CCE181EEB2B00516E7E /* WAWeatherVC.h */,
 				BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */,
 				BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */,
+				A7164982189078F300205E07 /* Condition detail table */,
+				A75636D218DE0DE000273EAE /* Daily forecast table */,
+				A75636D918DE0EE100273EAE /* Hourly forecast table */,
 			);
 			name = "Location view controller";
 			sourceTree = "<group>";
@@ -360,6 +407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,
+				A75636DD18DE165300273EAE /* UITableView+Reload.m in Sources */,
 				A71C08E9181ED1B6003488ED /* main.m in Sources */,
 				A70EE9D11826C1CD00F317A9 /* WASettingsTVC.m in Sources */,
 				A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */,
@@ -367,12 +415,14 @@
 				BCA93CE0181F0A9100516E7E /* WALocation.m in Sources */,
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,
 				A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */,
+				A7D84FED18DE472F005F30E2 /* BVReorderTableView.m in Sources */,
 				A7164981189078E800205E07 /* WAConditionDetailTVC.m in Sources */,
 				BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */,
-				A739BFAC1866B8B40003D323 /* BVReorderTableView.m in Sources */,
 				A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */,
+				A75636D518DE0E9200273EAE /* WADailyForecastTVC.m in Sources */,
 				A70EE9C01823622B00F317A9 /* WANewLocationTVC.m in Sources */,
 				A7E9779518288423004189B0 /* WANavigationController.m in Sources */,
+				A75636D818DE0EDD00273EAE /* WAHourlyForecastTVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

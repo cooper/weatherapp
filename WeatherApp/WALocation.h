@@ -14,7 +14,12 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 #pragma mark - General properties
 
 @property (weak) WALocationManager *manager;            // the manager
-@property WAWeatherVC *viewController;                  // the associated view controller
+
+@property WAWeatherVC *overviewVC;                      // overview
+@property WAConditionDetailTVC *detailVC;               // more details
+@property WADailyForecastTVC *dailyVC;                  // daily forecast
+@property WAHourlyForecastTVC *hourlyVC;                // hourly forecast
+
 @property BOOL isCurrentLocation;                       // true if this is current location object
 @property (readonly) NSUInteger index;                  // index in the manager
 @property BOOL loading;                                 // location info is loading now

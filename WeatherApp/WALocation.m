@@ -7,12 +7,17 @@
 //
 
 #import "WALocation.h"
-#import "WAWeatherVC.h"
 #import "WALocationManager.h"
+
 #import "WANavigationController.h"
 #import "WALocationListTVC.h"
 #import "WAPageViewController.h"
+
+#import "WAWeatherVC.h"
 #import "WAConditionDetailTVC.h"
+#import "WAHourlyForecastTVC.h"
+#import "WADailyForecastTVC.h"
+
 #import "UIImage+Preload.h"
 
 @implementation WALocation
@@ -60,7 +65,7 @@
         NSLog(@"Got conditions for %@", loc[@"city"]);
         
         // force the view to load if it hasn't already.
-        [self.viewController view];
+        [self.overviewVC view];
         
         // note: the setters ignore any lengthless value.
         // the setters call the interface methods to make changes.
@@ -399,9 +404,7 @@
     
     // create the view controller.
     if (!self.initialLoadingComplete) {
-        WAWeatherVC *weatherVC = [[WAWeatherVC alloc] initWithNibName:@"WAWeatherVC" bundle:nil];
-        self.viewController = weatherVC;
-        weatherVC.location  = self;         // weak
+        self.overviewVC = [[WAWeatherVC alloc] initWithLocation:self];
         self.initialLoadingComplete = YES;
     }
     
@@ -410,7 +413,7 @@
     
     // update the weather view controller's info.
     [self updateBackground];
-    [self.viewController update];
+    [self.overviewVC update];
     
     // if the location list TVC exists, update the cell for this location.
     WANavigationController *nc = appDelegate.nc;

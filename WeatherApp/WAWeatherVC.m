@@ -11,8 +11,17 @@
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 #import "WAConditionDetailTVC.h"
+#import "WADailyForecastTVC.h"
+#import "WAHourlyForecastTVC.h"
+#import "WAPageViewController.h"
 
 @implementation WAWeatherVC
+
+- (id)initWithLocation:(WALocation *)location {
+    self = [self initWithNibName:@"WAWeatherVC" bundle:nil];
+    if (self) self.location = location;
+    return self;
+}
 
 #pragma mark - View controller
 
@@ -26,7 +35,7 @@
     for (UILabel *label in @[
         self.temperature, self.conditionsLabel,
         self.locationTitle, self.coordinateLabel,
-        self.fullLocationLabel, self.feelsLikeLabel
+        self.regionLabel, self.feelsLikeLabel
     ]) {
         label.layer.shadowColor     = [UIColor blackColor].CGColor;
         label.layer.shadowOffset    = CGSizeMake(0, 0);
@@ -50,7 +59,6 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [self updateInterface];
-    if (detailTVC) detailTVC = nil;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -64,12 +72,6 @@
     // no forecast fetched yet; do so.
     if (!self.location.forecast)
         [self.location fetchForecast];
-
-    // load the forecast view controller.
-    detailTVC = [[WAConditionDetailTVC alloc] initWithLocation:self.location];
-    
-    // push.
-    [self.navigationController pushViewController:detailTVC animated:YES];
     
 }
 
@@ -77,14 +79,13 @@
 
 - (void)update {
     [self updateInterface];
-    if (detailTVC) [detailTVC update];
 }
 
 - (void)updateInterface {
     
     // info.
     self.locationTitle.text     = self.location.city;
-    self.fullLocationLabel.text = self.location.fullName;
+    self.regionLabel.text       = self.location.region;
     self.coordinateLabel.text   = FMT(@"%f,%f", self.location.latitude, self.location.longitude);
     self.conditionsLabel.text   = self.location.conditions;
     
@@ -95,18 +96,19 @@
     // localized temperature.
     self.temperature.text = self.location.temperature;
     
-    // feels like, windchill, and heat index.
-    if (self.location.windchillC != TEMP_NONE)
-        self.feelsLikeLabel.text = FMT(@"Windchill %@%@", self.location.windchill, self.location.tempUnit);
-    else if (self.location.heatIndexC != TEMP_NONE)
-        self.feelsLikeLabel.text = FMT(@"Heat index %@%@", self.location.heatIndex, self.location.tempUnit);
-    else if (![self.location.temperature isEqualToString:self.location.feelsLike])
-        self.feelsLikeLabel.text  = FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit);
-    else self.feelsLikeLabel.text = @"";
+    // windchill, heat index, or other "feels like" temperature.
+    self.feelsLikeLabel.text =
+        self.location.windchillC != TEMP_NONE                                           ?
+            FMT(@"Windchill %@%@", self.location.windchill, self.location.tempUnit)     :
+        self.location.heatIndexC != TEMP_NONE                                           ?
+            FMT(@"Heat index %@%@", self.location.heatIndex, self.location.tempUnit)    :
+        ![self.location.temperature isEqualToString:self.location.feelsLike]            ?
+            FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit)    :
+        @"";
 
     // hide labels if necessary.
-    self.coordinateLabel.alpha   = SETTING(kEnableLongitudeLatitudeSetting) ? 1 : 0;
-    self.fullLocationLabel.alpha = SETTING(kEnableFullLocationNameSetting ) ? 1 : 0;
+    self.coordinateLabel.alpha = SETTING(kEnableLongitudeLatitudeSetting) ? 1 : 0;
+    self.regionLabel.alpha     = SETTING(kEnableFullLocationNameSetting ) ? 1 : 0;
     
 }
 

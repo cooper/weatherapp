@@ -51,8 +51,8 @@
     // but we may as well destroy them since we know this
     // location will be destroyed soon.
     
-    location.viewController.location = nil;
-    location.viewController = nil;
+    location.overviewVC.location = nil;
+    location.overviewVC = nil;
     [self.locations removeObject:location];
 }
 
@@ -103,7 +103,7 @@
     
     // found it.
     WALocation *before  = self.locations[index - 1];
-    return before.viewController;
+    return before.overviewVC;
     
 }
 
@@ -122,14 +122,14 @@
     
     // found it.
     WALocation *after   = self.locations[index + 1];
-    return after.viewController;
+    return after.overviewVC;
     
 }
 
 - (void)focusLocationAtIndex:(NSUInteger)index {
     if (index >= [self.locations count]) return;
     WALocation *location = self.locations[index];
-    [appDelegate.pageVC setViewController:location.viewController];
+    [appDelegate.pageVC setViewController:location.overviewVC];
 }
 
 @end

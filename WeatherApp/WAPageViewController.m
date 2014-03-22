@@ -19,7 +19,7 @@
 
 - (id)initWithTransitionStyle:(UIPageViewControllerTransitionStyle)style navigationOrientation:(UIPageViewControllerNavigationOrientation)navigationOrientation options:(NSDictionary *)options {
     self = [super initWithTransitionStyle:style navigationOrientation:navigationOrientation options:options];
-    if (self) self.delegate = self; // we'll never destroy the page VC anyway.
+    if (self) self.delegate = self; // this is a looping reference, but we'll never destroy the page VC anyway.
     return self;
 }
 

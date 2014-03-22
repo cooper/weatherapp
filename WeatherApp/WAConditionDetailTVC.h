@@ -8,13 +8,11 @@
 
 @interface WAConditionDetailTVC : UITableViewController {
     NSArray         *currentConditions;
-    NSArray         *forecastedConditions;
     UIImage         *background;
     UIBarButtonItem *refreshButton;
-    NSMutableArray  *fakeLocations;
 }
 
-@property WALocation *location;
+@property (weak) WALocation *location;
 
 - (id)initWithLocation:(WALocation *)location;
 - (void)update;

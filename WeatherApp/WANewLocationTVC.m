@@ -189,7 +189,7 @@
             }
             
             if (![place[@"type"] isEqualToString:@"city"]) {
-                NSLog(@"%@ (%@) appears to not be a city; skipping", place[@"name"], place[@"fclName"]);
+                NSLog(@"%@ (%@) appears to not be a city; skipping", place[@"name"], place[@"type"]);
                 skipPlace = YES;
             }
             
@@ -217,6 +217,7 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     lastTypeDate = [NSDate date];
+    [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
     [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:0.5];
     return YES;
 }
