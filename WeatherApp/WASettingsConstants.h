@@ -23,3 +23,7 @@ FOUNDATION_EXPORT NSString * const kPercipitationMeasureMilimeters;
 FOUNDATION_EXPORT NSString * const kEnableBackgroundSetting;
 FOUNDATION_EXPORT NSString * const kEnableFullLocationNameSetting;
 FOUNDATION_EXPORT NSString * const kEnableLongitudeLatitudeSetting;
+
+// not really settings.
+
+FOUNDATION_EXPORT NSString * const kChanceRainKey;

@@ -77,34 +77,34 @@ WAAppDelegate *appDelegate = nil;
     WALocation *location = self.currentLocation;
     
     onFetchedConditions = ^{
-        UILocalNotification *notification = [UILocalNotification new];
 
         BOOL rain = [location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound;
         
         // chance of rain now, chance of rain before.
-        if (rain && SETTING(@"chance_rain")) {
+        if (rain && SETTING(kChanceRainKey)) {
             NSLog(@"Rain, but user already knows");
             completionHandler(UIBackgroundFetchResultNewData);
             return;
         }
         
         // chance of rain now, no chance before.
-        if (rain && !SETTING(@"chance_rain")) {
+        if (rain && !SETTING(kChanceRainKey)) {
             NSLog(@"Rain");
+            
+            // notify the user.
+            UILocalNotification *notification = [UILocalNotification new];
             notification.alertBody = @"Keep your umbrella handy!";
-            [DEFAULTS setBool:YES forKey:@"chance_rain"];
+            [application scheduleLocalNotification:notification];
+            
+            [DEFAULTS setBool:YES forKey:kChanceRainKey];
         }
         
         // no chance of rain.
-        if (!rain && SETTING(@"chance_rain")) {
-            NSLog(@"No rain");
-            //notification.alertBody = @"Looks like the rain's gone away";
-            [DEFAULTS setBool:NO forKey:@"chance_rain"];
-            completionHandler(UIBackgroundFetchResultNewData);
-            return;
+        else if (!rain && SETTING(kChanceRainKey)) {
+            NSLog(@"No more rain");
+            [DEFAULTS setBool:NO forKey:kChanceRainKey];
         }
         
-        [application scheduleLocalNotification:notification];
         completionHandler(UIBackgroundFetchResultNewData);
         
     };
