@@ -307,4 +307,14 @@
     longPress.enabled = YES;
 }
 
+// this is my own edit to wait 0.3 seconds until removing the image.
+- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
+    if (draggingView)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.3 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [draggingView removeFromSuperview];
+        self.draggingView = nil;
+    });
+    [super reloadRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+}
+
 @end

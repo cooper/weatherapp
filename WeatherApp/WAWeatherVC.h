@@ -9,7 +9,7 @@
 #import <CoreLocation/CoreLocation.h>
 
 @interface WAWeatherVC : UIViewController {
-    UIBarButtonItem         *refreshButton;
+    UIBarButtonItem *refreshButton;
 }
 
 @property IBOutlet UILabel *locationTitle;

@@ -413,7 +413,11 @@
     
     // update the weather view controller's info.
     [self updateBackground];
-    [self.overviewVC update];
+    
+    if (self.overviewVC) [self.overviewVC update];
+    if (self.detailVC)   [self.detailVC   update];
+    if (self.hourlyVC)   [self.hourlyVC   update];
+    if (self.dailyVC)    [self.dailyVC    update];
     
     // if the location list TVC exists, update the cell for this location.
     WANavigationController *nc = appDelegate.nc;

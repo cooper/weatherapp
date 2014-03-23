@@ -28,6 +28,9 @@
 		A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A786135A1863DA1C0052FCC5 /* WAPageViewController.m */; };
 		A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */ = {isa = PBXBuildFile; fileRef = A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */; };
 		A7D84FED18DE472F005F30E2 /* BVReorderTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D84FEC18DE472F005F30E2 /* BVReorderTableView.m */; };
+		A7D84FF518DE698A005F30E2 /* DIYMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D84FF118DE698A005F30E2 /* DIYMenu.m */; };
+		A7D84FF618DE698A005F30E2 /* DIYMenuItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D84FF318DE698A005F30E2 /* DIYMenuItem.m */; };
+		A7D84FFD18DE83EF005F30E2 /* UINavigationController+Fade.m in Sources */ = {isa = PBXBuildFile; fileRef = A7D84FFA18DE83EF005F30E2 /* UINavigationController+Fade.m */; };
 		A7E9779518288423004189B0 /* WANavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779418288423004189B0 /* WANavigationController.m */; };
 		A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779718288432004189B0 /* WALocationListTVC.m */; };
 		BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */ = {isa = PBXBuildFile; fileRef = BC1367FA182162920090CAC5 /* UserDefaults.txt */; };
@@ -57,7 +60,6 @@
 		A71C08EB181ED1B6003488ED /* WAAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WAAppDelegate.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A71C08EC181ED1B6003488ED /* WAAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = WAAppDelegate.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A71C08EE181ED1B7003488ED /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		A71C08F5181ED1B7003488ED /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		A739BFA61866A5220003D323 /* navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbar.png; sourceTree = "<group>"; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
 		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
@@ -75,6 +77,13 @@
 		A7CDF03D1891C6E50073E76F /* UIImage+Preload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Preload.m"; sourceTree = "<group>"; };
 		A7D84FEB18DE472F005F30E2 /* BVReorderTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BVReorderTableView.h; sourceTree = "<group>"; };
 		A7D84FEC18DE472F005F30E2 /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BVReorderTableView.m; sourceTree = "<group>"; };
+		A7D84FF018DE698A005F30E2 /* DIYMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DIYMenu.h; path = DIYMenu/DIYMenu/DIYMenu.h; sourceTree = "<group>"; };
+		A7D84FF118DE698A005F30E2 /* DIYMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DIYMenu.m; path = DIYMenu/DIYMenu/DIYMenu.m; sourceTree = "<group>"; };
+		A7D84FF218DE698A005F30E2 /* DIYMenuItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DIYMenuItem.h; path = DIYMenu/DIYMenu/DIYMenuItem.h; sourceTree = "<group>"; };
+		A7D84FF318DE698A005F30E2 /* DIYMenuItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DIYMenuItem.m; path = DIYMenu/DIYMenu/DIYMenuItem.m; sourceTree = "<group>"; };
+		A7D84FF418DE698A005F30E2 /* DIYMenuOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DIYMenuOptions.h; path = DIYMenu/DIYMenu/DIYMenuOptions.h; sourceTree = "<group>"; };
+		A7D84FF918DE83EF005F30E2 /* UINavigationController+Fade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UINavigationController+Fade.h"; path = "Fade/UINavigationController+Fade.h"; sourceTree = "<group>"; };
+		A7D84FFA18DE83EF005F30E2 /* UINavigationController+Fade.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UINavigationController+Fade.m"; path = "Fade/UINavigationController+Fade.m"; sourceTree = "<group>"; };
 		A7E9779318288423004189B0 /* WANavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WANavigationController.h; path = WeatherApp/WANavigationController.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		A7E9779418288423004189B0 /* WANavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = WANavigationController.m; path = WeatherApp/WANavigationController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7E9779618288432004189B0 /* WALocationListTVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = WALocationListTVC.h; path = WeatherApp/WALocationListTVC.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -160,7 +169,6 @@
 				A71C08DC181ED1B6003488ED /* Foundation.framework */,
 				A71C08DE181ED1B6003488ED /* CoreGraphics.framework */,
 				A71C08E0181ED1B6003488ED /* UIKit.framework */,
-				A71C08F5181ED1B7003488ED /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -258,11 +266,34 @@
 		A7D84FEF18DE47E4005F30E2 /* Extensions and categories */ = {
 			isa = PBXGroup;
 			children = (
+				A7D84FF818DE83DB005F30E2 /* Fade transition */,
 				A75636DA18DE162F00273EAE /* UITableView reload category */,
 				A7CDF03F1891C7360073E76F /* UIImage preload category */,
 				A7D84FEE18DE47D0005F30E2 /* Reorder table view */,
+				A7D84FF718DE698F005F30E2 /* DIY menu */,
 			);
 			name = "Extensions and categories";
+			sourceTree = "<group>";
+		};
+		A7D84FF718DE698F005F30E2 /* DIY menu */ = {
+			isa = PBXGroup;
+			children = (
+				A7D84FF018DE698A005F30E2 /* DIYMenu.h */,
+				A7D84FF118DE698A005F30E2 /* DIYMenu.m */,
+				A7D84FF218DE698A005F30E2 /* DIYMenuItem.h */,
+				A7D84FF318DE698A005F30E2 /* DIYMenuItem.m */,
+				A7D84FF418DE698A005F30E2 /* DIYMenuOptions.h */,
+			);
+			name = "DIY menu";
+			sourceTree = "<group>";
+		};
+		A7D84FF818DE83DB005F30E2 /* Fade transition */ = {
+			isa = PBXGroup;
+			children = (
+				A7D84FF918DE83EF005F30E2 /* UINavigationController+Fade.h */,
+				A7D84FFA18DE83EF005F30E2 /* UINavigationController+Fade.m */,
+			);
+			name = "Fade transition";
 			sourceTree = "<group>";
 		};
 		BC1367F9182091CC0090CAC5 /* Application delegate */ = {
@@ -407,10 +438,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A71C08ED181ED1B6003488ED /* WAAppDelegate.m in Sources */,
+				A7D84FFD18DE83EF005F30E2 /* UINavigationController+Fade.m in Sources */,
 				A75636DD18DE165300273EAE /* UITableView+Reload.m in Sources */,
 				A71C08E9181ED1B6003488ED /* main.m in Sources */,
+				A7D84FF518DE698A005F30E2 /* DIYMenu.m in Sources */,
 				A70EE9D11826C1CD00F317A9 /* WASettingsTVC.m in Sources */,
 				A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */,
+				A7D84FF618DE698A005F30E2 /* DIYMenuItem.m in Sources */,
 				BCA93CDC181F048400516E7E /* WALocationManager.m in Sources */,
 				BCA93CE0181F0A9100516E7E /* WALocation.m in Sources */,
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,

@@ -10,9 +10,6 @@
 
 #import "WAWeatherVC.h"
 #import "WALocation.h"
-#import "WAConditionDetailTVC.h"
-#import "WADailyForecastTVC.h"
-#import "WAHourlyForecastTVC.h"
 #import "WAPageViewController.h"
 
 @implementation WAWeatherVC
@@ -68,11 +65,7 @@
 #pragma mark - Interface actions
 
 - (void)tempTapped {
-
-    // no forecast fetched yet; do so.
-    if (!self.location.forecast)
-        [self.location fetchForecast];
-    
+    [appDelegate.pageVC titleTapped];
 }
 
 #pragma mark - Updates from WALocation

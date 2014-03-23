@@ -26,7 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.title     = @"Details";
+    self.navigationItem.titleView = [appDelegate.pageVC menuLabelWithTitle:@"Details"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
@@ -209,7 +209,6 @@
 
     // fetch most recent data.
     [self.location fetchCurrentConditions];
-    [self.location fetchForecast];
 
     // loading and refresh button is visible.
     if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {

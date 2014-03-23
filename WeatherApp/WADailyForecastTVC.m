@@ -10,6 +10,7 @@
 #import "WALocation.h"
 #import "WALocationListTVC.h"
 #import "UITableView+Reload.h"
+#import "WAPageViewController.h"
 
 @implementation WADailyForecastTVC
 
@@ -30,7 +31,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.title     = @"Forecast";
+    // forecast not yet obtained.
+    if (!self.location.forecast)
+        [self.location fetchForecast];
+    
+    self.navigationItem.titleView = [appDelegate.pageVC menuLabelWithTitle:@"Daily forecast"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 

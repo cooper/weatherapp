@@ -8,8 +8,15 @@
 
 #import "WAPageViewController.h"
 #import "WALocation.h"
-#import "WAWeatherVC.h"
 #import "WALocationManager.h"
+#import "WANavigationController.h"
+#import "Fade/UINavigationController+Fade.h"
+
+#import "WAWeatherVC.h"
+#import "WAConditionDetailTVC.h"
+#import "WADailyForecastTVC.h"
+#import "WAHourlyForecastTVC.h"
+#import "WAPageViewController.h"
 
 @implementation WAPageViewController
 
@@ -31,6 +38,19 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    // create menu.
+    UIFont *font = [UIFont systemFontOfSize:25];
+    menu = [[DIYMenu alloc] initWithFrame:self.view.window.bounds];
+    UIColor *c_1 = [UIColor colorWithRed: 43./255. green:101./255. blue:236./255. alpha:1];
+    UIColor *c_2 = [UIColor colorWithRed: 21./255. green:137./255. blue:1         alpha:1];
+    UIColor *c_3 = [UIColor colorWithRed: 56./255. green:172./255. blue:236./255. alpha:1];
+    UIColor *c_4 = [UIColor colorWithRed:130./255. green:202./255. blue:1         alpha:1];
+    [menu addItem:@"Current overview" withGlyph:@"🔆" withColor:c_1 withFont:font withGlyphFont:font];
+    [menu addItem:@"Current details"  withGlyph:@"📝" withColor:c_2 withFont:font withGlyphFont:font];
+    [menu addItem:@"Hourly forecast"  withGlyph:@"🕓" withColor:c_3 withFont:font withGlyphFont:font];
+    [menu addItem:@"Daily forecast"   withGlyph:@"📅" withColor:c_4 withFont:font withGlyphFont:font];
+    menu.delegate = self;
 
     // this fixes the navigation bar inset issue.
     // however, it causes the page view controller to ignore the navigation bar completely
@@ -39,7 +59,9 @@
         
     self.view.backgroundColor      = [UIColor clearColor];
     self.view.multipleTouchEnabled = NO;
-    self.navigationItem.title      = @"Conditions";
+    
+    // custom title view with gesture recognizer for menu.
+    self.navigationItem.titleView = [self menuLabelWithTitle:@"Overview"];
     
     // refresh button.
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
@@ -125,6 +147,70 @@
 // update conditions.
 - (void)refreshButtonTapped {
     [self.location fetchCurrentConditions];
+}
+
+// display the menu.
+- (void)titleTapped {
+    [menu showMenu];
+}
+
+#pragma mark - Menu
+
+- (void)menuItemSelected:(NSString *)action {
+    UIViewController *vc;
+
+    if ([action isEqualToString:@"Current overview"]) {
+        vc = self;
+    }
+    else if ([action isEqualToString:@"Current details"]) {
+        if (!self.location.detailVC)
+            self.location.detailVC = [[WAConditionDetailTVC alloc] initWithLocation:self.location];
+        vc = self.location.detailVC;
+    }
+    else if ([action isEqualToString:@"Hourly forecast"]) {
+        if (!self.location.hourlyVC)
+            self.location.hourlyVC = [[WAHourlyForecastTVC alloc] initWithLocation:self.location];
+        vc = self.location.hourlyVC;
+    }
+    else if ([action isEqualToString:@"Daily forecast"]) {
+        if (!self.location.dailyVC)
+            self.location.dailyVC = [[WADailyForecastTVC alloc] initWithLocation:self.location];
+        vc = self.location.dailyVC;
+    }
+    else return;
+    
+    // already on this view controller.
+    if (vc == appDelegate.nc.topViewController) return;
+    
+    // for the overview, just pop back to it if we aren't on it already.
+    if (vc == self) {
+        [appDelegate.nc popViewControllerAnimated:YES];
+        return;
+    }
+
+    // then move on to the selection.
+    // if the current top vc is the overview, push to it.
+    // if it's something else, use the fade transition to avoid confusion.
+    if (appDelegate.nc.topViewController == self) {
+        [appDelegate.nc pushViewController:vc animated:YES];
+    }
+    else {
+        [appDelegate.nc popViewControllerAnimated:NO];
+        [appDelegate.nc pushFadeViewController:vc];
+    }
+    
+}
+
+- (UILabel *)menuLabelWithTitle:(NSString *)title {
+    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
+    UITapGestureRecognizer *tap       = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(titleTapped)];
+    titleLabel.userInteractionEnabled = YES;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.textColor     = [UIColor whiteColor];
+    titleLabel.font          = [UIFont boldSystemFontOfSize:16];
+    titleLabel.text          = title;
+    [titleLabel addGestureRecognizer:tap];
+    return titleLabel;
 }
 
 #pragma mark - Scroll view delegate
