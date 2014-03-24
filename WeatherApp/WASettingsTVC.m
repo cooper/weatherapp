@@ -30,6 +30,10 @@
             kPercipitationMeasureInches,
             kPercipitationMeasureMilimeters
         ]],
+        @[kTimeZoneSetting, @[
+            kTimeZoneRemote,
+            kTimeZoneLocal
+        ]],
         @[
             kEnableBackgroundSetting,
             kEnableFullLocationNameSetting,

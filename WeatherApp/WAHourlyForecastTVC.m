@@ -84,9 +84,15 @@
 // then, the array is shifted so the smallest index becomes 0.
 - (void)addForecastForHour:(NSDictionary *)f index:(unsigned int)i {
 
-    // determine the date components in the gregorian calendar.
+    // create a date from the unix time and a gregorian calendar.
     NSDate *date          = [NSDate dateWithTimeIntervalSince1970:[f[@"FCTTIME"][@"epoch"] integerValue]];
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    
+    // if setting says to, switch to location's time zone.
+    if (SETTING_IS(kTimeZoneSetting, kTimeZoneRemote))
+        [gregorian setTimeZone:self.location.timeZone];
+    
+    // fetch the information we need.
     NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit | NSHourCalendarUnit fromDate:date];
     
     // adjust the day index to the offset.
@@ -104,7 +110,8 @@
     
         // determine the day name.
         NSDateFormatter *formatter = [NSDateFormatter new];
-        NSUInteger today = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]].day;
+        if (SETTING_IS(kTimeZoneSetting, kTimeZoneRemote))
+            [formatter setTimeZone:self.location.timeZone];
         NSString *dayName, *dateName;
 
         // determine day of week.
@@ -119,7 +126,11 @@
         else
             [daysAdded addObject:dayName];
         
-        // this is today.
+        // this is today in our local timezone.
+        // in other words, the day in the month is equal in both locations,
+        // so we will say "Today."
+        [gregorian setTimeZone:[NSTimeZone localTimeZone]];
+        NSUInteger today = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]].day;
         if (today == dateComponents.day)
             dayName = @"Today";
 
@@ -218,10 +229,10 @@
     cell.imageView.layer.shouldRasterize = YES;
     
     // time label.
-    NSString *time = FMT(@"%ld %@", (long)hour, pm ? @"PM" : @"AM");
+    NSString *time = FMT(@"%ld %@", (long)hour, pm ? @"pm" : @"am");
     NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:time];
     NSRange range = NSMakeRange([time length] - 2, 2);
-    [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:range];
+    [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:14] range:range];
     cell.textLabel.font           = [UIFont systemFontOfSize:20];
     cell.textLabel.numberOfLines  = 0;
     cell.textLabel.attributedText = string;

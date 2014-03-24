@@ -260,6 +260,7 @@ WAAppDelegate *appDelegate = nil;
     [DEFAULTS setObject:kTemperatureScaleFahrenheit forKey:kTemperatureScaleSetting];
     [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
     [DEFAULTS setObject:kPercipitationMeasureInches forKey:kPercipitationMeasureSetting];
+    [DEFAULTS setObject:kTimeZoneRemote             forKey:kTimeZoneSetting];
     
     // default booleans.
     [DEFAULTS setBool:YES forKey:kEnableBackgroundSetting];

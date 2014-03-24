@@ -167,7 +167,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [currentConditions count] + 1; // plus header
+    return [currentConditions count] + 2; // plus header and maps
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -180,28 +180,51 @@
 
     // show the location cell for this location.
     if (!indexPath.row) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         [WALocationListTVC applyWeatherInfo:self.location toCell:cell];
         cell.backgroundView = nil;
         return cell;
     }
     
-    // generic base cell.
-    cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
-
-    // detail for current conditions.
-    cell.textLabel.text = currentConditions[indexPath.row - 1][0];
-    cell.detailTextLabel.text = currentConditions[indexPath.row - 1][1];
+    // open in maps.
+    if (indexPath.row == [currentConditions count] + 1) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        cell.selectedBackgroundView = [UIView new];
+        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
+        cell.textLabel.text  = FMT(@"Open %@ in Maps", self.location.city);
+        cell.detailTextLabel.text = @"🌎";
+    }
     
+    // detail cell.
+    else {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"detail"];
+        if (!cell)
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"detail"];
+        
+        // detail for current conditions.
+        cell.textLabel.text       = currentConditions[indexPath.row - 1][0];
+        cell.detailTextLabel.text = currentConditions[indexPath.row - 1][1];
+    
+    }
+    
+    cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
+    cell.textLabel.textColor       =
+    cell.detailTextLabel.textColor = [UIColor blackColor];
     return cell;
 }
 
 // disable selection of cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row == [currentConditions count] + 1) return YES;
     return NO;
+}
+
+// selected "open in maps"
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row != [currentConditions count] + 1) return;
+    NSURL *url = [NSURL URLWithString:FMT(@"http://maps.apple.com/?q=%f,%f", self.location.latitude, self.location.longitude)];
+    [[UIApplication sharedApplication] openURL:url];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 #pragma mark - Interface actions

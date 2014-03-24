@@ -24,6 +24,10 @@ FOUNDATION_EXPORT NSString * const kEnableBackgroundSetting;
 FOUNDATION_EXPORT NSString * const kEnableFullLocationNameSetting;
 FOUNDATION_EXPORT NSString * const kEnableLongitudeLatitudeSetting;
 
+FOUNDATION_EXPORT NSString * const kTimeZoneSetting;
+FOUNDATION_EXPORT NSString * const kTimeZoneLocal;
+FOUNDATION_EXPORT NSString * const kTimeZoneRemote;
+
 // not really settings.
 
 FOUNDATION_EXPORT NSString * const kChanceRainKey;

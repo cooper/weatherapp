@@ -83,6 +83,13 @@
         self.country3166  = loc[@"country_iso3166"];
         self.region       = same ? possibleCountryName : loc[@"state_name"];
         
+        // time zone.
+        self.timeZone = [NSTimeZone timeZoneWithName:ob[@"local_tz_long"]];
+        if (!self.timeZone)
+            self.timeZone = [NSTimeZone timeZoneWithAbbreviation:ob[@"local_tz_short"]];
+        if (!self.timeZone)
+            self.timeZone = [NSTimeZone localTimeZone];
+        
         // don't use wunderground's coordinates if this is the current location,
         // because those reported by location services are far more accurate.
         if (!self.isCurrentLocation) {

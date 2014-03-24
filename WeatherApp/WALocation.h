@@ -54,6 +54,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSDate *conditionsAsOf;                       // date of last condition check
 @property NSDate *observationsAsOf;                     // observation unix time
 @property NSString *observationTimeString;              // observation time string
+@property NSTimeZone *timeZone;                         // time zone in this location
 
 // icons.
 @property UIImage  *conditionsImage;                    // icon image of conditions
