@@ -71,93 +71,125 @@
 }
 
 - (NSArray *)detailsForLocation:(WALocation *)location {
-    NSMutableArray *a = [NSMutableArray array];
-    NSDictionary   *r = location.response;
+    NSMutableArray *final = [NSMutableArray array];
+    NSDictionary   *r     = location.response;
     
-    // temperatures.
-    [a addObjectsFromArray:@[
-        @[@"Temperature",       FMT(@"%@ %@", location.temperature, location.tempUnit)      ],
-        @[@"Feels like",        FMT(@"%@ %@", location.feelsLike,   location.tempUnit)      ],
-        @[@"Dew point",         FMT(@"%@ %@", location.dewPoint,    location.tempUnit)      ]
-    ]];
+    // time formatter.
+    NSDateFormatter *fmt = [NSDateFormatter new];
+    [fmt setTimeZone:[NSTimeZone localTimeZone]];
+    [fmt setDateFormat:@"h:mm a"];
     
-    // only show heat index and wind chill if there is one.
-    if (location.heatIndexC != TEMP_NONE) [a addObject:
-        @[@"Heat index",        FMT(@"%@ %@", location.heatIndex, location.tempUnit)        ]
-    ];
-    if (location.windchillC != TEMP_NONE) [a addObject:
-        @[@"Windchill",        FMT(@"%@ %@", location.windchill, location.tempUnit)         ]
-    ];
+    // initial values of "NA"
+    NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *percipT,
+        *percipH, *windSpeed, *windDirection, *gustSpeed, *gustDirection;
+    dewPoint  = heatIndex = windchill     = pressure  = visibility    = percipT =
+    percipH   = windSpeed = windDirection = gustSpeed = gustDirection = @"NA";
     
-    // precipitation in inches.
-    if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches) &&
-        [r[@"percip_today_in"] floatValue] > 0) [a addObjectsFromArray:@[
-        @[@"Precip. today",     FMT(@"%@ in",       r[@"precip_today_in"])                  ],
-        @[@"Precip. in hour",   FMT(@"%@ in",       r[@"precip_1hr_in"])                    ]
-    ]];
+    // dewpoint.
+    if (location.dewPointC != TEMP_NONE)
+        dewPoint = FMT(@"%@ %@", location.dewPoint, location.tempUnit);
     
-    // precipitation in milimeters.
-    else if ([r[@"percip_today_metric"] floatValue] > 0) [a addObjectsFromArray:@[
-        @[@"Precip. today",     FMT(@"%@ mm",       r[@"precip_today_metric"])              ],
-        @[@"Precip. in hour",   FMT(@"%@ mm",       r[@"precip_1hr_metric"])                ]
-    ]];
+    // heat index.
+    if (location.heatIndexC != TEMP_NONE)
+        heatIndex = FMT(@"%@ %@", location.heatIndex, location.tempUnit);
     
-    // pressure and humidity.
-    // (pressure in both milibars and inches regardless of settings)
-    [a addObjectsFromArray:@[
-        @[@"Pressure",          FMT(@"%@ mb / %@ in", r[@"pressure_mb"], r[@"pressure_in"]) ],
-        @[@"Humidity",          r[@"relative_humidity"]                                     ]
-    ]];
+    // windchill.
+    if (location.windchillC != TEMP_NONE)
+        windchill = FMT(@"%@ %@", location.windchill, location.tempUnit);
     
+    
+    // percipitation.
+    if ([r[@"percip_today_metric"] floatValue] > 0) {
+    
+        // in inches.
+        if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches)) {
+            percipT = FMT(@"%@ in", r[@"precip_today_in"]);
+            percipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
+        }
+        
+        // in millimeters.
+        else {
+            percipT = FMT(@"%@ in", r[@"precip_today_metric"]);
+            percipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
+        }
+        
+    }
+    
+    // pressure.
+    pressure = SETTING_IS(kPressureMeasureSetting, kPressureMeasureInchHg) ?
+        FMT(@"%@ inHg", r[@"pressure_in"])                                 :
+        FMT(@"%@ inHg", r[@"pressure_mb"]);
+
     // miles.
     if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
         
         // wind in miles.   (using floatValue forces minimum number of decimals)
-        if ([r[@"wind_mph"] floatValue] > 0) [a addObjectsFromArray:@[
-            @[@"Wind speed",        FMT(@"%@ mph",      @([r[@"wind_mph"] floatValue]))     ],
-            @[@"Gust speed",        FMT(@"%@ mph",      @([r[@"wind_gust_mph"] floatValue]))],
-            @[@"Wind direction",    FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"]) ],
-        ]];
+        if ([r[@"wind_mph"] floatValue] > 0) {
+            windSpeed     = FMT(@"%@ mph", @( [r[@"wind_mph"] floatValue] ));
+            windDirection = FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"]);
+        }
+        
+        // gusts in miles.
+        if ([r[@"wind_gust_mph"] floatValue] > 0) {
+            gustSpeed     = FMT(@"%@ mph", @( [r[@"wind_gust_mph"] floatValue] ));
+            gustDirection = FMT(@"%@ %@º", r[@"wind_gust_dir"], r[@"wind_gust_degrees"]);
+        }
         
         // visibility in miles.
-        if ([r[@"visibility_mi"] floatValue] > 0) [a addObject:
-            @[@"Visibility", FMT(@"%@ mi", r[@"visibility_mi"]) ]
-        ];
+        if ([r[@"visibility_mi"] floatValue] > 0)
+            visibility = FMT(@"%@ mi", r[@"visibility_mi"]);
         
     }
     
     // kilometers.
     else {
 
-        // wind in kilometers.
-        if ([r[@"wind_kph"] floatValue] > 0) [a addObjectsFromArray:@[
-            @[@"Wind speed",     FMT(@"%@ km/hr",    r[@"wind_kph"])      ],
-            @[@"Gust speed",     FMT(@"%@ km/hr",    r[@"wind_gust_kph"]) ],
-            @[@"Wind direction", FMT(@"%@ %@º",      r[@"wind_dir"], r[@"wind_degrees"]) ],
-        ]];
+        // wind in km/h.   (using floatValue forces minimum number of decimals)
+        if ([r[@"wind_kph"] floatValue] > 0) {
+            windSpeed     = FMT(@"%@ km/hr", @( [r[@"wind_kph"] floatValue] ));
+            windDirection = FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"]);
+        }
         
-        // visibility in kilometers.
-        if ([r[@"visibility_km"] floatValue] > 0) [a addObject:
-            @[@"Visibility", FMT(@"%@ km", r[@"visibility_km"]) ]
-        ];
+        // gusts in km.
+        if ([r[@"wind_gust_kph"] floatValue] > 0) {
+            gustSpeed = FMT(@"%@ km/hr", @( [r[@"wind_gust_kph"] floatValue] ));
+            gustDirection = FMT(@"%@ %@º", r[@"wind_gust_dir"], r[@"wind_gust_degrees"]);
+        }
+        
+        // visibility in km.
+        if ([r[@"visibility_km"] floatValue] > 0)
+            visibility = FMT(@"%@ km", r[@"visibility_km"]);
         
     }
     
-
-    // determine time string.
-    NSDateFormatter *fmt = [NSDateFormatter new];
-    [fmt setTimeZone:[NSTimeZone localTimeZone]];
-    [fmt setDateFormat:@"h:mm a"];
-    NSString *asOf = [fmt stringFromDate:self.location.observationsAsOf];
-
-    // coordinates and date.
-    [a addObjectsFromArray:@[
-        @[@"Latitude",     FMT(@"%f", self.location.latitude)  ],
-        @[@"Longitude",    FMT(@"%f", self.location.longitude) ],
-        @[@"Last updated", FMT(@"%@", asOf) ]
-    ]];
+    NSArray *details = @[
+        @"Temperature",         FMT(@"%@ %@", location.temperature, location.tempUnit),
+        @"Feels like",          FMT(@"%@ %@", location.feelsLike,   location.tempUnit),
+        @"Dew point",           dewPoint,
+        @"Heat index",          heatIndex,
+        @"Windchill",           windchill,
+        @"Pressure",            pressure,
+        @"Humidity",            r[@"relative_humidity"],
+        @"Visibility",          visibility,
+        @"Percip. today",       percipT,
+        @"Percip. in hour",     percipH,
+        @"Wind speed",          windSpeed,
+        @"Wind direction",      windDirection,
+        @"Gust speed",          gustSpeed,
+        @"Gust direction",      gustDirection,
+        @"Last observation",    [fmt stringFromDate:self.location.observationsAsOf],
+        @"Last fetch",          [fmt stringFromDate:self.location.conditionsAsOf],
+        @"Latitude",            FMT(@"%f", self.location.latitude),
+        @"Longitude",           FMT(@"%f", self.location.longitude)
+    ];
     
-    return a;
+    // add all of them that are not NA.
+    for (NSUInteger i = 0; i < [details count]; i += 2) {
+        if ([details[i + 1] isEqual:@"NA"]) continue;
+        [final addObject:@[ details[i], details[i + 1] ]];
+    }
+    
+    return final;
 }
 
 #pragma mark - Table view data source

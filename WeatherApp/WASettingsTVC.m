@@ -30,6 +30,10 @@
             kPercipitationMeasureInches,
             kPercipitationMeasureMilimeters
         ]],
+        @[kPressureMeasureSetting, @[
+            kPressureMeasureInchHg,
+            kPressureMeasureMillibar
+        ]],
         @[kTimeZoneSetting, @[
             kTimeZoneRemote,
             kTimeZoneLocal

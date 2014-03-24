@@ -99,6 +99,7 @@
         
         // reset temperatures.
         self.degreesC   = self.degreesF   =
+        self.dewPointC  = self.dewPointF  =
         self.feelsLikeC = self.feelsLikeF =
         self.heatIndexC = self.heatIndexF =
         self.windchillC = self.windchillF =

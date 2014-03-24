@@ -11,6 +11,7 @@
 NSString * const kTemperatureScaleSetting           = @"Temperature scale";
 NSString * const kDistanceMeasureSetting            = @"Measure of distance";
 NSString * const kPercipitationMeasureSetting       = @"Measure of percipitation";
+NSString * const kPressureMeasureSetting            = @"Measure of pressure";
 
 NSString * const kTemperatureScaleFahrenheit        = @"Fahrenheit";
 NSString * const kTemperatureScaleCelsius           = @"Celsius";
@@ -22,9 +23,12 @@ NSString * const kDistanceMeasureKilometers         = @"Kilometers";
 NSString * const kPercipitationMeasureInches        = @"Inches";
 NSString * const kPercipitationMeasureMilimeters    = @"Milimeters";
 
-NSString * const kEnableBackgroundSetting           = @"Enable rain notifications";
-NSString * const kEnableFullLocationNameSetting     = @"Enable full location names";
-NSString * const kEnableLongitudeLatitudeSetting    = @"Enable global coordinates";
+NSString * const kPressureMeasureMillibar           = @"Millibars";
+NSString * const kPressureMeasureInchHg             = @"Inches of mercury";
+
+NSString * const kEnableBackgroundSetting           = @"Notify me when it will rain";
+NSString * const kEnableFullLocationNameSetting     = @"Region under city name";
+NSString * const kEnableLongitudeLatitudeSetting    = @"Global coordinates at bottom";
 
 NSString * const kTimeZoneSetting                   = @"Times in forecasts";
 NSString * const kTimeZoneLocal                     = @"Show in my time zone";

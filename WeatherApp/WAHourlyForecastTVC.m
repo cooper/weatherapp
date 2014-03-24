@@ -174,39 +174,58 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    UILabel *conditionLabel;
+    UILabel *conditionLabel, *timeLabel;
 
-    // new cell. create a condition label.
+    // new cell.
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-        conditionLabel = [[UILabel alloc] initWithFrame:CGRectMake(122, 0, 152, 50)];
+        
+        // create condition label.
+        conditionLabel = [[UILabel alloc] initWithFrame:CGRectMake(115, 0, 155, 50)];
         conditionLabel.tag = 17;
-        //conditionLabel.textAlignment = NSTextAlignmentCenter;
         conditionLabel.adjustsFontSizeToFitWidth = YES;
+        //conditionLabel.backgroundColor = [UIColor yellowColor];
         [cell.contentView addSubview:conditionLabel];
+
+        // create time label.
+        timeLabel      = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 50, 50)];
+        timeLabel.tag  = 16;
+        timeLabel.font = [UIFont systemFontOfSize:20];
+        timeLabel.textAlignment  = NSTextAlignmentRight;
+        //timeLabel.backgroundColor = [UIColor yellowColor];
+        [cell.contentView addSubview:timeLabel];
+        
+        cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.7];
+        cell.detailTextLabel.textColor = [UIColor blackColor];
+        
+        // shadow on icon.
+        cell.imageView.layer.shadowColor     = [UIColor blackColor].CGColor;
+        cell.imageView.layer.shadowOffset    = CGSizeMake(0, 0);
+        cell.imageView.layer.shadowRadius    = 0.3;
+        cell.imageView.layer.shadowOpacity   = 1.0;
+        cell.imageView.layer.masksToBounds   = NO;
+        cell.imageView.layer.shouldRasterize = YES;
+    
+        cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:20];
     }
     
     // reusing cell.
     else for (UIView *view in cell.contentView.subviews) {
-        if (view.tag != 17) continue;
-        conditionLabel = (UILabel *)view;
-        break;
+        if (view.tag == 17) conditionLabel = (UILabel *)view;
+        if (view.tag == 16) timeLabel      = (UILabel *)view;
     }
-    
-    cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.7];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
     
     // detail label on a forecast.
     NSDictionary *dict = forecasts[indexPath.section][indexPath.row + 1];
     NSDateComponents *dateComponents = dict[@"dateComponents"];
-    NSUInteger hour      = dateComponents.hour;
+    NSUInteger hour = dateComponents.hour;
     
-    // adjust to AM/PM.
+    // adjust AM/PM.
     BOOL pm = NO;
-    if (hour == 0) hour  = 12;
-    if (hour > 12) {
-        hour -= 12;
+    if (hour == 0) hour = 12;
+    if (hour >= 12) {
         pm = YES;
+        if (hour > 12) hour -= 12;
     }
     
     // create a fake location for the icons and temperatures.
@@ -221,27 +240,16 @@
     
     // 30x30 icon with a slight shadow to increase visibility.
     cell.imageView.image = [UIImage imageNamed:FMT(@"icons/30/%@", location.conditionsImageName)];
-    cell.imageView.layer.shadowColor     = [UIColor blackColor].CGColor;
-    cell.imageView.layer.shadowOffset    = CGSizeMake(0, 0);
-    cell.imageView.layer.shadowRadius    = 0.3;
-    cell.imageView.layer.shadowOpacity   = 1.0;
-    cell.imageView.layer.masksToBounds   = NO;
-    cell.imageView.layer.shouldRasterize = YES;
-    
+
     // time label.
     NSString *time = FMT(@"%ld %@", (long)hour, pm ? @"pm" : @"am");
     NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:time];
     NSRange range = NSMakeRange([time length] - 2, 2);
     [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:14] range:range];
-    cell.textLabel.font           = [UIFont systemFontOfSize:20];
-    cell.textLabel.numberOfLines  = 0;
-    cell.textLabel.attributedText = string;
+    timeLabel.attributedText = string;
 
-    // temperature label.
+    // temperature and condition labels.
     cell.detailTextLabel.text = location.temperature;
-    cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:20];
-    
-    // create an additional label for description of conditions.
     conditionLabel.text = dict[@"condition"];
     
     return cell;
