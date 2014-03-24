@@ -38,6 +38,8 @@
 #define OR(this, otherwise) (this ? this : otherwise)
 #define SETTING(setting)    [DEFAULTS boolForKey:setting]
 #define SETTING_IS(setting, value) [[DEFAULTS objectForKey:setting] isEqualToString:value]
+#define STR_OR_NIL(str)     (str && [str length] ? str : nil)
+#define TEMP_SAFE(temp)     ([temp floatValue] > -200 ? [temp floatValue] : TEMP_NONE)
 
 // Types.
 

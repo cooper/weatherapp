@@ -15,10 +15,10 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 
 @property (weak) WALocationManager *manager;            // the manager
 
-@property WAWeatherVC *overviewVC;                      // overview
-@property WAConditionDetailTVC *detailVC;               // more details
-@property WADailyForecastTVC *dailyVC;                  // daily forecast
-@property WAHourlyForecastTVC *hourlyVC;                // hourly forecast
+@property WAWeatherVC *overviewVC;                      // overview view controller
+@property WAConditionDetailTVC *detailVC;               // more details view controller
+@property WADailyForecastTVC *dailyVC;                  // daily forecast view controller
+@property WAHourlyForecastTVC *hourlyVC;                // hourly forecast view controller
 
 @property BOOL isCurrentLocation;                       // true if this is current location object
 @property (readonly) NSUInteger index;                  // index in the manager
@@ -86,6 +86,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 // forecasts.
 @property NSArray *forecast;                            // recent forecast response
 @property NSMutableArray *fakeLocations;                // location objects for forecast
+@property NSArray *hourlyForecast;                      // recent hourly response
+@property NSMutableArray *hourlyFakeLocations;          // location objects for hourly
 
 #pragma mark - Backgrounds
 
@@ -103,6 +105,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 - (void)fetchCurrentConditions;
 - (void)fetchCurrentConditionsThen:(WACallback)then;
 - (void)fetchForecast;
+- (void)fetchHourlyForecast;
 - (void)fetchIcon;
 
 #pragma mark - User defaults

@@ -43,6 +43,7 @@
 
 + (void)clearMenu;
 
+@property                       NSMutableArray              *menuItems;
 @property (unsafe_unretained)   NSObject<DIYMenuDelegate>   *delegate;
 
 - (void)showMenu;

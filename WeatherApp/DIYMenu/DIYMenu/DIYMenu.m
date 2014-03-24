@@ -14,7 +14,6 @@
 #import <QuartzCore/QuartzCore.h>
 
 @interface DIYMenu ()
-@property                       NSMutableArray              *menuItems;
 @property                       BOOL                        isActivated;
 @property                       BOOL                        isLandscape;
 @property                       UIView                      *shadingView;
@@ -128,13 +127,11 @@
         item.transform = CGAffineTransformMakeTranslation(0, -ITEMHEIGHT * (idx + 2));
     }];
     
-    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+    [UIView animateWithDuration:0.22f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         [self.menuItems enumerateObjectsUsingBlock:^(DIYMenuItem *item, NSUInteger idx, BOOL *stop) {
             item.transform = CGAffineTransformMakeTranslation(0, 0);
         }];
         self.shadingView.alpha = 0.75f;
-        NSLog(@"shading view w: %f, h: %f", self.shadingView.frame.size.width, self.shadingView.frame.size.height);
-        NSLog(@"my w: %f, h: %f", self.frame.size.width, self.frame.size.height);
     } completion:^(BOOL finished) {
         //
     }];
@@ -150,7 +147,7 @@
 - (void)dismissMenu
 {
     // Animate out the items
-    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+    [UIView animateWithDuration:0.22f delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         [self.menuItems enumerateObjectsUsingBlock:^(DIYMenuItem *item, NSUInteger idx, BOOL *stop) {
             item.transform = CGAffineTransformMakeTranslation(0, (CGFloat) -ITEMHEIGHT * (idx + 2));
         }];
@@ -159,7 +156,7 @@
     }];
     
     // Fade out the overlay window and remove self from it
-    [UIView animateWithDuration:0.2f delay:0.0f options:UIViewAnimationOptionCurveLinear animations:^{
+    [UIView animateWithDuration:0.22 delay:0.0f options:UIViewAnimationOptionCurveLinear animations:^{
         self.shadingView.alpha = 0.0f;
     } completion:^(BOOL finished) {
         [self removeFromSuperview];

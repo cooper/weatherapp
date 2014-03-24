@@ -39,18 +39,24 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // create menu.
-    UIFont *font = [UIFont systemFontOfSize:25];
+    // create the menu.
     menu = [[DIYMenu alloc] initWithFrame:self.view.window.bounds];
-    UIColor *c_1 = [UIColor colorWithRed: 43./255. green:101./255. blue:236./255. alpha:1];
-    UIColor *c_2 = [UIColor colorWithRed: 21./255. green:137./255. blue:1         alpha:1];
-    UIColor *c_3 = [UIColor colorWithRed: 56./255. green:172./255. blue:236./255. alpha:1];
-    UIColor *c_4 = [UIColor colorWithRed:130./255. green:202./255. blue:1         alpha:1];
-    [menu addItem:@"Current overview" withGlyph:@"🔆" withColor:c_1 withFont:font withGlyphFont:font];
-    [menu addItem:@"Current details"  withGlyph:@"📝" withColor:c_2 withFont:font withGlyphFont:font];
-    [menu addItem:@"Hourly forecast"  withGlyph:@"🕓" withColor:c_3 withFont:font withGlyphFont:font];
-    [menu addItem:@"Daily forecast"   withGlyph:@"📅" withColor:c_4 withFont:font withGlyphFont:font];
     menu.delegate = self;
+    
+    // many different shades of blue.
+    UIColor *c_0 = [UIColor colorWithRed:       0  green: 70./255. blue:200./255. alpha:1];
+    UIColor *c_1 = [UIColor colorWithRed: 43./255. green:101./255. blue:236./255. alpha:1];
+    UIColor *c_2 = [UIColor colorWithRed: 21./255. green:137./255. blue:       1  alpha:1];
+    UIColor *c_3 = [UIColor colorWithRed: 56./255. green:172./255. blue:236./255. alpha:1];
+    UIColor *c_4 = [UIColor colorWithRed:130./255. green:202./255. blue:       1  alpha:1];
+    
+    // add the menu items.
+    UIFont *font = [UIFont systemFontOfSize:25];
+    [menu addItem:@"Location list"     withGlyph:@"🌎" withColor:c_0 withFont:font withGlyphFont:font];
+    [menu addItem:@"Current overview"  withGlyph:@"⛅️" withColor:c_1 withFont:font withGlyphFont:font];
+    [menu addItem:@"Extensive details" withGlyph:@"📝" withColor:c_2 withFont:font withGlyphFont:font];
+    [menu addItem:@"Hourly forecast"   withGlyph:@"🕓" withColor:c_3 withFont:font withGlyphFont:font];
+    [menu addItem:@"Daily forecast"    withGlyph:@"📅" withColor:c_4 withFont:font withGlyphFont:font];
 
     // this fixes the navigation bar inset issue.
     // however, it causes the page view controller to ignore the navigation bar completely
@@ -151,6 +157,7 @@
 
 // display the menu.
 - (void)titleTapped {
+    ((DIYMenuItem *)menu.menuItems[1]).name.text = FMT(@"%@ overview", self.location.city);
     [menu showMenu];
 }
 
@@ -159,10 +166,14 @@
 - (void)menuItemSelected:(NSString *)action {
     UIViewController *vc;
 
-    if ([action isEqualToString:@"Current overview"]) {
+    if ([action isEqualToString:@"Location list"]) {
+        [appDelegate.nc popToRootViewControllerAnimated:YES];
+        return;
+    }
+    else if ([action rangeOfString:@"overview"].location != NSNotFound) {
         vc = self;
     }
-    else if ([action isEqualToString:@"Current details"]) {
+    else if ([action isEqualToString:@"Extensive details"]) {
         if (!self.location.detailVC)
             self.location.detailVC = [[WAConditionDetailTVC alloc] initWithLocation:self.location];
         vc = self.location.detailVC;
@@ -207,7 +218,7 @@
     titleLabel.userInteractionEnabled = YES;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor     = [UIColor whiteColor];
-    titleLabel.font          = [UIFont boldSystemFontOfSize:16];
+    titleLabel.font          = [UIFont boldSystemFontOfSize:17];
     titleLabel.text          = title;
     [titleLabel addGestureRecognizer:tap];
     return titleLabel;

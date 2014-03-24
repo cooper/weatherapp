@@ -10,10 +10,10 @@
 #define DIYMenu_DIYMenuOptions_h
 
 #define ITEMHEIGHT 55.0f
-#define ITEMPADDING 22.0f
+#define ITEMPADDING 12.0f
 
-#define ICONPADDING 10.0f
-#define ICONSIZE 30.0f
+#define ICONPADDING 12.0f
+#define ICONSIZE 25.0f
 
 #define GLYPHPADDINGADJUST 2.0f
 

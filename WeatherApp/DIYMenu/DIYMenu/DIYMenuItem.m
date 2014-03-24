@@ -39,7 +39,7 @@
 
 - (void)setName:(NSString *)name withColor:(UIColor *)color withFont:(UIFont *)font
 {
-    CGRect labelFrame = CGRectMake(ICONPADDING + ICONSIZE + ITEMPADDING, ICONPADDING, self.frame.size.width, ICONSIZE);
+    CGRect labelFrame = CGRectMake(ICONPADDING + ICONSIZE + ITEMPADDING, 0, self.frame.size.width, self.frame.size.height);
     _name = [[UILabel alloc] initWithFrame:labelFrame];
     self.name.backgroundColor = color;
     self.name.textColor = [UIColor whiteColor];

@@ -7,6 +7,7 @@
 //
 
 #import "DIYMenu/DIYMenu/DIYMenu.h"
+#import "DIYMenu/DIYMenu/DIYMenuItem.h"
 
 @interface WAPageViewController : UIPageViewController <UIPageViewControllerDelegate, UIScrollViewDelegate, DIYMenuDelegate> {
     UIBarButtonItem *refreshButton;

@@ -142,11 +142,20 @@
     
 }
 
-// three-day forecast. TODO: handle errors.
+// ten-day forecast. TODO: handle errors.
 - (void)fetchForecast {
     NSString *q = [self bestLookupMethod:@"forecast10day"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
         self.forecast = data[@"forecast"][@"simpleforecast"][@"forecastday"];
+    }];
+}
+
+// hourly forecast. TODO: handle errors.
+- (void)fetchHourlyForecast {
+    NSString *q = [self bestLookupMethod:@"hourly10day"];
+    [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
+        self.hourlyForecast = data[@"hourly_forecast"];
+        NSLog(@"%@", self.hourlyForecast);
     }];
 }
 
