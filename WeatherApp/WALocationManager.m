@@ -25,7 +25,7 @@
 - (WALocation *)createLocation {
     
     // create and add to manager.
-    WALocation *location = [[WALocation alloc] init];
+    WALocation *location = [WALocation new];
     location.loading     = YES;
     location.manager     = self; // weak
     [self.locations addObject:location];

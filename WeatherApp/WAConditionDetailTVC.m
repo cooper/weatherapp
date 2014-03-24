@@ -145,7 +145,7 @@
     
 
     // determine time string.
-    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    NSDateFormatter *fmt = [NSDateFormatter new];
     [fmt setTimeZone:[NSTimeZone localTimeZone]];
     [fmt setDateFormat:@"h:mm a"];
     NSString *asOf = [fmt stringFromDate:self.location.observationsAsOf];
@@ -176,12 +176,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
-    // generic base cell.
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
+    UITableViewCell *cell;
 
     // show the location cell for this location.
     if (!indexPath.row) {
@@ -190,6 +185,12 @@
         cell.backgroundView = nil;
         return cell;
     }
+    
+    // generic base cell.
+    cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
+    cell.detailTextLabel.textColor = [UIColor blackColor];
 
     // detail for current conditions.
     cell.textLabel.text = currentConditions[indexPath.row - 1][0];

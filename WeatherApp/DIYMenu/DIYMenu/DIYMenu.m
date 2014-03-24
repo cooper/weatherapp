@@ -29,7 +29,7 @@
     CGRect frame = [UIScreen mainScreen].bounds;
     //frame.origin.x -= ITEMHEIGHT;
     self.frame = frame;
-    _menuItems = [[NSMutableArray alloc] init];
+    _menuItems = [NSMutableArray array];
     self.clipsToBounds = true;
 
     // Set up shadingview
@@ -67,7 +67,7 @@
     static dispatch_once_t once;
     static DIYMenu *sharedView;
     dispatch_once(&once, ^{
-        sharedView = [[DIYMenu alloc] init];
+        sharedView = [DIYMenu new];
     });
     return sharedView;
 }

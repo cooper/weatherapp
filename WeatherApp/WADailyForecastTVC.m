@@ -86,7 +86,7 @@
     if ([fakeLocations count] >= i + 1)
         location = fakeLocations[i];
     else
-        location = fakeLocations[i] = [[WALocation alloc] init];
+        location = fakeLocations[i] = [WALocation new];
     
     location.loading     = NO;
     location.initialLoadingComplete = YES;
@@ -163,21 +163,24 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell;
 
-    // generic base cell.
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
     
     // artificial location row of a future day.
     if (!indexPath.row) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
+        cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
+        if (!cell) cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
         WALocation *location = forecastedConditions[indexPath.section][0];
         [WALocationListTVC applyWeatherInfo:location toCell:cell];
         return cell;
     }
     
+    // generic base cell.
+    cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
+    cell.detailTextLabel.textColor = [UIColor blackColor];
+
     // detail label on a forecast.
     cell.textLabel.text          = forecastedConditions[indexPath.section][1][indexPath.row - 1][0];
     cell.detailTextLabel.text    = forecastedConditions[indexPath.section][1][indexPath.row - 1][1];

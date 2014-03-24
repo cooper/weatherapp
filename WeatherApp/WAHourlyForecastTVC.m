@@ -11,11 +11,12 @@
 #import "WALocationListTVC.h"
 #import "UITableView+Reload.h"
 #import "WAPageViewController.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation WAHourlyForecastTVC
 
 - (id)initWithLocation:(WALocation *)location {
-    self = [super initWithStyle:UITableViewStyleGrouped];
+    self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
         self.location = location;
         if (!self.location.fakeLocations)
@@ -73,6 +74,7 @@
 
 - (void)updateForecasts {
     forecasts = [NSMutableArray array];
+    daysAdded = [NSMutableArray array];
     lastDay   = currentDayIndex = -1;
     for (unsigned int i = 0; i < [self.location.hourlyForecast count]; i++)
         [self addForecastForHour:self.location.hourlyForecast[i] index:i];
@@ -83,7 +85,7 @@
 - (void)addForecastForHour:(NSDictionary *)f index:(unsigned int)i {
 
     // determine the date components in the gregorian calendar.
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:[f[@"FCTTIME"][@"epoch"] integerValue]];
+    NSDate *date          = [NSDate dateWithTimeIntervalSince1970:[f[@"FCTTIME"][@"epoch"] integerValue]];
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
     NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit | NSHourCalendarUnit fromDate:date];
     
@@ -98,11 +100,37 @@
     }
     
     // this day does not yet exist.
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat       = @"EEEE";
-    NSString *dayName          = [formatter stringFromDate:date];
-    if ([forecasts count] == 0 || currentDayIndex > [forecasts count] - 1)
-        [forecasts addObject:[NSMutableArray arrayWithObject:dayName]];
+    if ([forecasts count] == 0 || currentDayIndex > [forecasts count] - 1) {
+    
+        // determine the day name.
+        NSDateFormatter *formatter = [NSDateFormatter new];
+        NSUInteger today = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]].day;
+        NSString *dayName, *dateName;
+
+        // determine day of week.
+        formatter.dateFormat = @"EEEE";
+        dayName = [formatter stringFromDate:date];
+        
+        // add to list.
+        // if it's there already, say "next" weekday,
+        // such as "Next Tuesday"
+        if ([daysAdded containsObject:dayName])
+            dayName = FMT(@"Next %@", dayName);
+        else
+            [daysAdded addObject:dayName];
+        
+        // this is today.
+        if (today == dateComponents.day)
+            dayName = @"Today";
+
+        // determine the date string.
+        formatter.dateFormat = @"MMMM d";
+        dateName = [formatter stringFromDate:date];
+        
+        // create the day array with the name as the first object.
+        [forecasts addObject:[NSMutableArray arrayWithObject:@[dayName, dateName]]];
+        
+    }
     NSMutableArray *day = forecasts[currentDayIndex];
     
     // information we care about.
@@ -112,7 +140,8 @@
         @"icon":            f[@"icon"],
         @"icon_url":        f[@"icon_url"],
         @"temp_c":          f[@"temp"][@"metric"],
-        @"temp_f":          f[@"temp"][@"english"]
+        @"temp_f":          f[@"temp"][@"english"],
+        @"condition":       f[@"condition"]
     }];
     NSLog(@"just added: %@", [day lastObject]);
 }
@@ -125,7 +154,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [forecasts[section] count];
+    return [forecasts[section] count] - 1; // excluding header
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -133,34 +162,76 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
-    // generic base cell.
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
-    
-    // artificial location row of a day.
-    if (!indexPath.row) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"day"];
-        cell.backgroundColor = [UIColor colorWithRed:  0./255. green:150./255. blue:1 alpha:0.5];
-        cell.textLabel.text = forecasts[indexPath.section][0];
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.font = [UIFont boldSystemFontOfSize:22];
-        cell.textLabel.textColor = [UIColor whiteColor];
-        return cell;
+    UILabel *conditionLabel;
+
+    // new cell. create a condition label.
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+        conditionLabel = [[UILabel alloc] initWithFrame:CGRectMake(122, 0, 152, 50)];
+        conditionLabel.tag = 17;
+        //conditionLabel.textAlignment = NSTextAlignmentCenter;
+        conditionLabel.adjustsFontSizeToFitWidth = YES;
+        [cell.contentView addSubview:conditionLabel];
     }
     
+    // reusing cell.
+    else for (UIView *view in cell.contentView.subviews) {
+        if (view.tag != 17) continue;
+        conditionLabel = (UILabel *)view;
+        break;
+    }
+    
+    cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.7];
+    cell.detailTextLabel.textColor = [UIColor blackColor];
+    
     // detail label on a forecast.
-    NSDictionary *dict = forecasts[indexPath.section][indexPath.row];
+    NSDictionary *dict = forecasts[indexPath.section][indexPath.row + 1];
     NSDateComponents *dateComponents = dict[@"dateComponents"];
     NSUInteger hour      = dateComponents.hour;
-    if (hour == 0) hour  = 12;
-    if (hour > 12) hour -= 12;
     
-    cell.textLabel.text          = FMT(@"%ld", (long)hour);
-    cell.detailTextLabel.text    = FMT(@"%@", dict[@"temp_f"]);
-    cell.textLabel.numberOfLines = 0;
+    // adjust to AM/PM.
+    BOOL pm = NO;
+    if (hour == 0) hour  = 12;
+    if (hour > 12) {
+        hour -= 12;
+        pm = YES;
+    }
+    
+    // create a fake location for the icons and temperatures.
+    WALocation *location = [WALocation new];
+    location.response = @{
+        @"icon":        dict[@"icon"],
+        @"icon_url":    dict[@"icon_url"]
+    };
+    location.degreesC = [dict[@"temp_c"] floatValue];
+    location.degreesF = [dict[@"temp_f"] floatValue];
+    [location fetchIcon];
+    
+    // 30x30 icon with a slight shadow to increase visibility.
+    cell.imageView.image = [UIImage imageNamed:FMT(@"icons/30/%@", location.conditionsImageName)];
+    cell.imageView.layer.shadowColor     = [UIColor blackColor].CGColor;
+    cell.imageView.layer.shadowOffset    = CGSizeMake(0, 0);
+    cell.imageView.layer.shadowRadius    = 0.3;
+    cell.imageView.layer.shadowOpacity   = 1.0;
+    cell.imageView.layer.masksToBounds   = NO;
+    cell.imageView.layer.shouldRasterize = YES;
+    
+    // time label.
+    NSString *time = FMT(@"%ld %@", (long)hour, pm ? @"PM" : @"AM");
+    NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:time];
+    NSRange range = NSMakeRange([time length] - 2, 2);
+    [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:range];
+    cell.textLabel.font           = [UIFont systemFontOfSize:20];
+    cell.textLabel.numberOfLines  = 0;
+    cell.textLabel.attributedText = string;
+
+    // temperature label.
+    cell.detailTextLabel.text = location.temperature;
+    cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:20];
+    
+    // create an additional label for description of conditions.
+    conditionLabel.text = dict[@"condition"];
     
     return cell;
 }
@@ -168,6 +239,24 @@
 // disable selection of cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"day"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"day"];
+        cell.backgroundColor            = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.9];;
+        cell.textLabel.textColor        = [UIColor whiteColor];
+        cell.detailTextLabel.textColor  = [UIColor whiteColor];
+        cell.textLabel.font             = [UIFont boldSystemFontOfSize:22];
+    }
+    cell.textLabel.text         = forecasts[section][0][0];
+    cell.detailTextLabel.text   = forecasts[section][0][1];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 40;
 }
 
 #pragma mark - Interface actions

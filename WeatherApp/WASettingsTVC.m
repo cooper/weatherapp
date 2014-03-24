@@ -79,10 +79,11 @@
     
     // boolean option.
     else if (indexPath.section < [settings count] - 1) {
-        rowName      = settings[indexPath.section][indexPath.row];
-        UISwitch *sw = [[UISwitch alloc] init];
-        sw.on        = SETTING(rowName);
-        sw.tag       = indexPath.row;
+        rowName        = settings[indexPath.section][indexPath.row];
+        UISwitch *sw   = [UISwitch new];
+        sw.on          = SETTING(rowName);
+        sw.tag         = indexPath.row;
+        sw.onTintColor = BLUE_COLOR;
         [sw addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = sw;
     }
@@ -133,7 +134,8 @@
     [DEFAULTS setObject:rowName forKey:sectionName];
     
     // unhighlight row.
-    [cell setSelected:NO animated:YES];
+    // this fixes the issue where it would stick after scrolling back to it.
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
 }
 

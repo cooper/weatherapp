@@ -29,7 +29,7 @@ WAAppDelegate *appDelegate = nil;
     [self setDefaults];
     
     // load locations from settings.
-    self.locationManager = [[WALocationManager alloc] init];
+    self.locationManager = [WALocationManager new];
     [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
     [self.locationManager fetchLocations];
     
@@ -130,7 +130,7 @@ WAAppDelegate *appDelegate = nil;
 - (void)startLocating {
     
     // create core location manager if we haven't already.
-    if (!coreLocationManager) coreLocationManager = [[CLLocationManager alloc] init];
+    if (!coreLocationManager) coreLocationManager = [CLLocationManager new];
     
     // set our desired accuracy.
     coreLocationManager.desiredAccuracy = kCLLocationAccuracyBest;

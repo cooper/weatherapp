@@ -34,10 +34,8 @@
     // remove the border between cells.
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
-    self.navigationItem.title = @"Locations";
-    self.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Overview" image:[[UIImage alloc] init] selectedImage:[[UIImage alloc] init]];
-    
     // navigation bar buttons.
+    self.navigationItem.title = @"Locations";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(goToNew)];
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"\u2699" style:UIBarButtonItemStylePlain target:self action:@selector(settingsButtonTapped)];
@@ -78,20 +76,23 @@
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"dummy"];
         if (!cell) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"dummy"];
-            cell.backgroundColor  = [UIColor clearColor];
+            cell.backgroundColor = [UIColor clearColor];
+            cell.alpha = 0;
         }
-        cell.alpha = 0;
         return cell;
     };
     
     // find or create cell.
-    // we only want to reuse a cell if our initial load is complete.
-    // otherwise, a new location's cell will have another's style.
-    UITableViewCell *cell;
-    if (location.initialLoadingComplete)
-        cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
     if (!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
+
+    // if the initial loading is not complete, remove stuff from queue.
+    if (!location.initialLoadingComplete) {
+        cell.backgroundView         = nil;
+        cell.detailTextLabel.text   = nil;
+        cell.textLabel.text         = nil;
+    }
 
     // do the rest.
     [[self class] applyWeatherInfo:location toCell:cell];
@@ -203,14 +204,14 @@
     
     // here's the background.
     if (location.cellBackground) {
-        UIImageView *cellBg = [[UIImageView alloc] init];
+        UIImageView *cellBg = [UIImageView new];
         cellBg.image        = location.cellBackground;
         cellBg.frame        = cell.bounds;
         cell.backgroundView = cellBg;
     }
     
     // here's the selected translucent blue tint.
-    cell.selectedBackgroundView = [[UIView alloc] init];
+    cell.selectedBackgroundView = [UIView new];
     cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
     cell.backgroundColor = [UIColor clearColor];
     

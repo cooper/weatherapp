@@ -41,7 +41,7 @@
 
 // create a new dummy location.
 + (id)newDummy {
-    WALocation *location = [[self alloc] init];
+    WALocation *location = [self new];
     location.dummy = YES;
     return location;
 }

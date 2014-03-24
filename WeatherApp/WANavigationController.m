@@ -19,10 +19,10 @@
     UINavigationBar *bar = self.navigationBar;
 
     // make bar translucently blue.
-    [self.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
-
-    bar.translucent = YES;
-    bar.tintColor   = [UIColor whiteColor];
+    //[bar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+    bar.barTintColor = BLUE_COLOR;
+    bar.translucent  = YES;
+    bar.tintColor    = [UIColor whiteColor];
     bar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
     
     return self;
