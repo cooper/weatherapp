@@ -10,11 +10,11 @@
     UIImage         *background;            // background image view
     UIBarButtonItem *refreshButton;         // refresh button in navbar
     UIActivityIndicatorView *indicator;     // the large indicator
-    NSMutableArray  *fakeLocations;         // forecast location objects
     NSMutableArray  *forecasts;             // array containing hourly forecast data
     NSUInteger      lastDay;                // the day in the month of the last hour checked
     NSUInteger      currentDayIndex;        // the index of the current day, starting at 0
     NSMutableArray  *daysAdded;             // track which days added to say "next" weekday
+    NSDate          *lastUpdate;            // last time cell information was updated
 }
 
 @property (weak) WALocation *location;

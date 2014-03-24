@@ -17,12 +17,7 @@
 
 - (id)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStylePlain];
-    if (self) {
-        self.location = location;
-        if (!self.location.fakeLocations)
-            self.location.fakeLocations = [NSMutableArray array];
-        fakeLocations = self.location.fakeLocations;
-    }
+    if (self) self.location = location;
     return self;
 }
         
@@ -44,7 +39,12 @@
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
 
-    [self update:NO];
+}
+
+// update if settings have been changed.
+- (void)viewWillAppear:(BOOL)animated {
+    if (!lastUpdate || [appDelegate.lastSettingsChange timeIntervalSinceDate:lastUpdate] > 0)
+        [self update:NO];
 }
 
 #pragma mark - Weather info
@@ -54,6 +54,7 @@
 }
 
 - (void)update:(BOOL)animated {
+    lastUpdate = [NSDate date];
 
     // generate new cell information.
     [self updateForecasts];
@@ -102,7 +103,6 @@
     if (dayIndex != lastDay) {
         currentDayIndex++;
         lastDay = dayIndex;
-        NSLog(@"day changed; new current(%lu), lastDay(%lu)", (unsigned long)currentDayIndex, (unsigned long)lastDay);
     }
     
     // this day does not yet exist.
@@ -154,7 +154,7 @@
         @"temp_f":          f[@"temp"][@"english"],
         @"condition":       f[@"condition"]
     }];
-    NSLog(@"just added: %@", [day lastObject]);
+    
 }
 
 

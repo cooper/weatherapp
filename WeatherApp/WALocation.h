@@ -88,7 +88,6 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSArray *forecast;                            // recent forecast response
 @property NSMutableArray *fakeLocations;                // location objects for forecast
 @property NSArray *hourlyForecast;                      // recent hourly response
-@property NSMutableArray *hourlyFakeLocations;          // location objects for hourly
 
 #pragma mark - Backgrounds
 

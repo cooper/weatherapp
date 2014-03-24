@@ -193,9 +193,9 @@
     // already on this view controller.
     if (vc == appDelegate.nc.topViewController) return;
     
-    // for the overview, just pop back to it if we aren't on it already.
+    // for the overview, just pop back to the page view controller.
     if (vc == self) {
-        [appDelegate.nc popViewControllerAnimated:YES];
+        [appDelegate.nc popToViewController:self animated:YES];
         return;
     }
 

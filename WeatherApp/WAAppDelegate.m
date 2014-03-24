@@ -21,7 +21,8 @@ WAAppDelegate *appDelegate = nil;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     appDelegate = self;
-    
+    self.lastSettingsChange = [NSDate date];
+
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = TABLE_COLOR;
 

@@ -15,11 +15,10 @@
 @implementation WAConditionDetailTVC
 
 - (id)initWithLocation:(WALocation *)location {
-    self = [super initWithStyle:UITableViewStyleGrouped];
+    self = [super initWithStyle:UITableViewStylePlain];
     if (self) self.location = location;
     return self;
 }
-        
 
 #pragma mark - Table view controller
 
@@ -33,23 +32,28 @@
     // refresh button.
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+}
 
-    [self update:YES];
+// update if settings have been changed.
+- (void)viewWillAppear:(BOOL)animated {
+    if (!lastUpdate || [appDelegate.lastSettingsChange timeIntervalSinceDate:lastUpdate] > 0)
+        [self update:NO];
 }
 
 #pragma mark - Weather info
 
 - (void)update {
-    [self update:NO];
+    [self update:YES];
 }
 
-- (void)update:(BOOL)firstTime {
-
+- (void)update:(BOOL)animated {
+    lastUpdate = [NSDate date];
+    
     // generate new cell information.
     currentConditions    = [self detailsForLocation:self.location];
     
     // update table.
-    [self.tableView reloadData:!firstTime];
+    [self.tableView reloadData:animated];
     
     // update the background if necessary.
     if (background != self.location.background)
@@ -162,6 +166,7 @@
         
     }
     
+    // compiled list of cell information.
     NSArray *details = @[
         @"Temperature",         FMT(@"%@ %@", location.temperature, location.tempUnit),
         @"Feels like",          FMT(@"%@ %@", location.feelsLike,   location.tempUnit),
@@ -183,7 +188,7 @@
         @"Longitude",           FMT(@"%f", self.location.longitude)
     ];
     
-    // add all of them that are not NA.
+    // filter out the "NA" values.
     for (NSUInteger i = 0; i < [details count]; i += 2) {
         if ([details[i + 1] isEqual:@"NA"]) continue;
         [final addObject:@[ details[i], details[i + 1] ]];
@@ -223,25 +228,28 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         cell.selectedBackgroundView = [UIView new];
         cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
-        cell.textLabel.text  = FMT(@"Open %@ in Maps", self.location.city);
+        cell.textLabel.text       = FMT(@"Open %@ in Maps", self.location.city);
         cell.detailTextLabel.text = @"🌎";
     }
     
     // detail cell.
     else {
         cell = [tableView dequeueReusableCellWithIdentifier:@"detail"];
-        if (!cell)
+        if (!cell) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"detail"];
+            //cell.textLabel.textColor = [UIColor colorWithRed:0  green:70./255. blue:200./255. alpha:1];
+            cell.textLabel.font      = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+        }
         
         // detail for current conditions.
         cell.textLabel.text       = currentConditions[indexPath.row - 1][0];
         cell.detailTextLabel.text = currentConditions[indexPath.row - 1][1];
-    
     }
-    
+
+    // for all non-location cells.
     cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.textLabel.textColor       =
     cell.detailTextLabel.textColor = [UIColor blackColor];
+    
     return cell;
 }
 

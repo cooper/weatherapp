@@ -12,6 +12,7 @@
     UIBarButtonItem *refreshButton;         // refresh button in navbar
     NSMutableArray  *fakeLocations;         // forecast location objects
     UIActivityIndicatorView *indicator;     // the large indicator
+    NSDate          *lastUpdate;            // last time cell information was updated
 }
 
 @property (weak) WALocation *location;

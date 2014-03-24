@@ -108,27 +108,27 @@
         // temperatures.
         // no longer round temperatures to the nearest whole degree here.
         
-        self.degreesC   = [ob[@"temp_c"]       floatValue];
-        self.degreesF   = [ob[@"temp_f"]       floatValue];
-        self.feelsLikeC = [ob[@"feelslike_c"]  floatValue];
-        self.feelsLikeF = [ob[@"feelslike_f"]  floatValue];
+        self.degreesC   = TEMP_SAFE(ob[@"temp_c"]);
+        self.degreesF   = TEMP_SAFE(ob[@"temp_f"]);
+        self.feelsLikeC = TEMP_SAFE(ob[@"feelslike_c"]);
+        self.feelsLikeF = TEMP_SAFE(ob[@"feelslike_f"]);
         
         // dew point. (NSString = NA)
         if (ob[@"dewpoint_c"] && [ob[@"dewpoint_c"] isMemberOfClass:[NSNumber class]]) {
-            self.dewPointC  = [ob[@"dewpoint_c"]   floatValue];
-            self.dewPointF  = [ob[@"dewpoint_f"]   floatValue];
+            self.dewPointC  = TEMP_SAFE(ob[@"dewpoint_c"]);
+            self.dewPointF  = TEMP_SAFE(ob[@"dewpoint_f"]);
         }
         
         // heat index. (NSString = NA)
         if (ob[@"heat_index_c"] && [ob[@"heat_index_c"] isMemberOfClass:[NSNumber class]]) {
-            self.heatIndexC = [ob[@"heat_index_c"] floatValue];
-            self.heatIndexF = [ob[@"heat_index_f"] floatValue];
+            self.heatIndexC = TEMP_SAFE(ob[@"heat_index_c"]);
+            self.heatIndexF = TEMP_SAFE(ob[@"heat_index_f"]);
         }
         
         // windchill. (NSString = NA)
         if (ob[@"windchill_c"] && [ob[@"windchill_c"] isMemberOfClass:[NSNumber class]]) {
-            self.windchillC = [ob[@"windchill_c"] floatValue];
-            self.windchillF = [ob[@"windchill_f"] floatValue];
+            self.windchillC = TEMP_SAFE(ob[@"windchill_c"]);
+            self.windchillF = TEMP_SAFE(ob[@"windchill_f"]);
         }
         
         // conditions.
@@ -155,6 +155,7 @@
     NSString *q = [self bestLookupMethod:@"forecast10day"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
         self.forecast = data[@"forecast"][@"simpleforecast"][@"forecastday"];
+        // make sure forecast10day is true
     }];
 }
 
@@ -163,7 +164,7 @@
     NSString *q = [self bestLookupMethod:@"hourly10day"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
         self.hourlyForecast = data[@"hourly_forecast"];
-        NSLog(@"%@", self.hourlyForecast);
+        // make sure hourly10day is true
     }];
 }
 

@@ -54,6 +54,10 @@
     self.tableView.backgroundColor = TABLE_COLOR;
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    appDelegate.lastSettingsChange = [NSDate date];
+}
+
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

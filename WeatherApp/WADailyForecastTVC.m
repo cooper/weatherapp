@@ -42,8 +42,13 @@
     // refresh button.
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+    
+}
 
-    [self update:NO];
+// update if settings have been changed.
+- (void)viewWillAppear:(BOOL)animated {
+    if (!lastUpdate || [appDelegate.lastSettingsChange timeIntervalSinceDate:lastUpdate] > 0)
+        [self update:NO];
 }
 
 #pragma mark - Weather info
@@ -53,6 +58,7 @@
 }
 
 - (void)update:(BOOL)animated {
+    lastUpdate = [NSDate date];
 
     // generate new cell information.
     forecastedConditions = [self forecastForLocation:self.location];

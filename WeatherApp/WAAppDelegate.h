@@ -72,6 +72,7 @@ typedef void(^WACallback)(void);    // WALocation's callback type
 @property WAPageViewController *pageVC;             // the location page view controller (swipe up/down)
 @property WALocationManager *locationManager;       // our location manager
 @property (readonly) WALocation *currentLocation;   // the current location object
+@property NSDate *lastSettingsChange;               // time of last settings change
 
 - (void)saveLocationsInDatabase;    // updates user defaults database
 - (void)beginActivity;              // increase activity counter

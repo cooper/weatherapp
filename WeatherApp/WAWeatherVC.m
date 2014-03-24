@@ -50,12 +50,12 @@
     [self.view addGestureRecognizer:recognizer];
     
     // update with current information.
-    [self updateInterface];
+    [self update];
     
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self updateInterface];
+    [self update];
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
@@ -71,11 +71,7 @@
 #pragma mark - Updates from WALocation
 
 - (void)update {
-    [self updateInterface];
-}
 
-- (void)updateInterface {
-    
     // info.
     self.locationTitle.text     = self.location.city;
     self.regionLabel.text       = self.location.region;
