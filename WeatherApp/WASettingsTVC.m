@@ -26,9 +26,9 @@
             kDistanceMeasureMiles,
             kDistanceMeasureKilometers
         ]],
-        @[kPercipitationMeasureSetting, @[
-            kPercipitationMeasureInches,
-            kPercipitationMeasureMilimeters
+        @[kPrecipitationMeasureSetting, @[
+            kPrecipitationMeasureInches,
+            kPrecipitationMeasureMilimeters
         ]],
         @[kPressureMeasureSetting, @[
             kPressureMeasureInchHg,

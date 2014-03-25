@@ -108,27 +108,27 @@
         // temperatures.
         // no longer round temperatures to the nearest whole degree here.
         
-        self.degreesC   = TEMP_SAFE(ob[@"temp_c"]);
-        self.degreesF   = TEMP_SAFE(ob[@"temp_f"]);
-        self.feelsLikeC = TEMP_SAFE(ob[@"feelslike_c"]);
-        self.feelsLikeF = TEMP_SAFE(ob[@"feelslike_f"]);
+        self.degreesC   = temp_safe(ob[@"temp_c"]);
+        self.degreesF   = temp_safe(ob[@"temp_f"]);
+        self.feelsLikeC = temp_safe(ob[@"feelslike_c"]);
+        self.feelsLikeF = temp_safe(ob[@"feelslike_f"]);
         
-        // dew point. (NSString = NA)
-        if (ob[@"dewpoint_c"] && [ob[@"dewpoint_c"] isMemberOfClass:[NSNumber class]]) {
-            self.dewPointC  = TEMP_SAFE(ob[@"dewpoint_c"]);
-            self.dewPointF  = TEMP_SAFE(ob[@"dewpoint_f"]);
+        // dew point.
+        if (temp_safe(ob[@"dewpoint_c"]) != TEMP_NONE) {
+            self.dewPointC  = temp_safe(ob[@"dewpoint_c"]);
+            self.dewPointF  = temp_safe(ob[@"dewpoint_f"]);
         }
         
-        // heat index. (NSString = NA)
-        if (ob[@"heat_index_c"] && [ob[@"heat_index_c"] isMemberOfClass:[NSNumber class]]) {
-            self.heatIndexC = TEMP_SAFE(ob[@"heat_index_c"]);
-            self.heatIndexF = TEMP_SAFE(ob[@"heat_index_f"]);
+        // heat index.
+        if (temp_safe(ob[@"heat_index_c"]) != TEMP_NONE) {
+            self.heatIndexC = temp_safe(ob[@"heat_index_c"]);
+            self.heatIndexF = temp_safe(ob[@"heat_index_f"]);
         }
         
-        // windchill. (NSString = NA)
-        if (ob[@"windchill_c"] && [ob[@"windchill_c"] isMemberOfClass:[NSNumber class]]) {
-            self.windchillC = TEMP_SAFE(ob[@"windchill_c"]);
-            self.windchillF = TEMP_SAFE(ob[@"windchill_f"]);
+        // windchill.
+        if (temp_safe(ob[@"windchill_c"]) != TEMP_NONE) {
+            self.windchillC = temp_safe(ob[@"windchill_c"]);
+            self.windchillF = temp_safe(ob[@"windchill_f"]);
         }
         
         // conditions.
@@ -305,7 +305,6 @@
         t = self.degreesC + 273.15;
     else
         t = self.degreesC;
-    
     return [NSString stringWithFormat:@"%.f", t];
 }
 
@@ -360,11 +359,11 @@
 - (NSString *)windchill {
     float t;
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.heatIndexF;
+        t = self.windchillF;
     else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.heatIndexC + 273.15;
+        t = self.windchillC + 273.15;
     else
-        t = self.heatIndexC;
+        t = self.windchillC;
     
     return [NSString stringWithFormat:@"%.f", t];
 }

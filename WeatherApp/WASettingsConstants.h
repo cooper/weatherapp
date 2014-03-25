@@ -8,7 +8,7 @@
 
 FOUNDATION_EXPORT NSString * const kTemperatureScaleSetting;
 FOUNDATION_EXPORT NSString * const kDistanceMeasureSetting;
-FOUNDATION_EXPORT NSString * const kPercipitationMeasureSetting;
+FOUNDATION_EXPORT NSString * const kPrecipitationMeasureSetting;
 FOUNDATION_EXPORT NSString * const kPressureMeasureSetting;
 
 FOUNDATION_EXPORT NSString * const kTemperatureScaleFahrenheit;
@@ -18,8 +18,8 @@ FOUNDATION_EXPORT NSString * const kTemperatureScaleKelvin;
 FOUNDATION_EXPORT NSString * const kDistanceMeasureMiles;
 FOUNDATION_EXPORT NSString * const kDistanceMeasureKilometers;
 
-FOUNDATION_EXPORT NSString * const kPercipitationMeasureInches;
-FOUNDATION_EXPORT NSString * const kPercipitationMeasureMilimeters;
+FOUNDATION_EXPORT NSString * const kPrecipitationMeasureInches;
+FOUNDATION_EXPORT NSString * const kPrecipitationMeasureMilimeters;
 
 FOUNDATION_EXPORT NSString * const kPressureMeasureMillibar;
 FOUNDATION_EXPORT NSString * const kPressureMeasureInchHg;

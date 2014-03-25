@@ -87,9 +87,9 @@
     
     // windchill, heat index, or other "feels like" temperature.
     self.feelsLikeLabel.text =
-        self.location.windchillC != TEMP_NONE                                           ?
+        self.location.windchillC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.windchill] ?
             FMT(@"Windchill %@%@", self.location.windchill, self.location.tempUnit)     :
-        self.location.heatIndexC != TEMP_NONE                                           ?
+        self.location.heatIndexC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.heatIndex] ?
             FMT(@"Heat index %@%@", self.location.heatIndex, self.location.tempUnit)    :
         ![self.location.temperature isEqualToString:self.location.feelsLike]            ?
             FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit)    :

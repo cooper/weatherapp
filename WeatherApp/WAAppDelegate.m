@@ -44,7 +44,7 @@ WAAppDelegate *appDelegate = nil;
     // start locating.
     [self startLocating];
 
-    // rain notification background check (every thirty minutes at most).
+    // rain notification background check (every thirty minutes or so).
     application.minimumBackgroundFetchInterval =
         SETTING(kEnableBackgroundSetting) ?
         1800 : UIApplicationBackgroundFetchIntervalNever;
@@ -55,6 +55,10 @@ WAAppDelegate *appDelegate = nil;
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     NSLog(@"Background fetch!");
+    
+    // hasn't been 30 minutes since last fetch.
+    if (abs([self.currentLocation.conditionsAsOf timeIntervalSinceNow]) < 1800)
+        return;
     
     // background fetch not enabled.
     if (!SETTING(kEnableBackgroundSetting)) {
@@ -260,7 +264,7 @@ WAAppDelegate *appDelegate = nil;
     // set default preferences.
     [DEFAULTS setObject:kTemperatureScaleFahrenheit forKey:kTemperatureScaleSetting];
     [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
-    [DEFAULTS setObject:kPercipitationMeasureInches forKey:kPercipitationMeasureSetting];
+    [DEFAULTS setObject:kPrecipitationMeasureInches forKey:kPrecipitationMeasureSetting];
     [DEFAULTS setObject:kPressureMeasureSetting     forKey:kPressureMeasureSetting];
     [DEFAULTS setObject:kTimeZoneRemote             forKey:kTimeZoneSetting];
     
@@ -273,6 +277,38 @@ WAAppDelegate *appDelegate = nil;
     
     // remember that we set these values.
     [DEFAULTS setBool:YES forKey:@"set_default_options"];
+    
+}
+
+#pragma mark - Convenience functions
+
+float temp_safe(id temp) {
+    float floatValue = [temp floatValue];
+    
+    // this is a number, which makes things easy.
+    if ([temp isKindOfClass:[NSNumber class]]) {
+        if (floatValue < -200)
+            return TEMP_NONE;
+        return floatValue;
+    }
+    
+    // otherwise, strings are a bit more tricky.
+    NSString *tempStr = temp;
+    
+    // empty string = no temperature.
+    if ([tempStr length] == 0)
+        return TEMP_NONE;
+    
+    // if it's more than 1 character, it can't be zero numerically.
+    // (unless they did something really silly like "0.", but I haven't seen that)
+    if ([tempStr length] > 1) {
+        if (floatValue == 0 || floatValue < -200)
+            return TEMP_NONE;
+        return floatValue;
+    }
+    
+    // if it's only 1 character, it's hopefully a single-digit number.
+    return floatValue;
     
 }
 

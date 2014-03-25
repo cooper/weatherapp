@@ -10,7 +10,7 @@
 
 NSString * const kTemperatureScaleSetting           = @"Temperature scale";
 NSString * const kDistanceMeasureSetting            = @"Measure of distance";
-NSString * const kPercipitationMeasureSetting       = @"Measure of percipitation";
+NSString * const kPrecipitationMeasureSetting       = @"Measure of precipitation";
 NSString * const kPressureMeasureSetting            = @"Measure of pressure";
 
 NSString * const kTemperatureScaleFahrenheit        = @"Fahrenheit";
@@ -20,8 +20,8 @@ NSString * const kTemperatureScaleKelvin            = @"Kelvin";
 NSString * const kDistanceMeasureMiles              = @"Miles";
 NSString * const kDistanceMeasureKilometers         = @"Kilometers";
 
-NSString * const kPercipitationMeasureInches        = @"Inches";
-NSString * const kPercipitationMeasureMilimeters    = @"Milimeters";
+NSString * const kPrecipitationMeasureInches        = @"Inches";
+NSString * const kPrecipitationMeasureMilimeters    = @"Milimeters";
 
 NSString * const kPressureMeasureMillibar           = @"Millibars";
 NSString * const kPressureMeasureInchHg             = @"Inches of mercury";

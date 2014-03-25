@@ -84,37 +84,36 @@
     [fmt setDateFormat:@"h:mm a"];
     
     // initial values of "NA"
-    NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *percipT,
-        *percipH, *windSpeed, *windDirection, *gustSpeed, *gustDirection;
-    dewPoint  = heatIndex = windchill     = pressure  = visibility    = percipT =
-    percipH   = windSpeed = windDirection = gustSpeed = gustDirection = @"NA";
+    NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *precipT,
+        *precipH, *windSpeed, *windDirection, *gustSpeed, *gustDirection, *uv;
+    dewPoint  = heatIndex = windchill     = pressure  = visibility    = precipT = uv =
+    precipH   = windSpeed = windDirection = gustSpeed = gustDirection = @"NA";
     
     // dewpoint.
     if (location.dewPointC != TEMP_NONE)
         dewPoint = FMT(@"%@ %@", location.dewPoint, location.tempUnit);
     
     // heat index.
-    if (location.heatIndexC != TEMP_NONE)
+    if (location.heatIndexC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.heatIndex])
         heatIndex = FMT(@"%@ %@", location.heatIndex, location.tempUnit);
     
     // windchill.
-    if (location.windchillC != TEMP_NONE)
+    if (location.windchillC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.windchill])
         windchill = FMT(@"%@ %@", location.windchill, location.tempUnit);
     
-    
-    // percipitation.
-    if ([r[@"percip_today_metric"] floatValue] > 0) {
+    // precipitation.
+    if ([r[@"precip_today_metric"] floatValue] > 0) {
     
         // in inches.
-        if (SETTING_IS(kPercipitationMeasureSetting, kPercipitationMeasureInches)) {
-            percipT = FMT(@"%@ in", r[@"precip_today_in"]);
-            percipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
+        if (SETTING_IS(kPrecipitationMeasureSetting, kPrecipitationMeasureInches)) {
+            precipT = FMT(@"%@ in", r[@"precip_today_in"]);
+            precipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
         }
         
         // in millimeters.
         else {
-            percipT = FMT(@"%@ in", r[@"precip_today_metric"]);
-            percipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
+            precipT = FMT(@"%@ in", r[@"precip_today_metric"]);
+            precipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
         }
         
     }
@@ -123,6 +122,11 @@
     pressure = SETTING_IS(kPressureMeasureSetting, kPressureMeasureInchHg) ?
         FMT(@"%@ inHg", r[@"pressure_in"])                                 :
         FMT(@"%@ inHg", r[@"pressure_mb"]);
+
+    // UV index.
+    float safeUV = temp_safe(r[@"UV"]);
+    if (safeUV != TEMP_NONE && safeUV > 0)
+        uv = r[@"UV"];
 
     // miles.
     if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
@@ -176,12 +180,13 @@
         @"Pressure",            pressure,
         @"Humidity",            r[@"relative_humidity"],
         @"Visibility",          visibility,
-        @"Percip. today",       percipT,
-        @"Percip. in hour",     percipH,
+        @"Precip. today",       precipT,
+        @"Precip. in hour",     precipH,
         @"Wind speed",          windSpeed,
         @"Wind direction",      windDirection,
         @"Gust speed",          gustSpeed,
         @"Gust direction",      gustDirection,
+        @"UV index",            uv,
         @"Last observation",    [fmt stringFromDate:self.location.observationsAsOf],
         @"Last fetch",          [fmt stringFromDate:self.location.conditionsAsOf],
         @"Latitude",            FMT(@"%f", self.location.latitude),

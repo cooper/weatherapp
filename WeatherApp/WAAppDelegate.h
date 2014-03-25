@@ -39,7 +39,6 @@
 #define SETTING(setting)    [DEFAULTS boolForKey:setting]
 #define SETTING_IS(setting, value) [[DEFAULTS objectForKey:setting] isEqualToString:value]
 #define STR_OR_NIL(str)     (str && [str length] ? str : nil)
-#define TEMP_SAFE(temp)     ([temp floatValue] > -200 ? [temp floatValue] : TEMP_NONE)
 
 // Types.
 
@@ -80,4 +79,5 @@ typedef void(^WACallback)(void);    // WALocation's callback type
 
 @end
 
-extern WAAppDelegate *appDelegate;
+FOUNDATION_EXPORT WAAppDelegate *appDelegate;
+FOUNDATION_EXPORT float temp_safe(id);
