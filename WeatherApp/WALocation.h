@@ -9,7 +9,15 @@
 
 typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSError *err);
 
-@interface WALocation : NSObject <NSURLConnectionDataDelegate>
+@interface WALocation : NSObject <NSURLConnectionDataDelegate> {
+
+    // hourly forecast.
+    NSMutableArray  *hourly;                // array containing hourly forecast data
+    NSUInteger      lastDay;                // the day in the month of the last hour checked
+    NSUInteger      currentDayIndex;        // the index of the current day, starting at 0
+    NSMutableArray  *daysAdded;             // track which days added to say "next" weekday
+    
+}
 
 #pragma mark - General properties
 
@@ -84,10 +92,22 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property (readonly) NSString *heatIndex;               // localized heat index string
 @property (readonly) NSString *windchill;               // localized windchill string
 
+// methods for extra decimal places.
+- (NSString *)temperature:(UInt8)decimalPlaces;         // localized with desired decimals
+- (NSString *)feelsLike:(UInt8)decimalPlaces;           // localized with desired decimals
+- (NSString *)highTemp:(UInt8)decimalPlaces;            // localized with desired decimals
+- (NSString *)dewPoint:(UInt8)decimalPlaces;            // localized with desired decimals
+- (NSString *)heatIndex:(UInt8)decimalPlaces;           // localized with desired decimals
+- (NSString *)windchill:(UInt8)decimalPlaces;           // localized with desired decimals
+
 // forecasts.
-@property NSArray *forecast;                            // recent forecast response
+@property NSArray *forecastResponse;                    // recent forecast response
+@property NSMutableArray *dailyForecast;                // generated daily forecast info
 @property NSMutableArray *fakeLocations;                // location objects for forecast
-@property NSArray *hourlyForecast;                      // recent hourly response
+@property NSArray *hourlyForecastResponse;              // recent hourly forecast response
+@property NSMutableArray *hourlyForecast;               // generated hourly forecast info
+@property NSDate *hourlyForecastAsOf;
+@property NSDate *dailyForecastAsOf;
 
 #pragma mark - Backgrounds
 
@@ -105,8 +125,13 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 - (void)fetchCurrentConditions;
 - (void)fetchCurrentConditionsThen:(WACallback)then;
 - (void)fetchForecast;
-- (void)fetchHourlyForecast;
+- (void)fetchHourlyForecast:(BOOL)tenDay;
 - (void)fetchIcon;
+
+#pragma mark - Forecasts
+
+- (void)updateDailyForecast;
+- (void)updateHourlyForecast;
 
 #pragma mark - User defaults
 

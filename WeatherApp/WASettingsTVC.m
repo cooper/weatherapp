@@ -40,8 +40,8 @@
         ]],
         @[
             kEnableBackgroundSetting,
-            kEnableFullLocationNameSetting,
-            kEnableLongitudeLatitudeSetting
+            kEnableHourlyPreviewSetting
+            //kEnableFullLocationNameSetting
         ],
         @[
             @[@"Icons",                 @"Mitchell Cooper"      ],
@@ -73,8 +73,9 @@
     return [settings[section] count];
 }
 
+// we don't reuse any cells here. they are so basic that there would be no advantage.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     
     NSString *sectionName, *rowName;
     
@@ -87,6 +88,8 @@
         if ([[DEFAULTS objectForKey:sectionName] isEqualToString:rowName])
             cell.accessoryType  = UITableViewCellAccessoryCheckmark;
         
+        cell.selectedBackgroundView = [UIView new];
+        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
     }
     
     // boolean option.

@@ -94,6 +94,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     [self updateNavigationBar];
 }
 
@@ -153,6 +154,11 @@
 // update conditions.
 - (void)refreshButtonTapped {
     [self.location fetchCurrentConditions];
+    
+    // if the hourly exists, reload that too for the preview.
+    if (self.location.hourlyForecastResponse)
+        [self.location fetchHourlyForecast:NO];
+    
 }
 
 // display the menu.

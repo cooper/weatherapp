@@ -85,21 +85,21 @@
     
     // initial values of "NA"
     NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *precipT,
-        *precipH, *windSpeed, *windDirection, *gustSpeed, *gustDirection, *uv;
-    dewPoint  = heatIndex = windchill     = pressure  = visibility    = precipT = uv =
-    precipH   = windSpeed = windDirection = gustSpeed = gustDirection = @"NA";
+        *precipH, *windSpeed, *windDirection, *gustSpeed, *uv;
+    dewPoint  = heatIndex = windchill     = pressure  = visibility = precipT = uv =
+    precipH   = windSpeed = windDirection = gustSpeed = @"NA";
     
     // dewpoint.
     if (location.dewPointC != TEMP_NONE)
-        dewPoint = FMT(@"%@ %@", location.dewPoint, location.tempUnit);
+        dewPoint = FMT(@"%@%@", [location dewPoint:1], location.tempUnit);
     
     // heat index.
     if (location.heatIndexC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.heatIndex])
-        heatIndex = FMT(@"%@ %@", location.heatIndex, location.tempUnit);
+        heatIndex = FMT(@"%@%@", [location heatIndex:1], location.tempUnit);
     
     // windchill.
     if (location.windchillC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.windchill])
-        windchill = FMT(@"%@ %@", location.windchill, location.tempUnit);
+        windchill = FMT(@"%@%@", [location windchill:1], location.tempUnit);
     
     // precipitation.
     if ([r[@"precip_today_metric"] floatValue] > 0) {
@@ -138,10 +138,8 @@
         }
         
         // gusts in miles.
-        if ([r[@"wind_gust_mph"] floatValue] > 0) {
+        if ([r[@"wind_gust_mph"] floatValue] > 0)
             gustSpeed     = FMT(@"%@ mph", @( [r[@"wind_gust_mph"] floatValue] ));
-            gustDirection = FMT(@"%@ %@º", r[@"wind_gust_dir"], r[@"wind_gust_degrees"]);
-        }
         
         // visibility in miles.
         if ([r[@"visibility_mi"] floatValue] > 0)
@@ -159,10 +157,8 @@
         }
         
         // gusts in km.
-        if ([r[@"wind_gust_kph"] floatValue] > 0) {
+        if ([r[@"wind_gust_kph"] floatValue] > 0)
             gustSpeed = FMT(@"%@ km/hr", @( [r[@"wind_gust_kph"] floatValue] ));
-            gustDirection = FMT(@"%@ %@º", r[@"wind_gust_dir"], r[@"wind_gust_degrees"]);
-        }
         
         // visibility in km.
         if ([r[@"visibility_km"] floatValue] > 0)
@@ -172,8 +168,8 @@
     
     // compiled list of cell information.
     NSArray *details = @[
-        @"Temperature",         FMT(@"%@ %@", location.temperature, location.tempUnit),
-        @"Feels like",          FMT(@"%@ %@", location.feelsLike,   location.tempUnit),
+        @"Temperature",         FMT(@"%@%@", [location temperature:1], location.tempUnit),
+        @"Feels like",          FMT(@"%@%@", [location feelsLike:1],   location.tempUnit),
         @"Dew point",           dewPoint,
         @"Heat index",          heatIndex,
         @"Windchill",           windchill,
@@ -185,7 +181,6 @@
         @"Wind speed",          windSpeed,
         @"Wind direction",      windDirection,
         @"Gust speed",          gustSpeed,
-        @"Gust direction",      gustDirection,
         @"UV index",            uv,
         @"Last observation",    [fmt stringFromDate:self.location.observationsAsOf],
         @"Last fetch",          [fmt stringFromDate:self.location.conditionsAsOf],
@@ -253,7 +248,7 @@
 
     // for all non-location cells.
     cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
+    cell.detailTextLabel.textColor = DARK_BLUE_COLOR;
     
     return cell;
 }

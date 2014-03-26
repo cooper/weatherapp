@@ -23,7 +23,7 @@
 #define TEMP_NONE           -999
 
 // Colors.
-
+#define DARK_BLUE_COLOR     [UIColor colorWithRed:0 green:0 blue:100./255. alpha:1]
 #define LLLL_BLUE_COLOR     [UIColor colorWithRed: 20./255. green:200./255. blue:1 alpha:1]
 #define  LLL_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:180./255. blue:1 alpha:1]
 #define   LL_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:170./255. blue:1 alpha:1]

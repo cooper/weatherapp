@@ -61,7 +61,7 @@
             textField = [[UITextField alloc] initWithFrame:CGRectMake(15, 10, 280, 30)];
         
         textField.adjustsFontSizeToFitWidth = YES;
-        textField.textColor = [UIColor blackColor];
+        textField.textColor = DARK_BLUE_COLOR;
 
         textField.keyboardType  = UIKeyboardTypeDefault;
         textField.returnKeyType = UIReturnKeyDefault;

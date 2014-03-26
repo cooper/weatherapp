@@ -10,16 +10,17 @@
 
 @interface WAWeatherVC : UIViewController {
     UIBarButtonItem *refreshButton;
+    NSDate *lastHourlyPreviewUpdate;
 }
 
 @property IBOutlet UILabel *locationTitle;
 @property IBOutlet UILabel *temperature;
-@property IBOutlet UILabel *regionLabel;
-@property IBOutlet UILabel *coordinateLabel;
 @property IBOutlet UILabel *conditionsLabel;
 @property IBOutlet UILabel *feelsLikeLabel;
 @property IBOutlet UIImageView *conditionsImageView;
-
+@property IBOutlet NSLayoutConstraint *heightConstraint;
+@property IBOutlet UIView *centeredView;
+@property IBOutlet UIView *hourlyContainer;
 @property (weak) WALocation *location;
 
 // these methods are for communication between the location object and

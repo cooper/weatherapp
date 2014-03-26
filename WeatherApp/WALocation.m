@@ -154,17 +154,21 @@
 - (void)fetchForecast {
     NSString *q = [self bestLookupMethod:@"forecast10day"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        self.forecast = data[@"forecast"][@"simpleforecast"][@"forecastday"];
+        self.forecastResponse = data[@"forecast"][@"simpleforecast"][@"forecastday"];
         // make sure forecast10day is true
+        [self updateDailyForecast];
+        self.dailyForecastAsOf = [NSDate date];
     }];
 }
 
 // hourly forecast. TODO: handle errors.
-- (void)fetchHourlyForecast {
-    NSString *q = [self bestLookupMethod:@"hourly10day"];
+- (void)fetchHourlyForecast:(BOOL)tenDay {
+    NSString *q = [self bestLookupMethod:tenDay ? @"hourly10day" : @"hourly"];
     [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        self.hourlyForecast = data[@"hourly_forecast"];
         // make sure hourly10day is true
+        self.hourlyForecastResponse = data[@"hourly_forecast"];
+        [self updateHourlyForecast];
+        self.hourlyForecastAsOf = [NSDate date];
     }];
 }
 
@@ -297,84 +301,37 @@
     return [self.manager.locations indexOfObject:self];
 }
 
-- (NSString *)temperature {
-    float t;
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.degreesF;
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.degreesC + 273.15;
-    else
-        t = self.degreesC;
-    return [NSString stringWithFormat:@"%.f", t];
-}
-
-- (NSString *)highTemp {
-    float t;
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.highF;
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.highC + 273.15;
-    else
-        t = self.highC;
-    
-    return [NSString stringWithFormat:@"%.f", t];
-}
-
-- (NSString *)feelsLike {
-    float t;
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.feelsLikeF;
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.feelsLikeC + 273.15;
-    else
-        t = self.feelsLikeC;
-    
-    return [NSString stringWithFormat:@"%.f", t];
-}
-
-- (NSString *)dewPoint {
-    float t;
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.dewPointF;
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.dewPointC + 273.15;
-    else
-        t = self.dewPointC;
-    
-    return [NSString stringWithFormat:@"%.f", t];
-}
-
-- (NSString *)heatIndex {
-    float t;
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.heatIndexF;
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.heatIndexC + 273.15;
-    else
-        t = self.heatIndexC;
-    
-    return [NSString stringWithFormat:@"%.f", t];
-}
-
-- (NSString *)windchill {
-    float t;
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        t = self.windchillF;
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
-        t = self.windchillC + 273.15;
-    else
-        t = self.windchillC;
-    
-    return [NSString stringWithFormat:@"%.f", t];
-}
-
 - (NSString *)tempUnit {
-    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))
-        return @"ºF";
-    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
         return @"K";
-    else return @"ºC";
+    else return @"º";
 }
+
+/*  since this is a ton of repetition but the property names are variable,
+    I decided to use a macro to define these methods and property getters.
+*/
+
+#define tempFunction(NAME, CPROP, FPROP)                                        \
+    - (NSString *)NAME {                                                        \
+        return [self NAME:0];                                                   \
+    }                                                                           \
+    - (NSString *)NAME:(UInt8)decimalPlaces {                                   \
+        float t;                                                                \
+        if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))  \
+            t = self.FPROP;                                                     \
+        else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin)) \
+            t = self.CPROP + 273.15;                                            \
+        else                                                                    \
+            t = self.CPROP;                                                     \
+        return FMT(FMT(@"%%.%df", decimalPlaces), t);                           \
+    }
+
+tempFunction(temperature, degreesC,   degreesF)
+tempFunction(windchill,   windchillC, windchillF)
+tempFunction(heatIndex,   heatIndexC, heatIndexF)
+tempFunction(dewPoint,    dewPointC,  dewPointF)
+tempFunction(highTemp,    highC,      highF)
+tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 #pragma mark - User defaults
 
@@ -556,6 +513,202 @@
 
     NSString *cellBackgroundFile = [[NSBundle mainBundle] pathForResource:FMT(@"backgrounds/200/%@", chosenBackground) ofType:@"jpg"];
     self.cellBackground = [[UIImage imageWithContentsOfFile:cellBackgroundFile] preloadedImage];
+    
+}
+
+#pragma mark - Daily forecast
+
+- (void)updateDailyForecast {
+    NSMutableArray *a = [NSMutableArray array];
+    for (unsigned int i = 0; i < [self.forecastResponse count]; i++)
+        [a addObject:[self forecastForDay:self.forecastResponse[i] index:i]];
+    self.dailyForecast = a;
+}
+
+- (NSArray *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
+    NSMutableArray *a = [NSMutableArray array];
+    if (!self.fakeLocations) self.fakeLocations = [NSMutableArray array];
+
+    // create a fake location for the cell.
+    WALocation *location;
+    if ([self.fakeLocations count] >= i + 1)
+        location = self.fakeLocations[i];
+    else
+        location = self.fakeLocations[i] = [WALocation new];
+    
+    location.loading = NO;
+    location.initialLoadingComplete = YES;
+    
+    // temperatures.
+    location.degreesC = [f[@"low"][@"celsius"]      floatValue];
+    location.degreesF = [f[@"low"][@"fahrenheit"]   floatValue];
+    location.highC    = [f[@"high"][@"celsius"]     floatValue];
+    location.highF    = [f[@"high"][@"fahrenheit"]  floatValue];
+    
+    // is this today?
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
+    BOOL today = dateComponents.day == [f[@"date"][@"day"] integerValue];
+    
+    // location (time).
+    location.city     = today ? @"Today" : f[@"date"][@"weekday"];
+    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
+
+    // conditions.
+    location.conditions     = f[@"conditions"];
+    location.conditionsAsOf = [NSDate date];
+    
+    // icon.
+    location.response = @{
+        @"icon":        f[@"icon"],
+        @"icon_url":    f[@"icon_url"]
+    };
+    [location fetchIcon];
+    
+    // cell background.
+    [location updateBackgroundBoth:NO];
+    
+    // other detail cells.↑%@↓
+    [a addObjectsFromArray:@[
+        @[@"Temperature",  FMT(@"↑%@%@ ↓%@%@", location.highTemp, location.tempUnit, location.temperature, location.tempUnit)],
+        @[@"Humidity",     FMT(@"~%@%% ↑%@%% ↓%@%%", f[@"avehumidity"], f[@"maxhumidity"], f[@"minhumidity"])],
+    ]];
+    
+    
+    // wind.
+    if ([f[@"avewind"][@"kph"] floatValue] > 0) {
+        
+        // wind info in miles.
+        if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
+            @[@"Wind",  FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"mph"])],
+            @[@"Gusts", FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"mph"])]
+        ]];
+        
+        // wind info in kilometers.
+        else [a addObjectsFromArray:@[
+            @[@"Wind",  FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"kph"])],
+            @[@"Gusts", FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"kph"])]
+        ]];
+
+    }
+    
+    return @[location, a];
+}
+
+#pragma mark - Hourly forecast
+
+- (void)updateHourlyForecast {
+    self.hourlyForecast = [NSMutableArray array];
+    daysAdded = [NSMutableArray array];
+    lastDay   = currentDayIndex = -1;
+    for (unsigned int i = 0; i < [self.hourlyForecastResponse count]; i++)
+        [self addHourlyForecastForHour:self.hourlyForecastResponse[i] index:i];
+}
+
+// format is forecasts[day in month][hour index] = dictionary of info for that hour
+// then, the array is shifted so the smallest index becomes 0.
+- (void)addHourlyForecastForHour:(NSDictionary *)f index:(unsigned int)i {
+
+    // create a date from the unix time and a gregorian calendar.
+    NSDate *date          = [NSDate dateWithTimeIntervalSince1970:[f[@"FCTTIME"][@"epoch"] integerValue]];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+    
+    // if setting says to, switch to location's time zone.
+    if (SETTING_IS(kTimeZoneSetting, kTimeZoneRemote))
+        [gregorian setTimeZone:self.timeZone];
+    
+    // fetch the information we need.
+    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit | NSHourCalendarUnit fromDate:date];
+    
+    // adjust hour to AM/PM.
+    NSUInteger adjustedHour = dateComponents.hour;
+    BOOL pm = NO;
+    if (adjustedHour == 0) adjustedHour = 12;
+    if (adjustedHour >= 12) {
+        pm = YES;
+        if (adjustedHour > 12) adjustedHour -= 12;
+    }
+    
+    NSUInteger dayIndex = dateComponents.day;
+    
+    // the day has changed.
+    if (dayIndex != lastDay) {
+        currentDayIndex++;
+        lastDay = dayIndex;
+    }
+    
+    // this day does not yet exist.
+    if ([self.hourlyForecast count] == 0 || currentDayIndex > [self.hourlyForecast count] - 1) {
+    
+        // determine the day name.
+        NSDateFormatter *formatter = [NSDateFormatter new];
+        if (SETTING_IS(kTimeZoneSetting, kTimeZoneRemote))
+            [formatter setTimeZone:self.timeZone];
+        NSString *dayName, *dateName;
+
+        // determine day of week.
+        formatter.dateFormat = @"EEEE";
+        dayName = [formatter stringFromDate:date];
+        
+        // add to list.
+        // if it's there already, say "next" weekday,
+        // such as "Next Tuesday"
+        if ([daysAdded containsObject:dayName])
+            dayName = FMT(@"Next %@", dayName);
+        else
+            [daysAdded addObject:dayName];
+        
+        // this is today in our local timezone.
+        // in other words, the day in the month is equal in both locations,
+        // so we will say "Today."
+        [gregorian setTimeZone:[NSTimeZone localTimeZone]];
+        NSUInteger today = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]].day;
+        if (today == dateComponents.day)
+            dayName = @"Today";
+
+        // determine the date string.
+        formatter.dateFormat = @"MMMM d";
+        dateName = [formatter stringFromDate:date];
+        
+        // create the day array with the name as the first object.
+        [self.hourlyForecast addObject:[NSMutableArray arrayWithObject:@[dayName, dateName]]];
+        
+    }
+    NSMutableArray *day = self.hourlyForecast[currentDayIndex];
+    
+    // create a fake location for the icons and temperatures.
+    WALocation *location = [[self class] new];
+    location.response = @{
+        @"icon":        f[@"icon"],
+        @"icon_url":    f[@"icon_url"]
+    };
+    location.degreesC = temp_safe(f[@"temp"][@"metric"]);
+    location.degreesF = temp_safe(f[@"temp"][@"english"]);
+    [location fetchIcon];
+    
+    // pretty attributed hour.
+    NSString *hourString = FMT(@"%ld %@", (long)adjustedHour, pm ? @"pm" : @"am");
+    NSMutableAttributedString *prettyHour = [[NSMutableAttributedString alloc] initWithString:hourString];
+    NSRange range = NSMakeRange([hourString length] - 2, 2);
+    [prettyHour addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:14] range:range];
+    
+    // information we care about.
+    [day addObject:@{
+        @"date":            date,
+        @"dateComponents":  dateComponents,
+        @"adjustedHour":    @(adjustedHour),
+        @"pm":              @(pm),
+        @"prettyHour":      prettyHour,
+        @"iconImage":       [UIImage imageNamed:FMT(@"icons/30/%@", location.conditionsImageName)],
+        @"temperature":     location.temperature,
+        @"condition":       f[@"condition"]
+        //@"hourString":      hourString,
+        //@"iconName":        location.conditionsImageName,
+        //@"icon":            f[@"icon"],
+        //@"icon_url":        f[@"icon_url"],
+        //@"temp_c":          f[@"temp"][@"metric"],
+        //@"temp_f":          f[@"temp"][@"english"],
+    }];
     
 }
 

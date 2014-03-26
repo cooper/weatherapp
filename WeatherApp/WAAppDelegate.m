@@ -57,8 +57,10 @@ WAAppDelegate *appDelegate = nil;
     NSLog(@"Background fetch!");
     
     // hasn't been 30 minutes since last fetch.
-    if (abs([self.currentLocation.conditionsAsOf timeIntervalSinceNow]) < 1800)
+    if (abs([self.currentLocation.conditionsAsOf timeIntervalSinceNow]) < 1800) {
+        completionHandler(UIBackgroundFetchResultNoData);
         return;
+    }
     
     // background fetch not enabled.
     if (!SETTING(kEnableBackgroundSetting)) {
@@ -206,11 +208,7 @@ WAAppDelegate *appDelegate = nil;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
-    if (status != kCLAuthorizationStatusAuthorized) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Location permissions" message:@"Please enable location services for this app in the Settings app." delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
-        [alert show];
-        return;
-    }
+    if (status != kCLAuthorizationStatusAuthorized) return;
     
     // only start updating location if we're able to.
     if ([CLLocationManager locationServicesEnabled]) {
@@ -265,13 +263,13 @@ WAAppDelegate *appDelegate = nil;
     [DEFAULTS setObject:kTemperatureScaleFahrenheit forKey:kTemperatureScaleSetting];
     [DEFAULTS setObject:kDistanceMeasureMiles       forKey:kDistanceMeasureSetting];
     [DEFAULTS setObject:kPrecipitationMeasureInches forKey:kPrecipitationMeasureSetting];
-    [DEFAULTS setObject:kPressureMeasureSetting     forKey:kPressureMeasureSetting];
+    [DEFAULTS setObject:kPressureMeasureInchHg      forKey:kPressureMeasureSetting];
     [DEFAULTS setObject:kTimeZoneRemote             forKey:kTimeZoneSetting];
     
     // default booleans.
     [DEFAULTS setBool:YES forKey:kEnableBackgroundSetting];
-    [DEFAULTS setBool:NO  forKey:kEnableFullLocationNameSetting];
-    [DEFAULTS setBool:NO  forKey:kEnableLongitudeLatitudeSetting];
+    [DEFAULTS setBool:YES forKey:kEnableHourlyPreviewSetting];
+    //[DEFAULTS setBool:NO  forKey:kEnableFullLocationNameSetting];
     
     [DEFAULTS setObject:@{} forKey:@"backgrounds"];
     

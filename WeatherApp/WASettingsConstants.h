@@ -25,8 +25,8 @@ FOUNDATION_EXPORT NSString * const kPressureMeasureMillibar;
 FOUNDATION_EXPORT NSString * const kPressureMeasureInchHg;
 
 FOUNDATION_EXPORT NSString * const kEnableBackgroundSetting;
-FOUNDATION_EXPORT NSString * const kEnableFullLocationNameSetting;
-FOUNDATION_EXPORT NSString * const kEnableLongitudeLatitudeSetting;
+FOUNDATION_EXPORT NSString * const kEnableHourlyPreviewSetting;
+//FOUNDATION_EXPORT NSString * const kEnableFullLocationNameSetting;
 
 FOUNDATION_EXPORT NSString * const kTimeZoneSetting;
 FOUNDATION_EXPORT NSString * const kTimeZoneLocal;

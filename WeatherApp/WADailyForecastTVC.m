@@ -16,12 +16,7 @@
 
 - (id)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        self.location = location;
-        if (!self.location.fakeLocations)
-            self.location.fakeLocations = [NSMutableArray array];
-        fakeLocations = self.location.fakeLocations;
-    }
+    if (self) self.location = location;
     return self;
 }
         
@@ -32,7 +27,7 @@
     [super viewDidLoad];
     
     // forecast not yet obtained.
-    if (!self.location.forecast)
+    if (!self.location.forecastResponse)
         [self.location fetchForecast];
     
     self.navigationItem.titleView = [appDelegate.pageVC menuLabelWithTitle:@"Daily forecast"];
@@ -61,8 +56,8 @@
     lastUpdate = [NSDate date];
 
     // generate new cell information.
-    forecastedConditions = [self forecastForLocation:self.location];
-
+    [self.location updateDailyForecast];
+    
     // update the background if necessary.
     if (background != self.location.background)
         self.tableView.backgroundView = [[UIImageView alloc] initWithImage:self.location.background];
@@ -77,90 +72,14 @@
     
 }
 
-- (NSArray *)forecastForLocation:(WALocation *)location {
-    NSMutableArray *a = [NSMutableArray array];
-    for (unsigned int i = 0; i < [self.location.forecast count]; i++)
-        [a addObject:[self forecastForDay:self.location.forecast[i] index:i]];
-    return a;
-}
-
-- (NSArray *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
-    NSMutableArray *a    = [NSMutableArray array];
-
-    // create a fake location for the cell.
-    WALocation *location;
-    if ([fakeLocations count] >= i + 1)
-        location = fakeLocations[i];
-    else
-        location = fakeLocations[i] = [WALocation new];
-    
-    location.loading     = NO;
-    location.initialLoadingComplete = YES;
-    
-    // temperatures.
-    location.degreesC = [f[@"low"][@"celsius"]      floatValue];
-    location.degreesF = [f[@"low"][@"fahrenheit"]   floatValue];
-    location.highC    = [f[@"high"][@"celsius"]     floatValue];
-    location.highF    = [f[@"high"][@"fahrenheit"]  floatValue];
-    
-    // is this today?
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
-    BOOL today = dateComponents.day == [f[@"date"][@"day"] integerValue];
-    
-    // location (time).
-    location.city     = today ? @"Today" : f[@"date"][@"weekday"];
-    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
-
-    // conditions.
-    location.conditions     = f[@"conditions"];
-    location.conditionsAsOf = [NSDate date];
-    
-    // icon.
-    location.response = @{
-        @"icon":        f[@"icon"],
-        @"icon_url":    f[@"icon_url"]
-    };
-    [location fetchIcon];
-    
-    // cell background.
-    [location updateBackgroundBoth:NO];
-    
-    // other detail cells.↑%@↓
-    [a addObjectsFromArray:@[
-        @[@"Temperature",  FMT(@"↑%@%@ ↓%@%@", location.highTemp, location.tempUnit, location.temperature, location.tempUnit)],
-        @[@"Humidity",     FMT(@"~%@%% ↑%@%% ↓%@%%", f[@"avehumidity"], f[@"maxhumidity"], f[@"minhumidity"])],
-    ]];
-    
-    
-    // wind.
-    if ([f[@"avewind"][@"kph"] floatValue] > 0) {
-        
-        // wind info in miles.
-        if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-            @[@"Wind",  FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"mph"])],
-            @[@"Gusts", FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"mph"])]
-        ]];
-        
-        // wind info in kilometers.
-        else [a addObjectsFromArray:@[
-            @[@"Wind",  FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"kph"])],
-            @[@"Gusts", FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"kph"])]
-        ]];
-
-    }
-    
-    return @[location, a];
-}
-
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [self.location.forecast count];
+    return [self.location.forecastResponse count];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [forecastedConditions[section][1] count] + 1; // plus header
+    return [self.location.dailyForecast[section][1] count] + 1; // plus header
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -176,7 +95,7 @@
     if (!indexPath.row) {
         cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
         if (!cell) cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
-        WALocation *location = forecastedConditions[indexPath.section][0];
+        WALocation *location = self.location.dailyForecast[indexPath.section][0];
         [WALocationListTVC applyWeatherInfo:location toCell:cell];
         return cell;
     }
@@ -185,11 +104,11 @@
     cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
     cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
+    cell.detailTextLabel.textColor = DARK_BLUE_COLOR;
 
     // detail label on a forecast.
-    cell.textLabel.text          = forecastedConditions[indexPath.section][1][indexPath.row - 1][0];
-    cell.detailTextLabel.text    = forecastedConditions[indexPath.section][1][indexPath.row - 1][1];
+    cell.textLabel.text          = self.location.dailyForecast[indexPath.section][1][indexPath.row - 1][0];
+    cell.detailTextLabel.text    = self.location.dailyForecast[indexPath.section][1][indexPath.row - 1][1];
     cell.textLabel.numberOfLines = 0;
     
     return cell;

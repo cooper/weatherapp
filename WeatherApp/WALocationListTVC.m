@@ -229,7 +229,6 @@
     
     // set weather info.
     cell.textLabel.attributedText   = name;
-    cell.detailTextLabel.textColor  = BLUE_COLOR;
     cell.detailTextLabel.font       = [UIFont systemFontOfSize:detailSize];
     cell.imageView.image            = location.conditionsImage;
     cell.textLabel.backgroundColor  = cell.detailTextLabel.backgroundColor = [UIColor clearColor];
@@ -237,24 +236,20 @@
     // text shadows.
     for (UILabel *label in @[cell.textLabel, cell.detailTextLabel]) {
         label.adjustsFontSizeToFitWidth = YES;
-        label.layer.shadowColor         = [UIColor blackColor].CGColor;
-        label.layer.shadowOffset        = CGSizeMake(1, 0);
-        label.layer.shadowRadius        = 2.0;
+        label.layer.shadowColor         = DARK_BLUE_COLOR.CGColor;
+        label.layer.shadowOffset        = CGSizeMake(0, 0.4);
+        label.layer.shadowRadius        = 1.0;
         label.layer.shadowOpacity       = 1.0;
-        label.layer.masksToBounds       = NO;
         label.layer.shouldRasterize     = YES;
-        label.textColor                 = TABLE_COLOR;
+        label.textColor                 = [UIColor whiteColor];
     }
     
-    // make the temperature part of the sublabel bold.
-    NSString *tempUnit = SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin) ? @"K" : @"º";
-
     // display high and low temps if necessary.
     NSString *tempStr;
     if (location.highC != TEMP_NONE)
         tempStr = FMT(@"↑%@↓%@", location.highTemp, location.temperature);
     else
-        tempStr = FMT(@"%@%@", location.temperature, tempUnit);
+        tempStr = FMT(@"%@%@", location.temperature, location.tempUnit);
     
     NSRange tempRange  = NSMakeRange(0, [tempStr length] + 1);
     
@@ -267,10 +262,6 @@
         [sublabel addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:cell.detailTextLabel.font.pointSize + 4] range:tempRange];
         cell.detailTextLabel.attributedText = sublabel;
     }
-    
-    // if initial load isn't complete, remove the arrow.
-    if (!location.initialLoadingComplete)
-        cell.accessoryType = UITableViewCellAccessoryNone;
     
 }
 
