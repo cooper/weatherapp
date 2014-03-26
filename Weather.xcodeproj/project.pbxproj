@@ -34,7 +34,6 @@
 		A7E9779518288423004189B0 /* WANavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779418288423004189B0 /* WANavigationController.m */; };
 		A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E9779718288432004189B0 /* WALocationListTVC.m */; };
 		A7F7754A18E28B3A00670AD3 /* WALocationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F7754918E28B3A00670AD3 /* WALocationCell.m */; };
-		A7F7754E18E2957700670AD3 /* ATSDragToReorderTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A7F7754D18E2957700670AD3 /* ATSDragToReorderTableViewController.m */; };
 		A7F7755018E2B01100670AD3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7F7754F18E2B01100670AD3 /* AVFoundation.framework */; };
 		BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */ = {isa = PBXBuildFile; fileRef = BC1367FA182162920090CAC5 /* UserDefaults.txt */; };
 		BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7CA060184E63BA00AAF520 /* WASettingsConstants.m */; };
@@ -93,8 +92,6 @@
 		A7E9779718288432004189B0 /* WALocationListTVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = WALocationListTVC.m; path = WeatherApp/WALocationListTVC.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		A7F7754818E28B3A00670AD3 /* WALocationCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WALocationCell.h; path = WeatherApp/WALocationCell.h; sourceTree = "<group>"; };
 		A7F7754918E28B3A00670AD3 /* WALocationCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WALocationCell.m; path = WeatherApp/WALocationCell.m; sourceTree = "<group>"; };
-		A7F7754C18E2957700670AD3 /* ATSDragToReorderTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ATSDragToReorderTableViewController.h; sourceTree = "<group>"; };
-		A7F7754D18E2957700670AD3 /* ATSDragToReorderTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ATSDragToReorderTableViewController.m; sourceTree = "<group>"; };
 		A7F7754F18E2B01100670AD3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		BC1367FA182162920090CAC5 /* UserDefaults.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = UserDefaults.txt; sourceTree = "<group>"; };
 		BC7CA05F184E63BA00AAF520 /* WASettingsConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = WASettingsConstants.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -269,8 +266,6 @@
 			children = (
 				A7D84FEB18DE472F005F30E2 /* BVReorderTableView.h */,
 				A7D84FEC18DE472F005F30E2 /* BVReorderTableView.m */,
-				A7F7754C18E2957700670AD3 /* ATSDragToReorderTableViewController.h */,
-				A7F7754D18E2957700670AD3 /* ATSDragToReorderTableViewController.m */,
 			);
 			name = "Reorder table view";
 			sourceTree = "<group>";
@@ -474,7 +469,6 @@
 				A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */,
 				A7D84FED18DE472F005F30E2 /* BVReorderTableView.m in Sources */,
 				A7164981189078E800205E07 /* WAConditionDetailTVC.m in Sources */,
-				A7F7754E18E2957700670AD3 /* ATSDragToReorderTableViewController.m in Sources */,
 				BC7CA061184E63BA00AAF520 /* WASettingsConstants.m in Sources */,
 				A7CDF03E1891C6E50073E76F /* UIImage+Preload.m in Sources */,
 				A75636D518DE0E9200273EAE /* WADailyForecastTVC.m in Sources */,

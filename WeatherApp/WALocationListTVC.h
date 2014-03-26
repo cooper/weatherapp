@@ -6,9 +6,9 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-#import "ATSDragToReorderTableViewController.h"
+#import "BVReorderTableView.h"
 
-@interface WALocationListTVC : ATSDragToReorderTableViewController <UIScrollViewDelegate>
+@interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate, UIScrollViewDelegate>
 
 - (void)updateLocationAtIndex:(NSUInteger)index;
 

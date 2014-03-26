@@ -640,6 +640,8 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         @"Time at location",    FMT(@"%@ %@", [rfmt stringFromDate:[NSDate date]], self.timeZone.abbreviation),
         @"Last observation",    [fmt stringFromDate:self.observationsAsOf],
         @"Last fetch",          [fmt stringFromDate:self.conditionsAsOf],
+        @"Elevation",           r[@"display_location"][@"elevation"] ?
+                FMT(@"%.f m", [r[@"display_location"][@"elevation"] floatValue]) : @"NA",
         @"Latitude",            FMT(@"%f", self.latitude),
         @"Longitude",           FMT(@"%f", self.longitude)
     ];

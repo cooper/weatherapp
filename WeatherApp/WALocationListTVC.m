@@ -27,6 +27,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    BVReorderTableView *reorderTableView = [[BVReorderTableView alloc] initWithFrame:self.tableView.frame style:UITableViewStylePlain];
+    reorderTableView.delegate = self;
+    self.tableView = reorderTableView;
+
     // remove the border between cells.
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
@@ -179,7 +183,7 @@
     NSArray *rows = @[[NSIndexPath indexPathForRow:index inSection:0]];
     [self.tableView reloadRowsAtIndexPaths:rows withRowAnimation:UITableViewRowAnimationFade];
 }
-/*
+
 #pragma mark - Reorderable table delegate
 
 - (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -201,6 +205,6 @@
 - (void)finishReorderingWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
     appDelegate.locationManager.locations[indexPath.row] = object;
     [appDelegate saveLocationsInDatabase];
-}*/
+}
 
 @end
