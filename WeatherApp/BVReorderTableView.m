@@ -152,6 +152,7 @@
         }
         
         [self beginUpdates];
+        
         [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
         [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
         
@@ -307,6 +308,7 @@
     longPress.enabled = YES;
 }
 
+/*
 // this is my own edit to wait 0.3 seconds until removing the image.
 - (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation {
     if (draggingView)
@@ -315,6 +317,6 @@
         self.draggingView = nil;
     });
     [super reloadRowsAtIndexPaths:indexPaths withRowAnimation:animation];
-}
+}*/
 
 @end

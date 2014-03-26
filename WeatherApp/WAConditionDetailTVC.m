@@ -11,6 +11,7 @@
 #import "WALocationListTVC.h"
 #import "WAPageViewController.h"
 #import "UITableView+Reload.h"
+#import "WALocationCell.h"
 
 @implementation WAConditionDetailTVC
 
@@ -36,8 +37,7 @@
 
 // update if settings have been changed.
 - (void)viewWillAppear:(BOOL)animated {
-    if (!lastUpdate || [appDelegate.lastSettingsChange timeIntervalSinceDate:lastUpdate] > 0)
-        [self update:NO];
+    [self update:NO];
 }
 
 #pragma mark - Weather info
@@ -47,12 +47,9 @@
 }
 
 - (void)update:(BOOL)animated {
-    lastUpdate = [NSDate date];
-    
-    // generate new cell information.
-    currentConditions    = [self detailsForLocation:self.location];
     
     // update table.
+    [self.location updateExtensiveDetails];
     [self.tableView reloadData:animated];
     
     // update the background if necessary.
@@ -74,134 +71,6 @@
     
 }
 
-- (NSArray *)detailsForLocation:(WALocation *)location {
-    NSMutableArray *final = [NSMutableArray array];
-    NSDictionary   *r     = location.response;
-    
-    // local time formatter.
-    NSDateFormatter *fmt = [NSDateFormatter new];
-    fmt.dateFormat = @"h:mm a";
-    
-    // remote time formatter.
-    NSDateFormatter *rfmt = [NSDateFormatter new];
-    rfmt.timeZone   = self.location.timeZone;
-    rfmt.dateFormat = @"h:mm a";
-    
-    // initial values of "NA"
-    NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *precipT,
-        *precipH, *windSpeed, *windDirection, *gustSpeed, *uv;
-    dewPoint  = heatIndex = windchill     = pressure  = visibility = precipT = uv =
-    precipH   = windSpeed = windDirection = gustSpeed = @"NA";
-    
-    // dewpoint.
-    if (location.dewPointC != TEMP_NONE)
-        dewPoint = FMT(@"%@%@", [location dewPoint:1], location.tempUnit);
-    
-    // heat index.
-    if (location.heatIndexC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.heatIndex])
-        heatIndex = FMT(@"%@%@", [location heatIndex:1], location.tempUnit);
-    
-    // windchill.
-    if (location.windchillC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.windchill])
-        windchill = FMT(@"%@%@", [location windchill:1], location.tempUnit);
-    
-    // precipitation.
-    if ([r[@"precip_today_metric"] floatValue] > 0) {
-    
-        // in inches.
-        if (SETTING_IS(kPrecipitationMeasureSetting, kPrecipitationMeasureInches)) {
-            precipT = FMT(@"%@ in", r[@"precip_today_in"]);
-            precipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
-        }
-        
-        // in millimeters.
-        else {
-            precipT = FMT(@"%@ in", r[@"precip_today_metric"]);
-            precipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
-        }
-        
-    }
-    
-    // pressure.
-    pressure = SETTING_IS(kPressureMeasureSetting, kPressureMeasureInchHg) ?
-        FMT(@"%@ inHg", r[@"pressure_in"])                                 :
-        FMT(@"%@ inHg", r[@"pressure_mb"]);
-
-    // UV index.
-    float safeUV = temp_safe(r[@"UV"]);
-    if (safeUV != TEMP_NONE && safeUV > 0)
-        uv = r[@"UV"];
-
-    // miles.
-    if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
-        
-        // wind in miles.   (using floatValue forces minimum number of decimals)
-        if ([r[@"wind_mph"] floatValue] > 0) {
-            windSpeed     = FMT(@"%@ mph", @( [r[@"wind_mph"] floatValue] ));
-            windDirection = FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"]);
-        }
-        
-        // gusts in miles.
-        if ([r[@"wind_gust_mph"] floatValue] > 0)
-            gustSpeed     = FMT(@"%@ mph", @( [r[@"wind_gust_mph"] floatValue] ));
-        
-        // visibility in miles.
-        if ([r[@"visibility_mi"] floatValue] > 0)
-            visibility = FMT(@"%@ mi", r[@"visibility_mi"]);
-        
-    }
-    
-    // kilometers.
-    else {
-
-        // wind in km/h.   (using floatValue forces minimum number of decimals)
-        if ([r[@"wind_kph"] floatValue] > 0) {
-            windSpeed     = FMT(@"%@ km/hr", @( [r[@"wind_kph"] floatValue] ));
-            windDirection = FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"]);
-        }
-        
-        // gusts in km.
-        if ([r[@"wind_gust_kph"] floatValue] > 0)
-            gustSpeed = FMT(@"%@ km/hr", @( [r[@"wind_gust_kph"] floatValue] ));
-        
-        // visibility in km.
-        if ([r[@"visibility_km"] floatValue] > 0)
-            visibility = FMT(@"%@ km", r[@"visibility_km"]);
-        
-    }
-    
-    // compiled list of cell information.
-    NSArray *details = @[
-        @"Temperature",         FMT(@"%@%@", [location temperature:1], location.tempUnit),
-        @"Feels like",          FMT(@"%@%@", [location feelsLike:1],   location.tempUnit),
-        @"Dew point",           dewPoint,
-        @"Heat index",          heatIndex,
-        @"Windchill",           windchill,
-        @"Pressure",            pressure,
-        @"Humidity",            r[@"relative_humidity"],
-        @"Visibility",          visibility,
-        @"Precip. today",       precipT,
-        @"Precip. in hour",     precipH,
-        @"Wind speed",          windSpeed,
-        @"Wind direction",      windDirection,
-        @"Gust speed",          gustSpeed,
-        @"UV index",            uv,
-        @"Time at location",    FMT(@"%@ %@", [rfmt stringFromDate:[NSDate date]], self.location.timeZone.abbreviation),
-        @"Last observation",    [fmt stringFromDate:self.location.observationsAsOf],
-        @"Last fetch",          [fmt stringFromDate:self.location.conditionsAsOf],
-        @"Latitude",            FMT(@"%f", self.location.latitude),
-        @"Longitude",           FMT(@"%f", self.location.longitude)
-    ];
-    
-    // filter out the "NA" values.
-    for (NSUInteger i = 0; i < [details count]; i += 2) {
-        if ([details[i + 1] isEqual:@"NA"]) continue;
-        [final addObject:@[ details[i], details[i + 1] ]];
-    }
-    
-    return final;
-}
-
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -209,7 +78,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [currentConditions count] + 2; // plus header and maps
+    return [self.location.extensiveDetails count] + 2; // plus header and maps
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -222,14 +91,14 @@
 
     // show the location cell for this location.
     if (!indexPath.row) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
-        [WALocationListTVC applyWeatherInfo:self.location toCell:cell];
-        cell.backgroundView = nil;
-        return cell;
+        WALocationCell *lcell = [[WALocationCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+        lcell.location = self.location;
+        lcell.backgroundView = nil;
+        return lcell;
     }
     
     // open in maps.
-    if (indexPath.row == [currentConditions count] + 1) {
+    if (indexPath.row == [self.location.extensiveDetails count] + 1) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         cell.selectedBackgroundView = [UIView new];
         cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
@@ -247,8 +116,8 @@
         }
         
         // detail for current conditions.
-        cell.textLabel.text       = currentConditions[indexPath.row - 1][0];
-        cell.detailTextLabel.text = currentConditions[indexPath.row - 1][1];
+        cell.textLabel.text       = self.location.extensiveDetails[indexPath.row - 1][0];
+        cell.detailTextLabel.text = self.location.extensiveDetails[indexPath.row - 1][1];
     }
 
     // for all non-location cells.
@@ -260,13 +129,13 @@
 
 // disable selection of cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row == [currentConditions count] + 1) return YES;
+    if (indexPath.row == [self.location.extensiveDetails count] + 1) return YES;
     return NO;
 }
 
 // selected "open in maps"
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.row != [currentConditions count] + 1) return;
+    if (indexPath.row != [self.location.extensiveDetails count] + 1) return;
     NSURL *url = [NSURL URLWithString:FMT(@"http://maps.apple.com/?q=%f,%f", self.location.latitude, self.location.longitude)];
     [[UIApplication sharedApplication] openURL:url];
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

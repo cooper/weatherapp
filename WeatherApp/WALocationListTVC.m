@@ -14,6 +14,7 @@
 #import "WANewLocationTVC.h"
 #import "WAWeatherVC.h"
 #import "WASettingsTVC.h"
+#import "WALocationCell.h"
 
 @implementation WALocationListTVC
 
@@ -25,11 +26,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // create reorder table view.
-    self.tableView        =
-    self.reorderTableView = [[BVReorderTableView alloc] initWithFrame:self.tableView.frame style:self.tableView.style];
-    self.reorderTableView.delegate = self;
     
     // remove the border between cells.
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -82,21 +78,12 @@
         return cell;
     };
     
-    // find or create cell.
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
+    // find or create location cell.
+    WALocationCell *cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
     if (!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
-
-    // if the initial loading is not complete, remove stuff from queue.
-    if (!location.initialLoadingComplete) {
-        cell.backgroundView         = nil;
-        cell.detailTextLabel.text   = nil;
-        cell.textLabel.text         = nil;
-    }
-
-    // do the rest.
-    [[self class] applyWeatherInfo:location toCell:cell];
+        cell = [[WALocationCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
     
+    cell.location = location;
     return cell;
 }
 
@@ -158,7 +145,7 @@
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 
     // switch the locations.
-    NSUInteger from = sourceIndexPath.row;
+    NSUInteger from  = sourceIndexPath.row;
     NSUInteger to    = destinationIndexPath.row;
     WALocation *loc1 = appDelegate.locationManager.locations[from];
     WALocation *loc2 = appDelegate.locationManager.locations[to];
@@ -172,97 +159,6 @@
 // do not allow weather cells to be moved out of section 1.
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
     return proposedDestinationIndexPath;
-}
-
-#pragma mark - Weather location cells
-
-// public method applies weather information to this type of cell.
-// this is a public method because it's borrowed by WAConditionDetailTVC.
-+ (void)applyWeatherInfo:(WALocation *)location toCell:(UITableViewCell *)cell {
-    cell.backgroundColor  = [UIColor clearColor];
-    
-    // font sizes.
-    CGFloat size       = 25;
-    CGFloat detailSize = 20;
-
-    // location info.
-    NSString *city   = [location.city   length] ? location.city   : @"";
-    NSString *region = [location.region length] ? location.region : ([location.longName length] ? location.longName : @"Locating...");
-    NSString *both   = FMT(@"%@ %@", city, region);
-
-    // make the city name bold.
-    NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:both attributes:nil];
-    [name setAttributes:@{
-        NSFontAttributeName:    [UIFont boldSystemFontOfSize:size]
-    } range:NSMakeRange(0, [city length])];
-    
-    // make the region name smaller.
-    [name setAttributes:@{
-        NSFontAttributeName:            [UIFont systemFontOfSize:(size - 10)],
-        NSForegroundColorAttributeName: [UIColor grayColor]
-    } range:NSMakeRange([city length] + 1, [region length])];
-    
-    // here's the background.
-    if (location.cellBackground) {
-        UIImageView *cellBg = [UIImageView new];
-        cellBg.image        = location.cellBackground;
-        cellBg.frame        = cell.bounds;
-        cell.backgroundView = cellBg;
-    }
-    
-    // here's the selected translucent blue tint.
-    cell.selectedBackgroundView = [UIView new];
-    cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
-    cell.backgroundColor = [UIColor clearColor];
-    
-    // if the location is loading, add an activity indicator.
-    if (location.loading) {
-        UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-        indicator.frame = CGRectMake(25, 25, 0, 0);
-        [cell.imageView addSubview:indicator];
-        [indicator startAnimating];
-    }
-    
-    // if there is no image at this point, use a dummy (clear) filler.
-    if (!location.conditionsImage)
-        location.conditionsImage = [UIImage imageNamed:@"icons/dummy"];
-    
-    // set weather info.
-    cell.textLabel.attributedText   = name;
-    cell.detailTextLabel.font       = [UIFont systemFontOfSize:detailSize];
-    cell.imageView.image            = location.conditionsImage;
-    cell.textLabel.backgroundColor  = cell.detailTextLabel.backgroundColor = [UIColor clearColor];
-    
-    // text shadows.
-    for (UILabel *label in @[cell.textLabel, cell.detailTextLabel]) {
-        label.adjustsFontSizeToFitWidth = YES;
-        label.layer.shadowColor         = DARK_BLUE_COLOR.CGColor;
-        label.layer.shadowOffset        = CGSizeMake(0, 0.4);
-        label.layer.shadowRadius        = 1.0;
-        label.layer.shadowOpacity       = 1.0;
-        label.layer.shouldRasterize     = YES;
-        label.textColor                 = [UIColor whiteColor];
-    }
-    
-    // display high and low temps if necessary.
-    NSString *tempStr;
-    if (location.highC != TEMP_NONE)
-        tempStr = FMT(@"↑%@↓%@", location.highTemp, location.temperature);
-    else
-        tempStr = FMT(@"%@%@", location.temperature, location.tempUnit);
-    
-    NSRange tempRange  = NSMakeRange(0, [tempStr length] + 1);
-    
-    // if we have no conditions, leave the sublabel blank.
-    if (location.conditionsAsOf) {
-        NSString *tempAndConditions = FMT(@"%@ %@", tempStr, OR(location.conditions, @""));
-        
-        // make the temperature part of the sublabel bold.
-        NSMutableAttributedString *sublabel = [[NSMutableAttributedString alloc] initWithString:tempAndConditions];
-        [sublabel addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:cell.detailTextLabel.font.pointSize + 4] range:tempRange];
-        cell.detailTextLabel.attributedText = sublabel;
-    }
-    
 }
 
 #pragma mark - Interface actions
@@ -283,7 +179,7 @@
     NSArray *rows = @[[NSIndexPath indexPathForRow:index inSection:0]];
     [self.tableView reloadRowsAtIndexPaths:rows withRowAnimation:UITableViewRowAnimationFade];
 }
-
+/*
 #pragma mark - Reorderable table delegate
 
 - (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -305,6 +201,6 @@
 - (void)finishReorderingWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath {
     appDelegate.locationManager.locations[indexPath.row] = object;
     [appDelegate saveLocationsInDatabase];
-}
+}*/
 
 @end

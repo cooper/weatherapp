@@ -52,6 +52,7 @@ typedef void(^WACallback)(void);    // WALocation's callback type
     WAPageViewController,
     WANavigationController,
     WALocationListTVC,
+    WALocationCell,
     WANewLocationTVC,
     WASettingsTVC,
     WAWeatherVC,

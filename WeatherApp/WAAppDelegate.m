@@ -12,6 +12,7 @@
 #import "WANavigationController.h"
 #import "WAPageViewController.h"
 #import "WALocationListTVC.h"
+#import <AVFoundation/AVSpeechSynthesis.h>
 
 WAAppDelegate *appDelegate = nil;
 
@@ -50,6 +51,7 @@ WAAppDelegate *appDelegate = nil;
         1800 : UIApplicationBackgroundFetchIntervalNever;
     
     [self.window makeKeyAndVisible];
+
     return YES;
 }
 

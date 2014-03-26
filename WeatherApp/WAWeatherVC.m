@@ -110,18 +110,41 @@
 
 #pragma mark - Updates from WALocation
 
+- (void)animatedUpdate:(UILabel *)label newText:(NSString *)newText {
+
+    // not visible. just do it.
+    if (!self.isViewLoaded || !self.view.window) {
+        label.text = newText;
+        return;
+    }
+
+    // text hasn't changed.
+    if ([newText isEqualToString:label.text]) return;
+    
+    // animate.
+    [UIView animateWithDuration:0.5 animations:^{
+        label.alpha = 0;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.5 animations:^{
+            label.text  = newText;
+            label.alpha = 1;
+        }];
+    }];
+    
+}
+
 - (void)update {
 
     // info.
-    self.locationTitle.text     = self.location.city;
-    self.conditionsLabel.text   = self.location.conditions;
+    [self animatedUpdate:self.locationTitle newText:self.location.city];
+    [self animatedUpdate:self.conditionsLabel newText:self.location.conditions];
     
     // conditions icon.
     self.conditionsImageView.image = [UIImage imageNamed:FMT(@"icons/230/%@", self.location.conditionsImageName)];
     if (!self.conditionsImageView.image) self.conditionsImageView.image = self.location.conditionsImage;
     
     // localized temperature.
-    self.temperature.text = self.location.temperature;
+    [self animatedUpdate:self.temperature newText:self.location.temperature];
     
     // remote time.
     NSDateFormatter *formatter = [NSDateFormatter new];
@@ -139,11 +162,12 @@
             FMT(@"Feels like %@", self.location.feelsLike)    :
         nil;
     
-    // display on the time if there is no feels like.
-    self.feelsLikeLabel.text =
+    // display on the time if there is no "feels like."
+    [self animatedUpdate:self.feelsLikeLabel newText:
         feelsLike ?
-            FMT(@"%@  %@%@", timeString, /*self.location.timeZone.abbreviation,*/ feelsLike, self.location.tempUnit)
-        : timeString;
+            FMT(@"%@  %@%@", timeString, feelsLike, self.location.tempUnit)
+        : timeString
+    ];
 
     // the rest of this is for hourly preview.
     if (!SETTING(kEnableHourlyPreviewSetting)) return;

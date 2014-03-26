@@ -100,7 +100,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 - (NSString *)heatIndex:(UInt8)decimalPlaces;           // localized with desired decimals
 - (NSString *)windchill:(UInt8)decimalPlaces;           // localized with desired decimals
 
-// forecasts.
+// forecasts and details.
 @property NSArray *forecastResponse;                    // recent forecast response
 @property NSMutableArray *dailyForecast;                // generated daily forecast info
 @property NSMutableArray *fakeLocations;                // location objects for forecast
@@ -108,6 +108,7 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSMutableArray *hourlyForecast;               // generated hourly forecast info
 @property NSDate *hourlyForecastAsOf;
 @property NSDate *dailyForecastAsOf;
+@property NSMutableArray *extensiveDetails;             // generated details
 
 #pragma mark - Backgrounds
 
@@ -128,10 +129,11 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 - (void)fetchHourlyForecast:(BOOL)tenDay;
 - (void)fetchIcon;
 
-#pragma mark - Forecasts
+#pragma mark - Forecasts and details
 
 - (void)updateDailyForecast;
 - (void)updateHourlyForecast;
+- (void)updateExtensiveDetails;
 
 #pragma mark - User defaults
 

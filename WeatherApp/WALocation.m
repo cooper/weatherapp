@@ -326,7 +326,11 @@
             t = self.CPROP + 273.15;                                            \
         else                                                                    \
             t = self.CPROP;                                                     \
-        return FMT(FMT(@"%%.%df", decimalPlaces), t);                           \
+        NSString *result = FMT(FMT(@"%%.%df", decimalPlaces), t);               \
+        NSRange range    = NSMakeRange([result length] - 2, 2);                 \
+        if ([[result substringWithRange:range] isEqualToString:@".0"])          \
+            return FMT(@"%.f", t);                                              \
+        return result;                                                          \
     }
 
 tempFunction(temperature, degreesC,   degreesF)
@@ -519,6 +523,136 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     
 }
 
+#pragma mark - Extensive details
+
+- (void)updateExtensiveDetails {
+    NSMutableArray *final = [NSMutableArray array];
+    NSDictionary   *r     = self.response;
+    
+    // local time formatter.
+    NSDateFormatter *fmt = [NSDateFormatter new];
+    fmt.dateFormat = @"h:mm a";
+    
+    // remote time formatter.
+    NSDateFormatter *rfmt = [NSDateFormatter new];
+    rfmt.timeZone   = self.timeZone;
+    rfmt.dateFormat = @"h:mm a";
+    
+    // initial values of "NA"
+    NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *precipT,
+        *precipH, *windSpeed, *windDirection, *gustSpeed, *uv;
+    dewPoint  = heatIndex = windchill     = pressure  = visibility = precipT = uv =
+    precipH   = windSpeed = windDirection = gustSpeed = @"NA";
+    
+    // dewpoint.
+    if (self.dewPointC != TEMP_NONE)
+        dewPoint = FMT(@"%@%@", [self dewPoint:1], self.tempUnit);
+    
+    // heat index.
+    if (self.heatIndexC != TEMP_NONE && ![self.temperature isEqualToString:self.heatIndex])
+        heatIndex = FMT(@"%@%@", [self heatIndex:1], self.tempUnit);
+    
+    // windchill.
+    if (self.windchillC != TEMP_NONE && ![self.temperature isEqualToString:self.windchill])
+        windchill = FMT(@"%@%@", [self windchill:1], self.tempUnit);
+    
+    // precipitation.
+    if ([r[@"precip_today_metric"] floatValue] > 0) {
+    
+        // in inches.
+        if (SETTING_IS(kPrecipitationMeasureSetting, kPrecipitationMeasureInches)) {
+            precipT = FMT(@"%@ in", r[@"precip_today_in"]);
+            precipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
+        }
+        
+        // in millimeters.
+        else {
+            precipT = FMT(@"%@ in", r[@"precip_today_metric"]);
+            precipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
+        }
+        
+    }
+    
+    // pressure.
+    pressure = SETTING_IS(kPressureMeasureSetting, kPressureMeasureInchHg) ?
+        FMT(@"%@ inHg", r[@"pressure_in"])                                 :
+        FMT(@"%@ inHg", r[@"pressure_mb"]);
+
+    // UV index.
+    float safeUV = temp_safe(r[@"UV"]);
+    if (safeUV != TEMP_NONE && safeUV > 0)
+        uv = r[@"UV"];
+
+    // miles.
+    if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
+        
+        // wind in miles.   (using floatValue forces minimum number of decimals)
+        if ([r[@"wind_mph"] floatValue] > 0) {
+            windSpeed     = FMT(@"%@ mph", @( [r[@"wind_mph"] floatValue] ));
+            windDirection = FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"]);
+        }
+        
+        // gusts in miles.
+        if ([r[@"wind_gust_mph"] floatValue] > 0)
+            gustSpeed     = FMT(@"%@ mph", @( [r[@"wind_gust_mph"] floatValue] ));
+        
+        // visibility in miles.
+        if ([r[@"visibility_mi"] floatValue] > 0)
+            visibility = FMT(@"%@ mi", r[@"visibility_mi"]);
+        
+    }
+    
+    // kilometers.
+    else {
+
+        // wind in km/h.   (using floatValue forces minimum number of decimals)
+        if ([r[@"wind_kph"] floatValue] > 0) {
+            windSpeed     = FMT(@"%@ km/hr", @( [r[@"wind_kph"] floatValue] ));
+            windDirection = FMT(@"%@ %@º", r[@"wind_dir"], r[@"wind_degrees"]);
+        }
+        
+        // gusts in km.
+        if ([r[@"wind_gust_kph"] floatValue] > 0)
+            gustSpeed = FMT(@"%@ km/hr", @( [r[@"wind_gust_kph"] floatValue] ));
+        
+        // visibility in km.
+        if ([r[@"visibility_km"] floatValue] > 0)
+            visibility = FMT(@"%@ km", r[@"visibility_km"]);
+        
+    }
+    
+    // compiled list of cell information.
+    NSArray *details = @[
+        @"Temperature",         FMT(@"%@%@", [self temperature:1], self.tempUnit),
+        @"Feels like",          FMT(@"%@%@", [self feelsLike:1],   self.tempUnit),
+        @"Dew point",           dewPoint,
+        @"Heat index",          heatIndex,
+        @"Windchill",           windchill,
+        @"Pressure",            pressure,
+        @"Humidity",            r[@"relative_humidity"],
+        @"Visibility",          visibility,
+        @"Precip. today",       precipT,
+        @"Precip. in hour",     precipH,
+        @"Wind speed",          windSpeed,
+        @"Wind direction",      windDirection,
+        @"Gust speed",          gustSpeed,
+        @"UV index",            uv,
+        @"Time at location",    FMT(@"%@ %@", [rfmt stringFromDate:[NSDate date]], self.timeZone.abbreviation),
+        @"Last observation",    [fmt stringFromDate:self.observationsAsOf],
+        @"Last fetch",          [fmt stringFromDate:self.conditionsAsOf],
+        @"Latitude",            FMT(@"%f", self.latitude),
+        @"Longitude",           FMT(@"%f", self.longitude)
+    ];
+    
+    // filter out the "NA" values.
+    for (NSUInteger i = 0; i < [details count]; i += 2) {
+        if ([details[i + 1] isEqual:@"NA"]) continue;
+        [final addObject:@[ details[i], details[i + 1] ]];
+    }
+    
+    self.extensiveDetails = final;
+}
+
 #pragma mark - Daily forecast
 
 - (void)updateDailyForecast {
@@ -528,8 +662,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     self.dailyForecast = a;
 }
 
-- (NSArray *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
-    NSMutableArray *a = [NSMutableArray array];
+- (NSDictionary *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
     if (!self.fakeLocations) self.fakeLocations = [NSMutableArray array];
 
     // create a fake location for the cell.
@@ -543,20 +676,16 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     location.initialLoadingComplete = YES;
     
     // temperatures.
-    location.degreesC = [f[@"low"][@"celsius"]      floatValue];
-    location.degreesF = [f[@"low"][@"fahrenheit"]   floatValue];
-    location.highC    = [f[@"high"][@"celsius"]     floatValue];
-    location.highF    = [f[@"high"][@"fahrenheit"]  floatValue];
+    location.degreesC = temp_safe(f[@"low"][@"celsius"]);
+    location.degreesF = temp_safe(f[@"low"][@"fahrenheit"]);
+    location.highC    = temp_safe(f[@"high"][@"celsius"]);
+    location.highF    = temp_safe(f[@"high"][@"fahrenheit"]);
     
     // is this today?
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
     NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
     BOOL today = dateComponents.day == [f[@"date"][@"day"] integerValue];
     
-    // location (time).
-    location.city     = today ? @"Today" : f[@"date"][@"weekday"];
-    location.region   = FMT(@"%@ %@", f[@"date"][@"monthname_short"], f[@"date"][@"day"]);
-
     // conditions.
     location.conditions     = f[@"conditions"];
     location.conditionsAsOf = [NSDate date];
@@ -571,31 +700,107 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     // cell background.
     [location updateBackgroundBoth:NO];
     
-    // other detail cells.↑%@↓
-    [a addObjectsFromArray:@[
-        @[@"Temperature",  FMT(@"↑%@%@ ↓%@%@", location.highTemp, location.tempUnit, location.temperature, location.tempUnit)],
-        @[@"Humidity",     FMT(@"~%@%% ↑%@%% ↓%@%%", f[@"avehumidity"], f[@"maxhumidity"], f[@"minhumidity"])],
-    ]];
-    
-    
+    NSString *windSpeed, *gustSpeed, *rainfall, *daytimeRainfall, *nighttimeRainfall,
+    *snowfall, *daytimeSnowfall, *nighttimeSnowfall, *pop;
+    windSpeed = gustSpeed = rainfall = daytimeRainfall = nighttimeRainfall = snowfall =
+    daytimeSnowfall = nighttimeSnowfall = pop = @"NA";
+
     // wind.
     if ([f[@"avewind"][@"kph"] floatValue] > 0) {
         
         // wind info in miles.
-        if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) [a addObjectsFromArray:@[
-            @[@"Wind",  FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"mph"])],
-            @[@"Gusts", FMT(@"%@ %@º %@ mph", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"mph"])]
-        ]];
+        if (SETTING_IS(kDistanceMeasureSetting, kDistanceMeasureMiles)) {
+            windSpeed = FMT(@"%@ mph", f[@"avewind"][@"mph"]);
+            gustSpeed = FMT(@"%@ mph", f[@"maxwind"][@"mph"]);
+        }
         
         // wind info in kilometers.
-        else [a addObjectsFromArray:@[
-            @[@"Wind",  FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"avewind"][@"kph"])],
-            @[@"Gusts", FMT(@"%@ %@º %@ km/hr", f[@"maxwind"][@"dir"], f[@"maxwind"][@"degrees"], f[@"maxwind"][@"kph"])]
-        ]];
+        else {
+            windSpeed = FMT(@"%@ km/hr", f[@"avewind"][@"kph"]);
+            gustSpeed = FMT(@"%@ km/hr", f[@"maxwind"][@"kph"]);
+        }
 
     }
     
-    return @[location, a];
+    /* rain and snow. this is the most hideous I've ever written, but it works.
+        NOTE: the QPFs sometimes simply do not make sense. It's not my fault.
+        Sometimes they just don't add up. Snowfall seems to be the same way.
+        It's Wunderground's fault. http://www.wxforum.net/index.php?topic=15513.0;wap2
+
+        "I don't think the forecast is always accurate and the data doesn't always match up.
+
+        For instance, the rain forecast doesn't always add up. They list a qpf (quantity
+        of precipitation forecast) for all day, day, and night in which those hardly add
+        up and sometimes a pop is listed with no qpf listed.
+        Found some listings of partly cloudy for the am & pm and it shows a qpf.
+        Sometimes the temperature forecast is 20 degrees higher for a particular day, as
+        compared to the NWS forecast, but later on that forecast will drop to a more
+        realistic value.
+        Wind gusts usually don't go 5 mph over the average wind speed.
+
+        There is a lot of data provided, but since most of it's inaccurate, it's hard to
+        put it on a web page without confusing the visitor."
+        
+    */
+    NSString *unit = SETTING_IS(kPrecipitationMeasureSetting, kPrecipitationMeasureInches)
+        ? @"in" : @"mm";
+    if (f[@"qpf_allday"] && [f[@"qpf_allday"][unit] floatValue] > 0)
+        rainfall = FMT(@"%.2f %@", [f[@"qpf_allday"][unit] floatValue], unit);
+    if (f[@"qpf_day"] && [f[@"qpf_day"][unit] floatValue] > 0)
+        daytimeRainfall = FMT(@"%.2f %@", [f[@"qpf_day"][unit] floatValue], unit);
+    if (f[@"qpf_night"] && [f[@"qpf_night"][unit] floatValue] > 0)
+        nighttimeRainfall = FMT(@"%.2f %@", [f[@"qpf_night"][unit] floatValue], unit);
+    if (f[@"snow_allday"] && [f[@"snow_allday"][unit] floatValue] > 0)
+        snowfall = FMT(@"%.2f %@", [f[@"snow_allday"][unit] floatValue], unit);
+    if (f[@"snow_day"] && [f[@"snow_day"][unit] floatValue] > 0)
+        daytimeSnowfall = FMT(@"%.2f %@", [f[@"snow_day"][unit] floatValue], unit);
+    if (f[@"snow_night"] && [f[@"snow_night"][unit] floatValue] > 0)
+        nighttimeSnowfall = FMT(@"%.2f %@", [f[@"snow_night"][unit] floatValue], unit);
+    
+    // probability of precipitation.
+    if (f[@"pop"] && [f[@"pop"] integerValue] > 0) {
+        NSString *d;
+        NSInteger p = [f[@"pop"] integerValue];
+             if (p >= 70) d = @"Very likely";
+        else if (p >= 50) d = @"Likely";
+        else if (p >= 30) d = @"Chance";
+        else if (p >= 20) d = @"Slight chance";
+        else              d = @"Unlikely";
+        pop = FMT(@"%@ %@%%", d, f[@"pop"]);
+    }
+    
+    // compile a list of details.
+    NSArray *details = @[
+        @"Maximum temperature",     FMT(@"%@%@", [location highTemp:1], location.tempUnit),
+        @"Minimum temperature",     FMT(@"%@%@", [location temperature:1], location.tempUnit),
+        @"Wind speed",              windSpeed,
+        @"Wind direction",          FMT(@"%@ %@º", f[@"avewind"][@"dir"], f[@"avewind"][@"degrees"]),
+        @"Gust speed",              gustSpeed,
+        @"Chance of precip.",       pop,
+        @"Daytime rainfall",        daytimeRainfall,
+        @"Evening rainfall",        nighttimeRainfall,
+        @"Total rainfall",          rainfall,
+        @"Daytime snowfall",        daytimeSnowfall,
+        @"Evening snowfall",        nighttimeSnowfall,
+        @"Total snowfall",          snowfall,
+        @"Average humidity",        FMT(@"%@%%", f[@"avehumidity"]),
+        @"Maximum humidity",        FMT(@"%@%%", f[@"maxhumidity"]),
+        @"Minimum humidity",        FMT(@"%@%%", f[@"minhumidity"])
+    ];
+    
+    // filter out the "NA" values.
+    NSMutableArray *final = [NSMutableArray array];
+    for (NSUInteger i = 0; i < [details count]; i += 2) {
+        if ([details[i + 1] isEqual:@"NA"]) continue;
+        [final addObject:@[ details[i], details[i + 1] ]];
+    }
+    
+    return @{
+        @"location":    location,
+        @"cells":       final,
+        @"dayName":     today ? @"Today" : f[@"date"][@"weekday"],
+        @"dateName":    FMT(@"%@ %@", f[@"date"][@"monthname"], f[@"date"][@"day"])
+    };
 }
 
 #pragma mark - Hourly forecast

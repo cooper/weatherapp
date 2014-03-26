@@ -11,12 +11,16 @@
 #import "WALocationListTVC.h"
 #import "UITableView+Reload.h"
 #import "WAPageViewController.h"
+#import "WALocationCell.h"
 
 @implementation WADailyForecastTVC
 
 - (id)initWithLocation:(WALocation *)location {
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) self.location = location;
+    self = [super initWithStyle:UITableViewStylePlain];
+    if (self) {
+        conditions    = [NSMutableArray array];
+        self.location = location;
+    }
     return self;
 }
         
@@ -79,7 +83,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.location.dailyForecast[section][1] count] + 1; // plus header
+    return [self.location.dailyForecast[section][@"cells"] count] + 1; // plus header
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -88,27 +92,27 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell;
 
-    
     // artificial location row of a future day.
     if (!indexPath.row) {
-        cell = [tableView dequeueReusableCellWithIdentifier:@"location"];
-        if (!cell) cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"location"];
-        WALocation *location = self.location.dailyForecast[indexPath.section][0];
-        [WALocationListTVC applyWeatherInfo:location toCell:cell];
-        return cell;
+        WALocationCell *lcell = (WALocationCell *)[tableView dequeueReusableCellWithIdentifier:@"location"];
+        if (!lcell) {
+            lcell = [[WALocationCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"location"];
+            lcell.isFakeLocation = YES;
+        }
+        lcell.location = self.location.dailyForecast[indexPath.section][@"location"];
+        return lcell;
     }
     
     // generic base cell.
-    cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
     cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
     cell.detailTextLabel.textColor = DARK_BLUE_COLOR;
 
     // detail label on a forecast.
-    cell.textLabel.text          = self.location.dailyForecast[indexPath.section][1][indexPath.row - 1][0];
-    cell.detailTextLabel.text    = self.location.dailyForecast[indexPath.section][1][indexPath.row - 1][1];
+    cell.textLabel.text          = self.location.dailyForecast[indexPath.section][@"cells"][indexPath.row - 1][0];
+    cell.detailTextLabel.text    = self.location.dailyForecast[indexPath.section][@"cells"][indexPath.row - 1][1];
     cell.textLabel.numberOfLines = 0;
     
     return cell;
@@ -117,6 +121,28 @@
 // disable selection of cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if (section == [self.location.dailyForecast count]) return nil;
+    NSDictionary *dict = self.location.dailyForecast[section];
+
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"day"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"day"];
+        cell.backgroundColor            = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.9];;
+        cell.textLabel.textColor        = [UIColor whiteColor];
+        cell.detailTextLabel.textColor  = [UIColor whiteColor];
+        cell.textLabel.font             = [UIFont boldSystemFontOfSize:22];
+    }
+    cell.textLabel.text         = dict[@"dayName"];
+    cell.detailTextLabel.text   = dict[@"dateName"];
+    return cell;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 40;
 }
 
 #pragma mark - Interface actions

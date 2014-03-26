@@ -6,13 +6,10 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-#import "BVReorderTableView.h"
+#import "ATSDragToReorderTableViewController.h"
 
-@interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate, UIScrollViewDelegate>
+@interface WALocationListTVC : ATSDragToReorderTableViewController <UIScrollViewDelegate>
 
 - (void)updateLocationAtIndex:(NSUInteger)index;
-+ (void)applyWeatherInfo:(WALocation *)location toCell:(UITableViewCell *)cell;
-
-@property BVReorderTableView *reorderTableView;
 
 @end

@@ -7,10 +7,8 @@
 //
 
 @interface WAConditionDetailTVC : UITableViewController {
-    NSArray         *currentConditions; // generated cell information
     UIImage         *background;        // the current background
     UIBarButtonItem *refreshButton;     // the refresh button in navbar
-    NSDate          *lastUpdate;        // last time cell information was updated
 }
 
 @property (weak) WALocation *location;
