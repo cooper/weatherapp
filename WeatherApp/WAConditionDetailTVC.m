@@ -78,10 +78,14 @@
     NSMutableArray *final = [NSMutableArray array];
     NSDictionary   *r     = location.response;
     
-    // time formatter.
+    // local time formatter.
     NSDateFormatter *fmt = [NSDateFormatter new];
-    [fmt setTimeZone:[NSTimeZone localTimeZone]];
-    [fmt setDateFormat:@"h:mm a"];
+    fmt.dateFormat = @"h:mm a";
+    
+    // remote time formatter.
+    NSDateFormatter *rfmt = [NSDateFormatter new];
+    rfmt.timeZone   = self.location.timeZone;
+    rfmt.dateFormat = @"h:mm a";
     
     // initial values of "NA"
     NSString *dewPoint, *heatIndex, *windchill, *pressure, *visibility, *precipT,
@@ -182,6 +186,7 @@
         @"Wind direction",      windDirection,
         @"Gust speed",          gustSpeed,
         @"UV index",            uv,
+        @"Time at location",    FMT(@"%@ %@", [rfmt stringFromDate:[NSDate date]], self.location.timeZone.abbreviation),
         @"Last observation",    [fmt stringFromDate:self.location.observationsAsOf],
         @"Last fetch",          [fmt stringFromDate:self.location.conditionsAsOf],
         @"Latitude",            FMT(@"%f", self.location.latitude),

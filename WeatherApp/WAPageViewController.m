@@ -138,6 +138,13 @@
     else if (!self.location.loading && self.navigationItem.rightBarButtonItem != refreshButton)
         [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
     
+//    // update number in title.
+//    UILabel *titleLabel = (UILabel *)[self.navigationItem.titleView viewWithTag:11];
+//    titleLabel.text = FMT(@"Location %lu of %lu",
+//        self.location.index + 1,
+//        (unsigned long)[appDelegate.locationManager.locations count]
+//    );
+
     // update the background while we're at it.
     [self updateBackground];
     
@@ -226,6 +233,7 @@
     titleLabel.textColor     = [UIColor whiteColor];
     titleLabel.font          = [UIFont boldSystemFontOfSize:17];
     titleLabel.text          = title;
+    //titleLabel.tag           = 11;
     [titleLabel addGestureRecognizer:tap];
     return titleLabel;
 }

@@ -15,7 +15,10 @@
 
 - (id)init {
     self = [super init];
-    if (self) self.locations = [NSMutableArray array];
+    if (self) {
+        self.locations = [NSMutableArray array];
+        self.queue     = [NSOperationQueue new];
+    }
     return self;
 }
 
@@ -30,7 +33,6 @@
     location.manager     = self; // weak
     [self.locations addObject:location];
     
-    NSLog(@"Created location %lu: %@", (unsigned long)[self.locations indexOfObject:location], location);
     return location;
 }
 

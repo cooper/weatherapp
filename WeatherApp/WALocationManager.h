@@ -8,9 +8,9 @@
 
 @interface WALocationManager : NSObject <UIPageViewControllerDataSource>
 
-@property NSMutableArray *locations;
-@property NSInteger index;
-@property WALocation *currentLocation;
+@property NSMutableArray *locations;                    // list of location objects
+@property WALocation *currentLocation;                  // the current location object
+@property NSOperationQueue *queue;                      // queue for JSON parsing
 
 - (WALocation *)createLocation;                         // creates a location and adds it to manager
 - (WALocation *)createLocationFromDictionary:(NSDictionary *)dictionary; // create from user defaults

@@ -123,17 +123,28 @@
     // localized temperature.
     self.temperature.text = self.location.temperature;
     
+    // remote time.
+    NSDateFormatter *formatter = [NSDateFormatter new];
+    formatter.timeZone   = self.location.timeZone;
+    formatter.dateFormat = @"h:mm a";
+    NSString *timeString = [formatter stringFromDate:self.location.observationsAsOf];
+
     // windchill, heat index, or other "feels like" temperature.
-    self.feelsLikeLabel.text =
+    NSString *feelsLike =
         self.location.windchillC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.windchill] ?
-            FMT(@"Windchill %@%@", self.location.windchill, self.location.tempUnit)     :
+            FMT(@"Windchill %@", self.location.windchill)     :
         self.location.heatIndexC != TEMP_NONE && ![self.location.temperature isEqualToString:self.location.heatIndex] ?
-            FMT(@"Heat index %@%@", self.location.heatIndex, self.location.tempUnit)    :
-        ![self.location.temperature isEqualToString:self.location.feelsLike]            ?
-            FMT(@"Feels like %@%@", self.location.feelsLike, self.location.tempUnit)    :
-        @"";
+            FMT(@"Heat index %@", self.location.heatIndex)    :
+        ![self.location.temperature isEqualToString:self.location.feelsLike]                                          ?
+            FMT(@"Feels like %@", self.location.feelsLike)    :
+        nil;
     
-    
+    // display on the time if there is no feels like.
+    self.feelsLikeLabel.text =
+        feelsLike ?
+            FMT(@"%@  %@%@", timeString, /*self.location.timeZone.abbreviation,*/ feelsLike, self.location.tempUnit)
+        : timeString;
+
     // the rest of this is for hourly preview.
     if (!SETTING(kEnableHourlyPreviewSetting)) return;
     

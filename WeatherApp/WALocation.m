@@ -253,7 +253,7 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:FMT(@"http://api.wunderground.com/api/" WU_API_KEY @"/%@", page)]];
     
     // send a request asyncrhonously.
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    [NSURLConnection sendAsynchronousRequest:request queue:self.manager.queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
 
         // an error occurred.
         if (connectionError || !data) {
@@ -279,14 +279,17 @@
             return;
         }
         
-        // everything looks well; go ahead and fire the callback.
-        callback(response, jsonData, connectionError);
-
-        [self endLoading];
+        // everything looks well; go ahead and fire the callback in main queue.
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            callback(response, jsonData, connectionError);
+            
+            [self endLoading];
         
-        // update the database.
-        [appDelegate saveLocationsInDatabase];
+            // update the database.
+            [appDelegate saveLocationsInDatabase];
         
+        }];
+    
     }];
 }
 
