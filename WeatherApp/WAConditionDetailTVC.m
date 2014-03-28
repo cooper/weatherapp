@@ -15,7 +15,8 @@
 
 @implementation WAConditionDetailTVC
 
-- (id)initWithLocation:(WALocation *)location {
+// initialize with a location.
+- (instancetype)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) self.location = location;
     return self;
@@ -26,7 +27,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.titleView = [appDelegate.pageVC menuLabelWithTitle:@"Details"];
+    self.navigationItem.titleView = [appDelegate.pageViewController menuLabelWithTitle:@"Details"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
@@ -46,6 +47,7 @@
     [self update:YES];
 }
 
+// update the displayed information if necessary.
 - (void)update:(BOOL)animated {
     
     // update table.
@@ -81,6 +83,7 @@
     return [self.location.extensiveDetails count] + 2; // plus header and maps
 }
 
+// the first cell is the location cell.
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (!indexPath.row) return 100;
     return 50;
@@ -90,6 +93,7 @@
     UITableViewCell *cell;
 
     // show the location cell for this location.
+    // there will only be one, so it will not be reused.
     if (!indexPath.row) {
         WALocationCell *lcell = [[WALocationCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
         lcell.location = self.location;
@@ -97,7 +101,8 @@
         return lcell;
     }
     
-    // open in maps.
+    // open in maps button.
+    // also only one of these; it will not be reused.
     if (indexPath.row == [self.location.extensiveDetails count] + 1) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
         cell.selectedBackgroundView = [UIView new];
@@ -111,8 +116,7 @@
         cell = [tableView dequeueReusableCellWithIdentifier:@"detail"];
         if (!cell) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"detail"];
-            //cell.textLabel.textColor = [UIColor colorWithRed:0  green:70./255. blue:200./255. alpha:1];
-            cell.textLabel.font      = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+            cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
         }
         
         // detail for current conditions.
@@ -133,7 +137,7 @@
     return NO;
 }
 
-// selected "open in maps"
+// selected "open in maps" button.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row != [self.location.extensiveDetails count] + 1) return;
     NSURL *url = [NSURL URLWithString:FMT(@"http://maps.apple.com/?q=%f,%f", self.location.latitude, self.location.longitude)];
@@ -143,6 +147,7 @@
 
 #pragma mark - Interface actions
 
+// refresh button was tapped.
 - (void)refreshButtonTapped {
 
     // fetch most recent data.

@@ -52,7 +52,10 @@
 		<key>name</key>
 		<string>snow</string>
 		<key>icon</key>
-		<string>snow</string>
+		<array>
+			<string>snow</string>
+			<string>sleet</string>
+		</array>
 		<key>conditions</key>
 		<string>snow</string>
 		<key>day</key>

@@ -11,28 +11,40 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 
 @interface WALocation : NSObject <NSURLConnectionDataDelegate> {
 
+    // backgrounds.
+    NSString        *currentBackgroundName;              // name of the current background
+    NSString        *currentBackgroundIcon;              // icon name from current background
+    NSString        *currentBackgroundConditions;        // conditions from current background
+    BOOL            currentBackgroundTimeOfDay;          // time of day from current background
+
+    // daily forecast.
+    NSMutableArray  *fakeLocations;                     // fake location objects for forecast cells
+
     // hourly forecast.
-    NSMutableArray  *hourly;                // array containing hourly forecast data
-    NSUInteger      lastDay;                // the day in the month of the last hour checked
-    NSUInteger      currentDayIndex;        // the index of the current day, starting at 0
-    NSMutableArray  *daysAdded;             // track which days added to say "next" weekday
-    
+    NSMutableArray  *daysAdded;                         // track which days added to say "next" weekday
+    NSUInteger      lastDay;                            // the day in the month of the last hour checked
+    NSUInteger      currentDayIndex;                    // the index of the current day, starting at 0
+
 }
 
-#pragma mark - General properties
+#pragma mark - General
 
-@property (weak) WALocationManager *manager;            // the manager
-
-@property WAWeatherVC *overviewVC;                      // overview view controller
-@property WAConditionDetailTVC *detailVC;               // more details view controller
-@property WADailyForecastTVC *dailyVC;                  // daily forecast view controller
-@property WAHourlyForecastTVC *hourlyVC;                // hourly forecast view controller
-
+@property (weak)     WALocationManager *manager;        // our location manager
+@property (readonly) NSUInteger index;                  // index in the location manager
 @property BOOL isCurrentLocation;                       // true if this is current location object
-@property (readonly) NSUInteger index;                  // index in the manager
-@property BOOL loading;                                 // location info is loading now
+@property BOOL loading;                                 // some sort of location info is loading now
 @property BOOL initialLoadingComplete;                  // initial conditions check after launch
-@property BOOL dummy;                                   // dummy for reordering.
+@property BOOL dummy;                                   // this is a dummy for reordering in list
+
++ (id)newDummy;                                         // creates a dummy for reordering in list
+- (NSDictionary *)userDefaultsDict;                     // creates a dictionary to be stored in database
+
+#pragma mark - View controllers
+
+@property WAWeatherVC          *overviewVC;             // overview view controller
+@property WAConditionDetailTVC *detailVC;               // more details view controller
+@property WADailyForecastTVC   *dailyVC;                // daily forecast view controller
+@property WAHourlyForecastTVC  *hourlyVC;               // hourly forecast view controller
 
 #pragma mark - Location information
 
@@ -41,35 +53,36 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 @property NSString *region;                             // state, province, country, etc.
 @property NSString *regionCode;                         // state, province, country, etc. code
 @property NSString *city;                               // full name of city
-@property (readonly) NSString *fullName;                // city and region separated by comma
 @property NSString *l;                                  // wunderground location query identifier
-@property NSString *longName;                           // location name as looked up
-
-+ (id)newDummy;
+@property NSString *longName;                           // full location name as looked up
+@property (readonly) NSString *fullName;                // city and region separated by comma
 
 #pragma mark - Global position
 
 @property NSDate *locationAsOf;                         // date of last location check
-@property float latitude;                               // set automatically when coordinate set
-@property float longitude;                              // set automatically when coordinate set
+@property float  latitude;                              // set automatically when coordinate set
+@property float  longitude;                             // set automatically when coordinate set
 
 #pragma mark - Weather conditions
 
-@property NSString *conditions;                         // recent conditions; i.e. "Cloudy"
+@property NSString     *conditions;                     // recent conditions; i.e. "Cloudy"
 @property NSDictionary *response;                       // recent conditions response
 
-// times.
-@property NSDate *conditionsAsOf;                       // date of last condition check
-@property NSDate *observationsAsOf;                     // observation unix time
-@property NSString *observationTimeString;              // observation time string
+#pragma mark - Time
+
+@property NSDate     *conditionsAsOf;                   // date of last condition check
+@property NSDate     *observationsAsOf;                 // observation unix time
+@property NSString   *observationTimeString;            // observation time string
 @property NSTimeZone *timeZone;                         // time zone in this location
 
-// icons.
+#pragma mark - Icons
+
 @property UIImage  *conditionsImage;                    // icon image of conditions
 @property NSString *conditionsImageName;                // name of image; i.e. "partlycloudy"
-@property BOOL nightTime;                               // is it night time?
+@property BOOL     nightTime;                           // is it night time?
 
-// temperatures.
+#pragma mark - Temperatures
+
 @property float degreesC;                               // current temp (C)
 @property float degreesF;                               // current temp (F)
 @property float highC;                                  // high temp (C)
@@ -100,43 +113,38 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 - (NSString *)heatIndex:(UInt8)decimalPlaces;           // localized with desired decimals
 - (NSString *)windchill:(UInt8)decimalPlaces;           // localized with desired decimals
 
-// forecasts and details.
-@property NSArray *forecastResponse;                    // recent forecast response
+#pragma mark - Forecasts and details
+
+// daily.
+@property NSArray        *forecastResponse;             // recent forecast response
 @property NSMutableArray *dailyForecast;                // generated daily forecast info
-@property NSMutableArray *fakeLocations;                // location objects for forecast
-@property NSArray *hourlyForecastResponse;              // recent hourly forecast response
+@property NSDate         *dailyForecastAsOf;            // time last daily forecast fetched
+
+// hourly.
+@property NSArray        *hourlyForecastResponse;       // recent hourly forecast response
 @property NSMutableArray *hourlyForecast;               // generated hourly forecast info
-@property NSDate *hourlyForecastAsOf;
-@property NSDate *dailyForecastAsOf;
-@property NSMutableArray *extensiveDetails;             // generated details
+@property NSDate         *hourlyForecastAsOf;           // time last hourly forecast fetched
+
+// details.
+@property NSMutableArray *extensiveDetails;             // generated details for cells
+
+- (void)updateDailyForecast;                            // recompile daily forecast info
+- (void)updateHourlyForecast;                           // recompile hourly forecast info
+- (void)updateExtensiveDetails;                         // recompile extensive details
 
 #pragma mark - Backgrounds
 
-@property UIImage *background;
-@property UIImage *cellBackground;
-@property NSString *currentBackgroundName;
-@property NSString *currentBackgroundIcon;
-@property NSString *currentBackgroundConditions;
-@property BOOL currentBackgroundTimeOfDay;
+@property UIImage *background;                          // the full-size background image
+@property UIImage *cellBackground;                      // the 100x320pt cell background
 
-- (void)updateBackgroundBoth:(BOOL)both;
+- (void)updateBackgroundBoth:(BOOL)both;                // update backgrounds (cell or both)
 
 #pragma mark - Fetching data
 
-- (void)fetchCurrentConditions;
-- (void)fetchCurrentConditionsThen:(WACallback)then;
-- (void)fetchForecast;
-- (void)fetchHourlyForecast:(BOOL)tenDay;
-- (void)fetchIcon;
-
-#pragma mark - Forecasts and details
-
-- (void)updateDailyForecast;
-- (void)updateHourlyForecast;
-- (void)updateExtensiveDetails;
-
-#pragma mark - User defaults
-
-- (NSDictionary *)userDefaultsDict;
+- (void)fetchCurrentConditions;                         // fetch the current conditions
+- (void)fetchCurrentConditionsThen:(WACallback)then;    // fetch conditions with callback
+- (void)fetchForecast;                                  // fetch daily (10 day) forecast
+- (void)fetchHourlyForecast:(BOOL)tenDay;               // fetch hourly forecast (3 or 10 days)
+- (void)fetchIcon;                                      // resolve icon and fetch if needed
 
 @end

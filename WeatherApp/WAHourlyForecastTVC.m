@@ -3,7 +3,7 @@
 //  Weather
 //
 //  Created by Mitchell Cooper on 3/22/14.
-//  Copyright (c) 2014 Really Good. All rights reserved.
+//  Copyright (c) 2014 Mitchell Cooper. All rights reserved.
 //
 
 #import "WAHourlyForecastTVC.h"
@@ -15,7 +15,8 @@
 
 @implementation WAHourlyForecastTVC
 
-- (id)initWithLocation:(WALocation *)location {
+// initialize with a location.
+- (instancetype)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) self.location = location;
     return self;
@@ -31,7 +32,7 @@
     if (!self.location.hourlyForecastResponse)
         [self.location fetchHourlyForecast:NO];
     
-    self.navigationItem.titleView = [appDelegate.pageVC menuLabelWithTitle:@"Hourly forecast"];
+    self.navigationItem.titleView = [appDelegate.pageViewController menuLabelWithTitle:@"Hourly forecast"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
@@ -39,6 +40,9 @@
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
 
+    // register for table headers.
+    [self.tableView registerClass:[UITableViewHeaderFooterView class] forHeaderFooterViewReuseIdentifier:@"day"];
+    
 }
 
 // update if settings have been changed.
@@ -53,6 +57,7 @@
     [self update:YES];
 }
 
+// update anything that has changed.
 - (void)update:(BOOL)animated {
     lastUpdate = [NSDate date];
 
@@ -94,11 +99,22 @@
     // more button.
     if (indexPath.section == [self.location.hourlyForecast count]) {
         UITableViewCell *cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        
+        // bold label.
         cell.textLabel.text         = @"See further into the future";
-        cell.detailTextLabel.text   = @"🕝";
-        cell.backgroundColor        = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.7];
+        cell.textLabel.font         = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+        cell.textLabel.textColor    = [UIColor whiteColor];
+        
+        // white tint when select.
+        cell.backgroundColor        = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.95];
         cell.selectedBackgroundView = [UIView new];
-        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
+        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.5];
+        
+        // hourly menu icon.
+        UIImageView *icon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icons/menu/hourly"]];
+        icon.frame        = CGRectMake(cell.contentView.bounds.size.width - 40, 10, 30, 30);
+        [cell.contentView addSubview:icon];
+        
         return cell;
     }
 
@@ -170,20 +186,49 @@
     tenDay = YES; // remember for refresh
 }
 
+// header views. these are reused.
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if (section == [self.location.hourlyForecast count]) return nil;
+    UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"day"];
+    
+    // fetch labels with tags.
+    UILabel *dayNameLabel  = (UILabel *)[view.contentView viewWithTag:1];
+    UILabel *dateNameLabel = (UILabel *)[view.contentView viewWithTag:2];
+    
+    // if there is no label, view hasn't been set up.
+    if (!dayNameLabel) {
+    
+        /*  The backgroundColor property changes nothing, and the tintColor property
+            seems to be completely ineffective on iOS 7. I have resorted to using a
+            custom background view instead.
+            
+            http://stackoverflow.com/questions/15604900/ios-uitableviewheaderfooterview-unable-to-change-background-color
+        */
+        view.backgroundView = [[UIView alloc] initWithFrame:view.frame];
+        view.backgroundView.backgroundColor = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.95];
 
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"day"];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"day"];
-        cell.backgroundColor            = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.9];;
-        cell.textLabel.textColor        = [UIColor whiteColor];
-        cell.detailTextLabel.textColor  = [UIColor whiteColor];
-        cell.textLabel.font             = [UIFont boldSystemFontOfSize:22];
+        // day, e.g. Friday
+        dayNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, 200, 40)];
+        dayNameLabel.textColor = [UIColor whiteColor];
+        dayNameLabel.tag       = 1;
+        dayNameLabel.font      = [UIFont boldSystemFontOfSize:25];
+        [view.contentView addSubview:dayNameLabel];
+
+        // date, e.g. March 28
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        dateNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(screenWidth - 165, 0, 150, 40)];
+        dateNameLabel.textAlignment = NSTextAlignmentRight;
+        dateNameLabel.textColor     = [UIColor whiteColor];
+        dateNameLabel.tag           = 2;
+        [view.contentView addSubview:dateNameLabel];
+        
     }
-    cell.textLabel.text         = self.location.hourlyForecast[section][0][0];
-    cell.detailTextLabel.text   = self.location.hourlyForecast[section][0][1];
-    return cell;
+    
+    // update text.
+    dayNameLabel.text  = self.location.hourlyForecast[section][0][0];
+    dateNameLabel.text = self.location.hourlyForecast[section][0][1];
+    
+    return view;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -193,6 +238,7 @@
 
 #pragma mark - Interface actions
 
+// refresh button was tapped.
 - (void)refreshButtonTapped {
 
     // fetch most recent data.

@@ -10,6 +10,6 @@
 
 @interface WALocationListTVC : UITableViewController <ReorderTableViewDelegate, UIScrollViewDelegate>
 
-- (void)updateLocationAtIndex:(NSUInteger)index;
+- (void)updateLocationAtIndex:(NSUInteger)index;        // reload row for location at index
 
 @end

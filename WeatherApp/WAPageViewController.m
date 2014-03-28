@@ -11,6 +11,7 @@
 #import "WALocationManager.h"
 #import "WANavigationController.h"
 #import "Fade/UINavigationController+Fade.h"
+#import "UIImage+WhiteImage.h"
 
 #import "WAWeatherVC.h"
 #import "WAConditionDetailTVC.h"
@@ -20,20 +21,17 @@
 
 @implementation WAPageViewController
 
-@synthesize background = background;
-
 #pragma mark - Page view controller
 
-- (id)initWithTransitionStyle:(UIPageViewControllerTransitionStyle)style navigationOrientation:(UIPageViewControllerNavigationOrientation)navigationOrientation options:(NSDictionary *)options {
+- (instancetype)initWithTransitionStyle:(UIPageViewControllerTransitionStyle)style navigationOrientation:(UIPageViewControllerNavigationOrientation)navigationOrientation options:(NSDictionary *)options {
     self = [super initWithTransitionStyle:style navigationOrientation:navigationOrientation options:options];
-    if (self) self.delegate = self; // this is a looping reference, but we'll never destroy the page VC anyway.
+    
+    // this is a looping reference - I am aware.
+    // However, this object will never be destroyed from start to exit of the application,
+    // so the hanging refcount does not actually matter at all.
+    if (self) self.delegate = self;
+    
     return self;
-}
-
-- (void)setViewController:(WAWeatherVC *)weatherVC {
-    [appDelegate.pageVC setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
-    self.location = weatherVC.location;
-    [self updateNavigationBar];
 }
 
 - (void)viewDidLoad {
@@ -51,12 +49,19 @@
     UIColor *c_4 = [UIColor colorWithRed:130./255. green:202./255. blue:       1  alpha:1];
     
     // add the menu items.
-    UIFont *font = [UIFont systemFontOfSize:25];
-    [menu addItem:@"Location list"     withGlyph:@"🌎" withColor:c_0 withFont:font withGlyphFont:font];
-    [menu addItem:@"Current overview"  withGlyph:@"⛅️" withColor:c_1 withFont:font withGlyphFont:font];
-    [menu addItem:@"Extensive details" withGlyph:@"📝" withColor:c_2 withFont:font withGlyphFont:font];
-    [menu addItem:@"Hourly forecast"   withGlyph:@"🕓" withColor:c_3 withFont:font withGlyphFont:font];
-    [menu addItem:@"Daily forecast"    withGlyph:@"📅" withColor:c_4 withFont:font withGlyphFont:font];
+    UIFont *font   = [UIFont systemFontOfSize:25];
+    NSArray *items = @[
+        @[@"Location list",     @"list",    c_0],
+        @[@"Current overview",  @"",        c_1],
+        @[@"Extensive details", @"details", c_2],
+        @[@"Hourly forecast",   @"hourly",  c_3],
+        @[@"Daily forecast",    @"daily",   c_4]
+    ];
+    for (NSArray *item in items) {
+        UIImage *icon   = [UIImage imageNamed:FMT(@"icons/menu/%@", item[1])];
+        if (!icon) icon = [UIImage imageNamed:@"icons/30/clear"];
+        [menu addItem:item[0] withIcon:icon withColor:item[2] withFont:font];
+    }
 
     // this fixes the navigation bar inset issue.
     // however, it causes the page view controller to ignore the navigation bar completely
@@ -80,7 +85,7 @@
     [self.view.subviews[0] setDelegate:self];
     
     // from background.
-    self.background = background = [[UIImageView alloc] initWithFrame:self.view.bounds];
+    background = [[UIImageView alloc] initWithFrame:self.view.bounds];
     background.backgroundColor = [UIColor clearColor];
     [self.view addSubview:background];
     [self.view sendSubviewToBack:background];
@@ -95,7 +100,6 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self updateNavigationBar];
 }
 
 #pragma mark - Page view controller delegate
@@ -104,10 +108,12 @@
     WAWeatherVC *toVC = pendingViewControllers[0];
     NSUInteger i      = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
     
+    // set the forebackground to the location we were on already.
     WALocation *locationBefore = appDelegate.locationManager.locations[i];
     background.image = locationBefore.background;
     background.frame = self.view.bounds;
     
+    // set the backbackground to that of the upcoming location.
     backBackground.image = toVC.location.background;
     backBackground.frame = self.view.bounds;
     
@@ -116,12 +122,24 @@
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
     WAWeatherVC *weatherVC = self.viewControllers[0];
+
+    // update the current location.
     NSLog(@"Setting current city from %@ to %@", self.location.city, weatherVC.location.city);
     self.location = weatherVC.location;
+
+    // update the navigation bar and background only if the user lets go.
     if (completed) [self updateNavigationBar]; // fixes it.
+    
 }
 
 #pragma mark - Update information
+
+// set the current weather view controller, updating location and navigation bar.
+- (void)setViewController:(WAWeatherVC *)weatherVC {
+    [appDelegate.pageViewController setViewControllers:@[weatherVC] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+    self.location = weatherVC.location;
+    [self updateNavigationBar];
+}
 
 // update the information and buttons on the navigation bar.
 - (void)updateNavigationBar {
@@ -137,13 +155,6 @@
     // not loading and refresh button is not visible.
     else if (!self.location.loading && self.navigationItem.rightBarButtonItem != refreshButton)
         [self.navigationItem setRightBarButtonItem:refreshButton animated:YES];
-    
-//    // update number in title.
-//    UILabel *titleLabel = (UILabel *)[self.navigationItem.titleView viewWithTag:11];
-//    titleLabel.text = FMT(@"Location %lu of %lu",
-//        self.location.index + 1,
-//        (unsigned long)[appDelegate.locationManager.locations count]
-//    );
 
     // update the background while we're at it.
     [self updateBackground];
@@ -152,7 +163,8 @@
 
 // update the background image.
 - (void)updateBackground {
-    background.image = self.location.background;
+    if (background.image != self.location.background)
+        background.image = self.location.background;
     background.frame = self.view.bounds;
 }
 
@@ -170,17 +182,24 @@
 
 // display the menu.
 - (void)titleTapped {
-    ((DIYMenuItem *)menu.menuItems[1]).name.text = FMT(@"%@ overview", self.location.city);
+    DIYMenuItem *item = menu.menuItems[1];
+    item.name.text = FMT(@"%@ overview", self.location.city);
+    UIImageView *iconView = (UIImageView *)[item viewWithTag:10];
+    iconView.image = [UIImage imageNamed:FMT(@"icons/30/%@", self.location.conditionsImageName)];
+    iconView.image = [iconView.image whiteImage];
     [menu showMenu];
 }
 
 #pragma mark - Menu
 
 - (void)menuItemSelected:(NSString *)action {
+    WANavigationController *navigationController = appDelegate.navigationController;
     UIViewController *vc;
 
+    // decide which item was selected.
+
     if ([action isEqualToString:@"Location list"]) {
-        [appDelegate.nc popToRootViewControllerAnimated:YES];
+        [navigationController popToRootViewControllerAnimated:YES];
         return;
     }
     else if ([action rangeOfString:@"overview"].location != NSNotFound) {
@@ -203,38 +222,44 @@
     }
     else return;
     
-    // already on this view controller.
-    if (vc == appDelegate.nc.topViewController) return;
+    // we're already on this view controller.
+    if (vc == navigationController.topViewController) return;
     
-    // for the overview, just pop back to the page view controller.
+    // for the overview, just pop back to the page view controller (self).
     if (vc == self) {
-        [appDelegate.nc popToViewController:self animated:YES];
+        [navigationController popToViewController:self animated:YES];
         return;
     }
 
     // then move on to the selection.
     // if the current top vc is the overview, push to it.
     // if it's something else, use the fade transition to avoid confusion.
-    if (appDelegate.nc.topViewController == self) {
-        [appDelegate.nc pushViewController:vc animated:YES];
+    if (navigationController.topViewController == self) {
+        [navigationController pushViewController:vc animated:YES];
     }
     else {
-        [appDelegate.nc popViewControllerAnimated:NO];
-        [appDelegate.nc pushFadeViewController:vc];
+        [navigationController popViewControllerAnimated:NO];
+        [navigationController pushFadeViewController:vc];
     }
     
 }
 
+// create a UILabel with a gesture recognizer to show the menu.
+// this is used across the different weather data view controllers.
 - (UILabel *)menuLabelWithTitle:(NSString *)title {
+
+    // create a label of the appropriate dimensions.
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
-    UITapGestureRecognizer *tap       = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(titleTapped)];
     titleLabel.userInteractionEnabled = YES;
     titleLabel.textAlignment = NSTextAlignmentCenter;
     titleLabel.textColor     = [UIColor whiteColor];
-    titleLabel.font          = [UIFont boldSystemFontOfSize:17];
-    titleLabel.text          = title;
-    //titleLabel.tag           = 11;
+    titleLabel.font = [UIFont boldSystemFontOfSize:17];
+    titleLabel.text = title;
+    
+    // add gesture recognizer.
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(titleTapped)];
     [titleLabel addGestureRecognizer:tap];
+    
     return titleLabel;
 }
 

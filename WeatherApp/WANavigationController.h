@@ -8,8 +8,8 @@
 
 @interface WANavigationController : UINavigationController
 
-@property WALocationListTVC *tvc;
+@property WALocationListTVC *locationList;
 
-- (id)initWithMyRootController;
+- (instancetype)initWithMyRootController;
 
 @end

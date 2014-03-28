@@ -27,6 +27,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    // create a reorder table view and replace the original table view with it.
     BVReorderTableView *reorderTableView = [[BVReorderTableView alloc] initWithFrame:self.tableView.frame style:UITableViewStylePlain];
     reorderTableView.delegate = self;
     self.tableView = reorderTableView;
@@ -51,7 +52,6 @@
 }
 
 #pragma mark - Table view data source
-
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 100;
@@ -91,14 +91,6 @@
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return nil;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    return nil;
-}
-
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
 
@@ -115,21 +107,23 @@
     return YES;
 }
 
-// prevent moving of current location cells.
+// all can move.
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     return YES;
 }
 
+// commit a deletion.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (location.isCurrentLocation) return;
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [appDelegate.locationManager destroyLocation:location];
-        [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
     [appDelegate saveLocationsInDatabase];
 }
 
+// select a location.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     // initial load not complete.
@@ -138,14 +132,14 @@
 
     // set current page to this location, and dismiss the nc.
     [appDelegate.locationManager focusLocationAtIndex:indexPath.row];
-    [self.navigationController pushViewController:appDelegate.pageVC animated:YES];
+    [self.navigationController pushViewController:appDelegate.pageViewController animated:YES];
     
     // update database for reorder and deletion.
     [appDelegate saveLocationsInDatabase];
 
 }
 
-// move.
+// move two locations.
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 
     // switch the locations.
@@ -167,11 +161,13 @@
 
 #pragma mark - Interface actions
 
+// go to the new location view controller.
 - (void)goToNew {
     WANewLocationTVC *vc = [[WANewLocationTVC alloc] initWithStyle:UITableViewStyleGrouped];
     [self.navigationController pushViewController:vc animated:YES];
 }
 
+// go to the settings view controller.
 - (void)settingsButtonTapped {
     WASettingsTVC *vc = [[WASettingsTVC alloc] initWithStyle:UITableViewStyleGrouped];
     [self.navigationController pushViewController:vc animated:YES];
@@ -179,6 +175,7 @@
 
 #pragma mark - Messages from WALocation
 
+// reload the location at the given index.
 - (void)updateLocationAtIndex:(NSUInteger)index {
     NSArray *rows = @[[NSIndexPath indexPathForRow:index inSection:0]];
     [self.tableView reloadRowsAtIndexPaths:rows withRowAnimation:UITableViewRowAnimationFade];
@@ -186,6 +183,8 @@
 
 #pragma mark - Reorderable table delegate
 
+// This method is called when starting the re-ording process. You insert a blank row object into your
+// data source and return the object you want to save for later. This method is only called once.
 - (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
     WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     [appDelegate.locationManager.locations replaceObjectAtIndex:indexPath.row withObject:[WALocation newDummy]];

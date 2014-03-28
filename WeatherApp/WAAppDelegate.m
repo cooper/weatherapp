@@ -12,7 +12,6 @@
 #import "WANavigationController.h"
 #import "WAPageViewController.h"
 #import "WALocationListTVC.h"
-#import <AVFoundation/AVSpeechSynthesis.h>
 
 WAAppDelegate *appDelegate = nil;
 
@@ -24,23 +23,22 @@ WAAppDelegate *appDelegate = nil;
     appDelegate = self;
     self.lastSettingsChange = [NSDate date];
 
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = TABLE_COLOR;
 
     // set default options if we haven't already.
     [self setDefaults];
     
-    // load locations from settings.
-    self.locationManager = [WALocationManager new];
-    [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
-    [self.locationManager fetchLocations];
-    
     // create the navigation controller.
-    self.window.rootViewController = self.nc = [[WANavigationController alloc] initWithMyRootController];
+    self.window.rootViewController = self.navigationController = [[WANavigationController alloc] initWithMyRootController];
     
     // create the page view controller.
-    self.pageVC = [[WAPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:@{ UIPageViewControllerOptionSpineLocationKey: @(UIPageViewControllerSpineLocationMid) }];
-    self.pageVC.dataSource = self.locationManager;
+    self.pageViewController = [[WAPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:@{ UIPageViewControllerOptionSpineLocationKey: @(UIPageViewControllerSpineLocationMid) }];
+    
+    // load locations from settings.
+    self.pageViewController.dataSource = self.locationManager = [WALocationManager new];
+    [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
+    [self.locationManager fetchLocations];
     
     // start locating.
     [self startLocating];
@@ -167,26 +165,31 @@ WAAppDelegate *appDelegate = nil;
     
 }
 
-#pragma mark - Activity
+#pragma mark - Activity indicator
 
+// increase activity count.
 - (void)beginActivity {
     activityCount++;
     if (activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 }
 
+// decrease activity count.
 - (void)endActivity {
-    activityCount--;
+    if (activityCount > 0) activityCount--;
     if (!activityCount) [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
-#pragma mark - Core location manager delegate
+#pragma mark - CoreLocation manager delegate
 
 // got a location update. set our current location object's coordinates.
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     CLLocation *recentLocation = [locations lastObject];
     
     // first update - start the ticker.
-    if (!gotLocation) [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
+    if (!gotLocation) {
+        gotLocation = YES;
+        [self performSelector:@selector(stopLocating) withObject:nil afterDelay:3];
+    }
     
     NSLog(@"Updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
     
@@ -194,8 +197,6 @@ WAAppDelegate *appDelegate = nil;
     self.currentLocation.latitude     = recentLocation.coordinate.latitude;
     self.currentLocation.longitude    = recentLocation.coordinate.longitude;
     self.currentLocation.locationAsOf = [NSDate date];
-    
-    gotLocation = YES;
 
 }
 

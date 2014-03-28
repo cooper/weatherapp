@@ -3,7 +3,7 @@
 //  Weather
 //
 //  Created by Mitchell Cooper on 3/22/14.
-//  Copyright (c) 2014 Really Good. All rights reserved.
+//  Copyright (c) 2014 Mitchell Cooper. All rights reserved.
 //
 
 #import "WADailyForecastTVC.h"
@@ -15,7 +15,8 @@
 
 @implementation WADailyForecastTVC
 
-- (id)initWithLocation:(WALocation *)location {
+// initialize with a location.
+- (instancetype)initWithLocation:(WALocation *)location {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
         conditions    = [NSMutableArray array];
@@ -34,13 +35,16 @@
     if (!self.location.forecastResponse)
         [self.location fetchForecast];
     
-    self.navigationItem.titleView = [appDelegate.pageVC menuLabelWithTitle:@"Daily forecast"];
+    self.navigationItem.titleView = [appDelegate.pageViewController menuLabelWithTitle:@"Daily forecast"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.separatorInset = UIEdgeInsetsZero;
 
     // refresh button.
     refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshButtonTapped)];
     self.navigationItem.rightBarButtonItem = refreshButton;
+
+    // register for table headers.
+    [self.tableView registerClass:[UITableViewHeaderFooterView class] forHeaderFooterViewReuseIdentifier:@"day"];
     
 }
 
@@ -56,6 +60,7 @@
     [self update:YES];
 }
 
+// update anything that has changed.
 - (void)update:(BOOL)animated {
     lastUpdate = [NSDate date];
 
@@ -86,6 +91,7 @@
     return [self.location.dailyForecast[section][@"cells"] count] + 1; // plus header
 }
 
+// the location cells are all row 0.
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (!indexPath.row) return 100;
     return 50;
@@ -123,23 +129,51 @@
     return NO;
 }
 
+// header views. these are reused.
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if (section == [self.location.dailyForecast count]) return nil;
     NSDictionary *dict = self.location.dailyForecast[section];
+    UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"day"];
+    
+    // fetch labels with tags.
+    UILabel *dayNameLabel  = (UILabel *)[view.contentView viewWithTag:1];
+    UILabel *dateNameLabel = (UILabel *)[view.contentView viewWithTag:2];
+    
+    // if there is no label, view hasn't been set up.
+    if (!dayNameLabel) {
 
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"day"];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"day"];
-        cell.backgroundColor            = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.9];;
-        cell.textLabel.textColor        = [UIColor whiteColor];
-        cell.detailTextLabel.textColor  = [UIColor whiteColor];
-        cell.textLabel.font             = [UIFont boldSystemFontOfSize:22];
+        /*  The backgroundColor property changes nothing, and the tintColor property
+            seems to be completely ineffective on iOS 7. I have resorted to using a
+            custom background view instead.
+            
+            http://stackoverflow.com/questions/15604900/ios-uitableviewheaderfooterview-unable-to-change-background-color
+        */
+        view.backgroundView = [[UIView alloc] initWithFrame:view.frame];
+        view.backgroundView.backgroundColor = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.95];
+
+        // day, e.g. Friday
+        dayNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, 200, 40)];
+        dayNameLabel.textColor = [UIColor whiteColor];
+        dayNameLabel.tag       = 1;
+        dayNameLabel.font      = [UIFont boldSystemFontOfSize:25];
+        [view.contentView addSubview:dayNameLabel];
+
+        // date, e.g. March 28
+        CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
+        dateNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(screenWidth - 165, 0, 150, 40)];
+        dateNameLabel.textAlignment = NSTextAlignmentRight;
+        dateNameLabel.textColor     = [UIColor whiteColor];
+        dateNameLabel.tag           = 2;
+        [view.contentView addSubview:dateNameLabel];
+        
     }
-    cell.textLabel.text         = dict[@"dayName"];
-    cell.detailTextLabel.text   = dict[@"dateName"];
-    return cell;
+    
+    // update text.
+    dayNameLabel.text  = dict[@"dayName"];
+    dateNameLabel.text = dict[@"dateName"];
+    
+    return view;
 }
-
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     return 40;
@@ -147,6 +181,7 @@
 
 #pragma mark - Interface actions
 
+// refresh button was tapped.
 - (void)refreshButtonTapped {
 
     // fetch most recent data.

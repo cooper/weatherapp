@@ -7,7 +7,7 @@
 //
 
 @interface WASettingsTVC : UITableViewController {
-    NSArray *settings;
+    NSArray *settings;              // structure of settings
 }
 
 @end

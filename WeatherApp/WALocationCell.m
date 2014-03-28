@@ -3,7 +3,7 @@
 //  Weather
 //
 //  Created by Mitchell Cooper on 3/26/14.
-//  Copyright (c) 2014 Really Good. All rights reserved.
+//  Copyright (c) 2014 Mitchell Cooper. All rights reserved.
 //
 
 #import "WALocationCell.h"
@@ -11,7 +11,7 @@
 
 @implementation WALocationCell
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) [self setup];
     return self;
@@ -20,11 +20,12 @@
 - (void)setup {
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
     
-    // here's the background.
+    // background view.
     UIImageView *cellBg = [UIImageView new];
     cellBg.frame        = self.bounds;
     self.backgroundView = cellBg;
 
+    // icon view.
     self.iconView = [[UIImageView alloc] initWithFrame:CGRectMake(screenWidth - 60, 25, 50, 50)];
     self.iconView.layer.shadowColor         = DARK_BLUE_COLOR.CGColor;
     self.iconView.layer.shadowOffset        = CGSizeMake(0, 0);
@@ -33,11 +34,15 @@
     self.iconView.layer.shouldRasterize     = YES;
     [self addSubview:self.iconView];
     
+    // labels.
     self.locationLabel    = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, screenWidth, 40)];
     self.conditionsLabel  = [[UILabel alloc] initWithFrame:CGRectMake(0,  50, 0,   40)]; // x and w TBD
     self.temperatureLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 50, 100, 40)];
-
-    // here's the selected translucent blue tint.
+    self.locationLabel.font    = [UIFont systemFontOfSize:30];
+    self.conditionsLabel.font  = [UIFont systemFontOfSize:25];
+    self.temperatureLabel.font = [UIFont boldSystemFontOfSize:35];
+    
+    // selected translucent blue tint.
     self.selectedBackgroundView = [UIView new];
     self.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
     self.backgroundColor = [UIColor clearColor];
@@ -59,11 +64,6 @@
     self.indicator.frame = self.iconView.frame;
     [self addSubview:self.indicator];
 
-    // other properties.
-    self.locationLabel.font = [UIFont systemFontOfSize:30];
-    self.conditionsLabel.font = [UIFont systemFontOfSize:25];
-    self.temperatureLabel.font = [UIFont boldSystemFontOfSize:35];
-
 }
 
 - (void)setLocation:(WALocation *)location {
@@ -77,8 +77,19 @@
         self.locationLabel.text     = nil;
     }
 
-    if (location.loading) [self.indicator startAnimating];
-    else [self.indicator stopAnimating];
+    // start the indicator.
+    // hide the shadow when it's loading.
+    // otherwise, the activity indicator would have a shadow.
+    if (location.loading) {
+        self.iconView.layer.shadowColor = [UIColor clearColor].CGColor;
+        [self.indicator startAnimating];
+    }
+    
+    // hide the indicator and replace the shadow.
+    else {
+        self.iconView.layer.shadowColor = DARK_BLUE_COLOR.CGColor;
+        [self.indicator stopAnimating];
+    }
 
     // location info.
     NSString *city   = [location.city   length] ? location.city   : @"";

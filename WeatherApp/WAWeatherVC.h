@@ -6,29 +6,22 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-#import <CoreLocation/CoreLocation.h>
-
 @interface WAWeatherVC : UIViewController {
-    UIBarButtonItem *refreshButton;
-    NSDate *lastHourlyPreviewUpdate;
+    UIBarButtonItem *refreshButton;                         // the refresh button in navbar
+    NSDate          *lastHourlyPreviewUpdate;               // time we last updated the hourly preview
 }
 
-@property IBOutlet UILabel *locationTitle;
-@property IBOutlet UILabel *temperature;
-@property IBOutlet UILabel *conditionsLabel;
-@property IBOutlet UILabel *feelsLikeLabel;
-@property IBOutlet UIImageView *conditionsImageView;
-@property IBOutlet NSLayoutConstraint *heightConstraint;
-@property IBOutlet UIView *centeredView;
-@property IBOutlet UIView *hourlyContainer;
-@property (weak) WALocation *location;
+@property IBOutlet UILabel *locationTitle;                  // label for city name
+@property IBOutlet UILabel *temperature;                    // label for temperature
+@property IBOutlet UILabel *conditionsLabel;                // label for conditions description
+@property IBOutlet UILabel *feelsLikeLabel;                 // label for feels like temperature
+@property IBOutlet UIImageView        *conditionsImageView; // 230x230pt conditions icon
+@property IBOutlet NSLayoutConstraint *heightConstraint;    // constraint for everything minus navbar
+@property IBOutlet UIView   *centeredView;                  // 416x320pt container to fit any iPhone
+@property IBOutlet UIView   *hourlyContainer;               // view for hourly preview at bottom
+@property (weak) WALocation *location;                      // weak reference to this view's location
 
-// these methods are for communication between the location object and
-// the interface. this approach makes it very easy to make interface
-// changes by keeping all interface code within the view controller
-// and all functionality code within the location object.
-
-- (id)initWithLocation:(WALocation *)location;
-- (void)update;
+- (instancetype)initWithLocation:(WALocation *)location;    // initialize with a location
+- (void)update;                                             // update the displayed information
 
 @end

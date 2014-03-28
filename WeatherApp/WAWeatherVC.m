@@ -7,7 +7,6 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
-
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 #import "WAPageViewController.h"
@@ -16,7 +15,8 @@
 
 @implementation WAWeatherVC
 
-- (id)initWithLocation:(WALocation *)location {
+// initialize with a location.
+- (instancetype)initWithLocation:(WALocation *)location {
     self = [self initWithNibName:@"WAWeatherVC" bundle:nil];
     if (self) self.location = location;
     return self;
@@ -52,11 +52,13 @@
     
 }
 
+// update information whenever view will appear.
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self update];
 }
 
+// update hourly preview.
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     if (!SETTING(kEnableHourlyPreviewSetting)) return;
@@ -70,28 +72,24 @@
     
 }
 
+// update the height constraint.
+// this is always equal to the screen's height minus the sum of the
+// navigation bar and status bar heights. it is used to center the centeredView
+// between the bottom of the navigation bar and the bottom of the screen.
 - (void)updateViewConstraints {
     [super updateViewConstraints];
-    self.heightConstraint.constant = [UIScreen mainScreen].bounds.size.height - [UIApplication sharedApplication].statusBarFrame.size.height - appDelegate.nc.navigationBar.frame.size.height;
+    self.heightConstraint.constant = [UIScreen mainScreen].bounds.size.height - [UIApplication sharedApplication].statusBarFrame.size.height - self.navigationController.navigationBar.frame.size.height;
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;
 }
 
-- (void)addShadow:(UIView *)view radius:(CGFloat)radius {
-    view.layer.shadowColor     = DARK_BLUE_COLOR.CGColor;
-    view.layer.shadowOffset    = CGSizeMake(0, 0);
-    view.layer.shadowRadius    = radius;
-    view.layer.shadowOpacity   = 1.0;
-    view.layer.shouldRasterize = YES;
-}
-
 #pragma mark - Interface actions
 
 // anywhere tapped.
 - (void)tempTapped {
-    [appDelegate.pageVC titleTapped];
+    [appDelegate.pageViewController titleTapped];
 }
 
 // hourly preview tapped.
@@ -105,11 +103,21 @@
     if (!self.location.hourlyVC)
         self.location.hourlyVC = [[WAHourlyForecastTVC alloc] initWithLocation:self.location];
     
-    [appDelegate.nc pushViewController:self.location.hourlyVC animated:YES];
+    [self.navigationController pushViewController:self.location.hourlyVC animated:YES];
+}
+
+// add a shadow to a view.
+- (void)addShadow:(UIView *)view radius:(CGFloat)radius {
+    view.layer.shadowColor     = DARK_BLUE_COLOR.CGColor;
+    view.layer.shadowOffset    = CGSizeMake(0, 0);
+    view.layer.shadowRadius    = radius;
+    view.layer.shadowOpacity   = 1.0;
+    view.layer.shouldRasterize = YES;
 }
 
 #pragma mark - Updates from WALocation
 
+// animate the changing of text in a UILabel if necessary.
 - (void)animatedUpdate:(UILabel *)label newText:(NSString *)newText {
 
     // not visible. just do it.
@@ -122,10 +130,10 @@
     if ([newText isEqualToString:label.text]) return;
     
     // animate.
-    [UIView animateWithDuration:0.5 animations:^{
+    [UIView animateWithDuration:0.3 animations:^{
         label.alpha = 0;
     } completion:^(BOOL finished) {
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:0.3 animations:^{
             label.text  = newText;
             label.alpha = 1;
         }];
@@ -133,15 +141,17 @@
     
 }
 
+// update all information that has changed.
 - (void)update {
 
     // info.
-    [self animatedUpdate:self.locationTitle newText:self.location.city];
+    [self animatedUpdate:self.locationTitle   newText:self.location.city];
     [self animatedUpdate:self.conditionsLabel newText:self.location.conditions];
     
     // conditions icon.
     self.conditionsImageView.image = [UIImage imageNamed:FMT(@"icons/230/%@", self.location.conditionsImageName)];
-    if (!self.conditionsImageView.image) self.conditionsImageView.image = self.location.conditionsImage;
+    if (!self.conditionsImageView.image)
+        self.conditionsImageView.image = self.location.conditionsImage;
     
     // localized temperature.
     [self animatedUpdate:self.temperature newText:self.location.temperature];
@@ -233,9 +243,14 @@
 
 #pragma mark - Hourly forecast preview
 
+// fetch the next five hours from the hourly forecast.
 - (NSArray *)nextFiveHours {
     NSMutableArray *a = [NSMutableArray arrayWithCapacity:5];
+    
+    // no hourly forecast loaded.
     if (!self.location.hourlyForecastResponse) return nil;
+    
+    // search each day then each hour.
     for (NSArray *day in self.location.hourlyForecast)
     for (id obj in day) {
         if ([a count] == 5) return a;
@@ -246,6 +261,7 @@
         
         [a addObject:hour];
     }
+    
     return [a count] ? a : nil;
 }
 

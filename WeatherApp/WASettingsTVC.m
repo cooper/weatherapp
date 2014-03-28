@@ -17,6 +17,9 @@
 
     self.navigationItem.title = @"Settings";
     settings = @[
+    
+        // string selection settings.
+    
         @[kTemperatureScaleSetting, @[
             kTemperatureScaleFahrenheit,
             kTemperatureScaleCelsius,
@@ -38,22 +41,29 @@
             kTimeZoneRemote,
             kTimeZoneLocal
         ]],
+        
+        // boolean settings.
+        
         @[
             kEnableBackgroundSetting,
             kEnableHourlyPreviewSetting
-            //kEnableFullLocationNameSetting
         ],
+        
+        // credit cells.
+        
         @[
             @[@"Icons",                 @"Mitchell Cooper"      ],
             @[@"Other images",          @"Public domain"        ],
             @[@"Weather data",          @"WeatherUnderground"   ],
             @""
         ]
+        
     ];
     
     self.tableView.backgroundColor = TABLE_COLOR;
 }
 
+// update the time of last potential settings change.
 - (void)viewWillAppear:(BOOL)animated {
     appDelegate.lastSettingsChange = [NSDate date];
 }
@@ -73,7 +83,8 @@
     return [settings[section] count];
 }
 
-// we don't reuse any cells here. they are so basic that there would be no advantage.
+// we don't reuse any cells here. they are so basic, and there are so few
+// that there would be no actual advantage to reusal.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     
@@ -97,7 +108,7 @@
         rowName        = settings[indexPath.section][indexPath.row];
         UISwitch *sw   = [UISwitch new];
         sw.on          = SETTING(rowName);
-        sw.tag         = indexPath.row;
+        sw.tag         = indexPath.row; // used below to get settings key
         sw.onTintColor = BLUE_COLOR;
         [sw addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
         cell.accessoryView = sw;
@@ -122,15 +133,16 @@
     }
 
     cell.textLabel.text = rowName;
-    
     return cell;
 }
 
+// only highlight the selection options.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section < [settings count] - 2) return YES;
     return NO;
 }
 
+// selected a selection option.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *sectionName = settings[indexPath.section][0];
     NSString *rowName     = settings[indexPath.section][1][indexPath.row];

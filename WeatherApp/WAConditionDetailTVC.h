@@ -7,13 +7,13 @@
 //
 
 @interface WAConditionDetailTVC : UITableViewController {
-    UIImage         *background;        // the current background
-    UIBarButtonItem *refreshButton;     // the refresh button in navbar
+    UIImage         *background;                            // the current background image
+    UIBarButtonItem *refreshButton;                         // the refresh button in navbar
 }
 
-@property (weak) WALocation *location;
+@property (weak) WALocation *location;                      // weak reference to the location
 
-- (id)initWithLocation:(WALocation *)location;
-- (void)update;
+- (instancetype)initWithLocation:(WALocation *)location;    // initialize with a location
+- (void)update;                                             // update the displayed information
 
 @end

@@ -13,7 +13,7 @@
 
 @implementation WALocationManager
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.locations = [NSMutableArray array];
@@ -75,12 +75,14 @@
 
 #pragma mark - User defaults
 
+// load an array of locations from the database.
 - (void)loadLocations:(NSArray *)locationsArray {
     if (!locationsArray) return;
     for (NSDictionary *l in locationsArray)
         [self createLocationFromDictionary:l];
 }
 
+// create an array of locations for saving in the database.
 - (NSArray *)locationsArrayForSaving {
     NSMutableArray *locs = [NSMutableArray array];
     for (WALocation *location in self.locations)
@@ -90,6 +92,7 @@
 
 #pragma mark - Page view controller source
 
+// fetch the view controller before another.
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
     
     // find index of this location.
@@ -109,6 +112,7 @@
     
 }
 
+// fetch the view controller after another.
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
     
     // find the index of this location.
@@ -128,10 +132,11 @@
     
 }
 
+// focus the location at the given index.
 - (void)focusLocationAtIndex:(NSUInteger)index {
     if (index >= [self.locations count]) return;
     WALocation *location = self.locations[index];
-    [appDelegate.pageVC setViewController:location.overviewVC];
+    [appDelegate.pageViewController setViewController:location.overviewVC];
 }
 
 @end

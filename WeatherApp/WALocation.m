@@ -22,7 +22,7 @@
 
 @implementation WALocation
 
-- (id)init {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.highC      =
@@ -342,6 +342,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 #pragma mark - User defaults
 
+// create a dictionary for storage in the user defaults database.
 - (NSDictionary *)userDefaultsDict {
     if (self.dummy) return @{};
     NSArray * const keys = @[
@@ -375,7 +376,8 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     
     // if pageVC exists, update its navigation bar.
     // (to add indicator in place of refresh button)
-    if (appDelegate.pageVC) [appDelegate.pageVC updateNavigationBar];
+    if (appDelegate.pageViewController)
+        [appDelegate.pageViewController updateNavigationBar];
     
 }
 
@@ -401,12 +403,13 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     if (self.dailyVC)    [self.dailyVC    update];
     
     // if the location list TVC exists, update the cell for this location.
-    WANavigationController *nc = appDelegate.nc;
-    if (nc && nc.tvc) [nc.tvc updateLocationAtIndex:self.index];
+    WALocationListTVC *locationList = appDelegate.navigationController.locationList;
+    if (locationList) [locationList updateLocationAtIndex:self.index];
     
     // if the pageVC exists, update the navigation bar.
     // (replace loading indicator with refresh button)
-    if (appDelegate.pageVC) [appDelegate.pageVC updateNavigationBar];
+    if (appDelegate.pageViewController)
+        [appDelegate.pageViewController updateNavigationBar];
     
 }
 
@@ -424,6 +427,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     return [self updateBackgroundBoth:YES];
 }
 
+// update the background(s) according to the current conditions.
 - (void)updateBackgroundBoth:(BOOL)both {
 
     // in order by priority. the first match wins.
@@ -435,19 +439,31 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     // the last-used index in the user defaults database.
     
     // load backgrounds from plist.
-    NSString *bgPlist    = [[NSBundle mainBundle] pathForResource: @"backgrounds" ofType: @"plist"];
+    NSString *bgPlist    = [[NSBundle mainBundle] pathForResource:@"backgrounds" ofType:@"plist"];
     NSArray *backgrounds = [NSArray arrayWithContentsOfFile:bgPlist];
     
     // if the icon and conditions haven't changed, don't waste energy analyzing backgrounds.
     unsigned int i = 0; NSDictionary *selection;
-    if (![self.currentBackgroundIcon isEqualToString:self.conditionsImageName] ||
-        ![self.currentBackgroundConditions isEqualToString:self.conditions])
+    if (![currentBackgroundIcon isEqualToString:self.conditionsImageName] ||
+        ![currentBackgroundConditions isEqualToString:self.conditions])
         
     // one or both have changed.
     for (NSDictionary *bg in backgrounds) {
     
-        // search for matches.
-        BOOL matchesIcon = bg[@"icon"] && [self.conditionsImageName rangeOfString:bg[@"icon"] options:NSCaseInsensitiveSearch].location != NSNotFound;
+        // search for matches in icon.
+        BOOL matchesIcon = NO;
+        id icons = bg[@"icon"];
+        if (icons) {
+            if (![icons isKindOfClass:[NSArray class]]) icons = @[icons];
+            for (NSString *icon in icons) {
+                if ([self.conditionsImageName rangeOfString:icon options:NSCaseInsensitiveSearch].location == NSNotFound)
+                    continue;
+                matchesIcon = YES;
+                break;
+            }
+        }
+        
+        // search for matches in conditions.
         BOOL matchesConditions = bg[@"conditions"] && [self.conditions rangeOfString:bg[@"conditions"] options:NSCaseInsensitiveSearch].location != NSNotFound;
         
         // this is a match.
@@ -472,7 +488,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     
     // if the background category and time of day are same, nothing needs to be changed.
     NSString *chosenBackground;
-    if ([self.currentBackgroundName isEqualToString:selection[@"name"]] && self.currentBackgroundTimeOfDay == [selection[@"night"] boolValue])
+    if ([currentBackgroundName isEqualToString:selection[@"name"]] && currentBackgroundTimeOfDay == [selection[@"night"] boolValue])
         NSLog(@"Conditions/icon changed, but category and time of day still same");
     
     // a background group was selected.
@@ -507,10 +523,10 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     // finally apply the background.
     if (!chosenBackground) return;
     
-    self.currentBackgroundName       = selection[@"name"];
-    self.currentBackgroundIcon       = self.conditionsImageName;
-    self.currentBackgroundConditions = self.conditions;
-    self.currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
+    currentBackgroundName       = selection[@"name"];
+    currentBackgroundIcon       = self.conditionsImageName;
+    currentBackgroundConditions = self.conditions;
+    currentBackgroundTimeOfDay  = [selection[@"night"] boolValue];
     
     // load the full-size background as well.
     if (both) {
@@ -525,6 +541,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 #pragma mark - Extensive details
 
+// recompile data for extensive details view.
 - (void)updateExtensiveDetails {
     NSMutableArray *final = [NSMutableArray array];
     NSDictionary   *r     = self.response;
@@ -557,20 +574,19 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         windchill = FMT(@"%@%@", [self windchill:1], self.tempUnit);
     
     // precipitation.
-    if ([r[@"precip_today_metric"] floatValue] > 0) {
+    BOOL isT = [r[@"precip_today_metric"] floatValue] > 0;
+    BOOL isH = [r[@"precip_1hr_metric"]   floatValue] > 0;
     
-        // in inches.
-        if (SETTING_IS(kPrecipitationMeasureSetting, kPrecipitationMeasureInches)) {
-            precipT = FMT(@"%@ in", r[@"precip_today_in"]);
-            precipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
-        }
-        
-        // in millimeters.
-        else {
-            precipT = FMT(@"%@ in", r[@"precip_today_metric"]);
-            precipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
-        }
-        
+    // in inches.
+    if (SETTING_IS(kPrecipitationMeasureSetting, kPrecipitationMeasureInches)) {
+        if (isT) precipT = FMT(@"%@ in", r[@"precip_today_in"]);
+        if (isH) precipH = FMT(@"%@ in", r[@"precip_1hr_in"]);
+    }
+    
+    // in millimeters.
+    else {
+        if (isT) precipT = FMT(@"%@ in", r[@"precip_today_metric"]);
+        if (isH) precipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
     }
     
     // pressure.
@@ -657,6 +673,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 #pragma mark - Daily forecast
 
+// recompile daily forecast information.
 - (void)updateDailyForecast {
     NSMutableArray *a = [NSMutableArray array];
     for (unsigned int i = 0; i < [self.forecastResponse count]; i++)
@@ -664,15 +681,16 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     self.dailyForecast = a;
 }
 
+// recompile a single day for the daily forecast.
 - (NSDictionary *)forecastForDay:(NSDictionary *)f index:(unsigned int)i {
-    if (!self.fakeLocations) self.fakeLocations = [NSMutableArray array];
+    if (!fakeLocations) fakeLocations = [NSMutableArray array];
 
     // create a fake location for the cell.
     WALocation *location;
-    if ([self.fakeLocations count] >= i + 1)
-        location = self.fakeLocations[i];
+    if ([fakeLocations count] >= i + 1)
+        location = fakeLocations[i];
     else
-        location = self.fakeLocations[i] = [WALocation new];
+        location = fakeLocations[i] = [WALocation new];
     
     location.loading = NO;
     location.initialLoadingComplete = YES;
@@ -807,6 +825,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 #pragma mark - Hourly forecast
 
+// recompile hourly forecast data.
 - (void)updateHourlyForecast {
     self.hourlyForecast = [NSMutableArray array];
     daysAdded = [NSMutableArray array];
@@ -815,6 +834,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         [self addHourlyForecastForHour:self.hourlyForecastResponse[i] index:i];
 }
 
+// recompile a single hour for hourly forecast.
 // format is forecasts[day in month][hour index] = dictionary of info for that hour
 // then, the array is shifted so the smallest index becomes 0.
 - (void)addHourlyForecastForHour:(NSDictionary *)f index:(unsigned int)i {
@@ -833,12 +853,12 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     // adjust hour to AM/PM.
     NSUInteger adjustedHour = dateComponents.hour;
     BOOL pm = NO;
-    if (adjustedHour == 0) adjustedHour = 12;
     if (adjustedHour >= 12) {
         pm = YES;
         if (adjustedHour > 12) adjustedHour -= 12;
     }
-    
+    if (adjustedHour == 0) adjustedHour = 12;
+
     NSUInteger dayIndex = dateComponents.day;
     
     // the day has changed.

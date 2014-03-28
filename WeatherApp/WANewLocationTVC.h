@@ -6,7 +6,7 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-@interface WANewLocationTVC : UITableViewController <UITextFieldDelegate, UISearchDisplayDelegate> {
+@interface WANewLocationTVC : UITableViewController <UITextFieldDelegate> {
     NSMutableArray *results;    // array of search results
     NSDate *lastTypeDate;       // time of last typing event (key press)
     UITextField *textField;     // the search text field in the first row

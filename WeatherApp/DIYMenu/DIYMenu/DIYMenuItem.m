@@ -39,9 +39,11 @@
 
 - (void)setName:(NSString *)name withColor:(UIColor *)color withFont:(UIFont *)font
 {
-    CGRect labelFrame = CGRectMake(ICONPADDING + ICONSIZE + ITEMPADDING, 0, self.frame.size.width, self.frame.size.height);
+    CGFloat x = ICONPADDING + ICONSIZE + ITEMPADDING;
+    CGRect labelFrame = CGRectMake(x, 0, self.frame.size.width - x, ITEMHEIGHT);
+    NSLog(@"label height: %f", self.frame.size.height);
     _name = [[UILabel alloc] initWithFrame:labelFrame];
-    self.name.backgroundColor = color;
+    self.name.backgroundColor = [UIColor clearColor];
     self.name.textColor = [UIColor whiteColor];
     self.name.font = font;
     self.name.text = name;
@@ -59,7 +61,10 @@
     
     if (image != nil) {
         _icon = [[UIImageView alloc] initWithImage:image];
-        self.icon.frame = CGRectMake(ICONPADDING, ICONPADDING, ICONSIZE, ICONSIZE);
+        CGFloat y = (ITEMHEIGHT - ICONSIZE) / 2.;
+        self.icon.frame = CGRectMake(ICONPADDING, y, ICONSIZE, ICONSIZE);
+        NSLog(@"item: %f, icon: %f, y: %f", ITEMHEIGHT, ICONSIZE, y);
+        self.icon.tag = 10;
         [self addSubview:self.icon];
     }
     else {

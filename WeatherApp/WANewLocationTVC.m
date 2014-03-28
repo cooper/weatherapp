@@ -33,101 +33,88 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+
+    // scroll back to the top with this silly rect.
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
+    
+    // select the text field and bring up the keyboard.
     [textField becomeFirstResponder];
+    
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return 2; // one for text field, one for results
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == 0) return 1;
-    return [results count];
+    if (section == 0) return 1; // text field
+    return [results count];     // results
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:indexPath.section ?  @"cell" : @"inputcell"];
-    
-    cell.showsReorderControl = NO;
+    UITableViewCell *cell;
 
     // input section.
     if (indexPath.section == 0) {
         
+        // this will not be reused.
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+        
         if (!textField)
             textField = [[UITextField alloc] initWithFrame:CGRectMake(15, 10, 280, 30)];
         
+        textField.placeholder               = @"Search locations...";
+        textField.backgroundColor           = [UIColor clearColor];
+        textField.autocorrectionType        = UITextAutocorrectionTypeNo;
+        textField.autocapitalizationType    = UITextAutocapitalizationTypeNone;
         textField.adjustsFontSizeToFitWidth = YES;
-        textField.textColor = DARK_BLUE_COLOR;
-
-        textField.keyboardType  = UIKeyboardTypeDefault;
-        textField.returnKeyType = UIReturnKeyDefault;
-        textField.placeholder   = @"Search locations...";
-
-        textField.backgroundColor = [UIColor clearColor];
-        textField.autocorrectionType = UITextAutocorrectionTypeNo; // no auto correction support
-        textField.autocapitalizationType = UITextAutocapitalizationTypeNone; // no auto capitalization support
-        
-        textField.textAlignment = NSTextAlignmentLeft;
-        textField.tag = 0;
-        textField.delegate = self;
-        
-        textField.clearButtonMode = UITextFieldViewModeNever; // no clear 'x' button to the right
-        [textField setEnabled: YES];
-        
+        textField.delegate                  = self;
         [cell.contentView addSubview:textField];
+        
         cell.backgroundColor = TABLE_COLOR;
         return cell;
     }
     
+    // result section.
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"result"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"result"];
+        cell.backgroundColor     = [UIColor clearColor];
+        cell.textLabel.textColor = [UIColor whiteColor];
+        cell.textLabel.adjustsFontSizeToFitWidth = YES;
+    }
+    
     cell.textLabel.text = results[indexPath.row][@"longName"];
-    cell.backgroundColor = [UIColor clearColor];
-    cell.textLabel.textColor = [UIColor whiteColor];
-    cell.textLabel.adjustsFontSizeToFitWidth = YES;
-
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return nil;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    return nil;
-}
-
-
-// prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 0) return NO;
-    if ([results count] == 0)   return NO;
+    if ([results count]   == 0) return NO;
     return YES;
 }
 
-// prevent editing of current location cells.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
 }
 
-// prevent moving of current location cells.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return NO;
-}
-
+// a result was selected.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    // create a location using the data we generated in lookupSuggestion:
     WALocation *location = [appDelegate.locationManager createLocationFromDictionary:results[indexPath.row]];
     
-    // fetch the conditions. then, update the sections if something changed.
-    //NSString *before = results[indexPath.row][@"longName"];
+    // fetch the conditions; then, return to the location list.
     [location fetchCurrentConditions];
-    [appDelegate.nc popToRootViewControllerAnimated:YES];
+    [self.navigationController popToRootViewControllerAnimated:YES];
+    
 }
 
 #pragma mark - Suggestion lookups
 
+// look up something (firstPart = the query so far)
 - (void)lookupSuggestion:(NSString *)firstPart {
 
     // empty. just clear it.
@@ -222,6 +209,7 @@
     return YES;
 }
 
+// check if the user has typed since a half-second ago.
 - (void)checkIfTypedSince:(NSDate *)date {
     
     // user has typed since.
@@ -233,6 +221,7 @@
 
 #pragma mark - Keyboard notifications
 
+// the keyboard WAS shown.
 - (void)keyboardWasShown:(NSNotification*)aNotification {
     NSDictionary* info = [aNotification userInfo];
     CGSize kbSize      = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
@@ -260,6 +249,7 @@
     
 }
 
+// the keyboard WILL hide.
 - (void)keyboardWillBeHidden:(NSNotification*)aNotification {
     NSDictionary* info = [aNotification userInfo];
     CGSize kbSize      = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;

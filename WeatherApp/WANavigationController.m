@@ -13,16 +13,16 @@
 
 @implementation WANavigationController
 
-- (id)initWithMyRootController {
-    self.tvc  = [[WALocationListTVC alloc] initWithStyle:UITableViewStylePlain];
-    self      = [super initWithRootViewController:self.tvc];
-    UINavigationBar *bar = self.navigationBar;
-
+- (instancetype)initWithMyRootController {
+    WALocationListTVC *locationList = [[WALocationListTVC alloc] initWithStyle:UITableViewStylePlain];
+    self = [super initWithRootViewController:locationList];
+    self.locationList = locationList;
+    
     // make bar translucently blue.
-    //[bar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
-    bar.barTintColor = BLUE_COLOR;
-    bar.translucent  = YES;
-    bar.tintColor    = [UIColor whiteColor];
+    UINavigationBar *bar    = self.navigationBar;
+    bar.barTintColor        = BLUE_COLOR;
+    bar.translucent         = YES;
+    bar.tintColor           = [UIColor whiteColor];
     bar.titleTextAttributes = [NSDictionary dictionaryWithObject:[UIColor whiteColor] forKey:NSForegroundColorAttributeName];
     
     return self;
