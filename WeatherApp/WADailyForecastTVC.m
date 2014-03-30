@@ -32,8 +32,10 @@
     [super viewDidLoad];
     
     // forecast not yet obtained.
-    if (!self.location.forecastResponse)
+    if (!self.location.forecastResponse) {
         [self.location fetchForecast];
+        [self.location commitRequest];
+    }
     
     self.navigationItem.titleView = [appDelegate.pageViewController menuLabelWithTitle:@"Daily forecast"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;

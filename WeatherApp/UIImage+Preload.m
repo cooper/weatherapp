@@ -11,17 +11,16 @@
 @implementation UIImage (Preload)
 
 CGImageRef preload_image(CGImageRef image) {
-    
     size_t width  = CGImageGetWidth(image);
     size_t height = CGImageGetHeight(image);
     
-    CGColorSpaceRef colourSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef imageContext   = CGBitmapContextCreate(
-        NULL, width, height, 8, width * 4, colourSpace,
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef imageContext  = CGBitmapContextCreate(
+        NULL, width, height, 8, width * 4, colorSpace,
         kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Little
     );
     
-    CGColorSpaceRelease(colourSpace);
+    CGColorSpaceRelease(colorSpace);
     CGContextDrawImage(imageContext, CGRectMake(0, 0, width, height), image);
     
     CGImageRef outputImage = CGBitmapContextCreateImage(imageContext);

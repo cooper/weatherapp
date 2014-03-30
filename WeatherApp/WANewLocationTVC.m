@@ -78,15 +78,33 @@
     }
     
     // result section.
+    UIImageView *imageView;
     cell = [self.tableView dequeueReusableCellWithIdentifier:@"result"];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"result"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"result"];
         cell.backgroundColor     = [UIColor clearColor];
-        cell.textLabel.textColor = [UIColor whiteColor];
+        cell.textLabel.textColor =
+        cell.detailTextLabel.textColor = [UIColor whiteColor];
         cell.textLabel.adjustsFontSizeToFitWidth = YES;
-    }
+        imageView     = [UIImageView new];
+        imageView.tag = 1;
+        [cell.contentView addSubview:imageView];
+    } else imageView = (UIImageView *)[cell.contentView viewWithTag:1];
     
+    // location name.
     cell.textLabel.text = results[indexPath.row][@"longName"];
+    
+    // country flag.
+    UIImage *image    = [UIImage imageNamed:FMT(@"flags/%@", [results[indexPath.row][@"countryShort"] lowercaseString])];
+    if (!image) image = [UIImage imageNamed:@"flags/unknown"];
+    imageView.image   = image;
+    imageView.frame   = CGRectMake(
+        [UIScreen mainScreen].bounds.size.width - image.size.width - 15,
+        (cell.frame.size.height - image.size.height) / 2.,
+        image.size.width,
+        image.size.height
+    );
+    
     return cell;
 }
 
@@ -137,7 +155,6 @@
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         [appDelegate endActivity];
 
-    
         // the user already selected something, so just forget about this request.
         // or if the user has typed since this request started, forget it.
         if (selectedOne || [lastTypeDate laterDate:date] == lastTypeDate) return;
@@ -152,7 +169,7 @@
         // decode the JSON.
         NSError *jsonError;
         NSDictionary *obj = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-        
+        NSLog(@"json: %@", obj);
         // a JSON error occured.
         if (jsonError) {
             NSLog(@"JSON error: %@", jsonError);
