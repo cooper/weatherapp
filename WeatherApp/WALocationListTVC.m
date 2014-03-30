@@ -117,7 +117,13 @@
     WALocation *location = appDelegate.locationManager.locations[indexPath.row];
     if (location.isCurrentLocation) return;
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [appDelegate.locationManager destroyLocation:location];
+        [location.manager destroyLocation:location];
+        
+        /*  There is a bug in iOS 7 where the last row of a tableview has a very screwy animation.
+            this bug is visible even in the built-in apps of iOS! It currently cannot be avoided.
+            http://stackoverflow.com/questions/20976700/problems-with-animation-when-deleting-the-last-row-of-tableview-ios7
+        */
+        
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
     [appDelegate saveLocationsInDatabase];
@@ -131,7 +137,7 @@
     if (!location.initialLoadingComplete) return;
 
     // set current page to this location, and dismiss the nc.
-    [appDelegate.locationManager focusLocationAtIndex:indexPath.row];
+    [location.manager focusLocationAtIndex:indexPath.row];
     [self.navigationController pushViewController:appDelegate.pageViewController animated:YES];
     
     // update database for reorder and deletion.
@@ -187,7 +193,7 @@
 // data source and return the object you want to save for later. This method is only called once.
 - (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
     WALocation *location = appDelegate.locationManager.locations[indexPath.row];
-    [appDelegate.locationManager.locations replaceObjectAtIndex:indexPath.row withObject:[WALocation newDummy]];
+    [location.manager.locations replaceObjectAtIndex:indexPath.row withObject:[WALocation newDummy]];
     return location;
 }
 

@@ -6,18 +6,21 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-#import "WAPageViewController.h"
 #import "WALocation.h"
 #import "WALocationManager.h"
+
 #import "WANavigationController.h"
-#import "Fade/UINavigationController+Fade.h"
-#import "UIImage+WhiteImage.h"
+#import "WAPageViewController.h"
 
 #import "WAWeatherVC.h"
 #import "WAConditionDetailTVC.h"
 #import "WADailyForecastTVC.h"
 #import "WAHourlyForecastTVC.h"
-#import "WAPageViewController.h"
+
+#import "UINavigationController+Fade.h"
+#import "UIImage+WhiteImage.h"
+
+#import "WAMenu/WAMenuItem.h"
 
 @implementation WAPageViewController
 
@@ -38,7 +41,7 @@
     [super viewDidLoad];
     
     // create the menu.
-    menu = [[DIYMenu alloc] initWithFrame:self.view.window.bounds];
+    menu = [[WAMenu alloc] initWithFrame:self.view.window.bounds];
     menu.delegate = self;
     
     // many different shades of blue.
@@ -60,7 +63,7 @@
     for (NSArray *item in items) {
         UIImage *icon   = [UIImage imageNamed:FMT(@"icons/menu/%@", item[1])];
         if (!icon) icon = [UIImage imageNamed:@"icons/30/clear"];
-        [menu addItem:item[0] withIcon:icon withColor:item[2] withFont:font];
+        [menu addItem:item[0] icon:icon color:item[2] font:font];
     }
 
     // this fixes the navigation bar inset issue.
@@ -178,11 +181,12 @@
     if (self.location.hourlyForecastResponse)
         [self.location fetchHourlyForecast:NO];
     
+    [self.location commitRequest];
 }
 
 // display the menu.
 - (void)titleTapped {
-    DIYMenuItem *item = menu.menuItems[1];
+    WAMenuItem *item = menu.menuItems[1];
     item.name.text = FMT(@"%@ overview", self.location.city);
     UIImageView *iconView = (UIImageView *)[item viewWithTag:10];
     iconView.image = [UIImage imageNamed:FMT(@"icons/30/%@", self.location.conditionsImageName)];

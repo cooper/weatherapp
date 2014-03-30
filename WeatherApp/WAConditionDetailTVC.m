@@ -152,6 +152,7 @@
 
     // fetch most recent data.
     [self.location fetchCurrentConditions];
+    [self.location commitRequest];
 
     // loading and refresh button is visible.
     if (self.location.loading && self.navigationItem.rightBarButtonItem == refreshButton) {

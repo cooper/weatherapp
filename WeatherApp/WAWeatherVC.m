@@ -6,7 +6,6 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-#import <QuartzCore/QuartzCore.h>
 #import "WAWeatherVC.h"
 #import "WALocation.h"
 #import "WAPageViewController.h"
@@ -64,12 +63,12 @@
     if (!SETTING(kEnableHourlyPreviewSetting)) return;
     
     // fetch hourly forecast if that's enabled and we haven't already.
-    if (!self.location.hourlyForecastResponse)
+    if (!self.location.hourlyForecastResponse) {
         [self.location fetchHourlyForecast:NO];
-    
-    // replace the hourly preview with snapshot if necessary.
-    [self replaceHourlyWithSnapshot];
-    
+        [self.location commitRequest];
+    }
+
+    [self updateHourlyPreview];
 }
 
 // update the height constraint.
@@ -179,8 +178,16 @@
         : timeString
     ];
 
-    // the rest of this is for hourly preview.
-    if (!SETTING(kEnableHourlyPreviewSetting)) return;
+    // hourly preview.
+    if (SETTING(kEnableHourlyPreviewSetting))
+        [self updateHourlyPreview];
+    
+}
+
+#pragma mark - Hourly forecast preview
+
+- (void)updateHourlyPreview {
+    if (!self.isViewLoaded) return;
     
     // nothing has changed.
     NSDate *laterDate = [self.location.hourlyForecastAsOf laterDate:lastHourlyPreviewUpdate];
@@ -232,16 +239,14 @@
     }
     
     // new data; fade in.
-    if (fiveHours) [UIView animateWithDuration:0.5 animations:^{
+    [UIView animateWithDuration:0.5 animations:^{
         self.hourlyContainer.alpha = 1;
     } completion:^(BOOL finished) {
-        [self replaceHourlyWithSnapshot];
+        if (finished) [self replaceHourlyWithSnapshot];
     }];
     
     lastHourlyPreviewUpdate = [NSDate date];
 }
-
-#pragma mark - Hourly forecast preview
 
 // fetch the next five hours from the hourly forecast.
 - (NSArray *)nextFiveHours {
@@ -257,9 +262,8 @@
         
         // this is the day info array.
         if (![obj isKindOfClass:[NSDictionary class]]) continue;
-        NSDictionary *hour = obj;
         
-        [a addObject:hour];
+        [a addObject:obj];
     }
     
     return [a count] ? a : nil;
@@ -283,8 +287,9 @@
     // lots of shadows are sometimes expensive, so after the animation completes,
     // replace all of these views with a single snapshot view.
     // this greatly improves the smoothness of swiping between locations.
-    NSLog(@"Replacing hourly with snapshot");
-    UIView *snapshot = [self.hourlyContainer snapshotViewAfterScreenUpdates:YES];
+    NSLog(@"Replacing %@ hourly with snapshot", self.location.city);
+    
+    UIView *snapshot = [self.hourlyContainer snapshotViewAfterScreenUpdates:NO];
     
     // note: this property returns a copy of the subviews array, so there
     // is no need to copy it again here.

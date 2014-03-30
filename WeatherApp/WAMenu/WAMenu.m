@@ -1,33 +1,29 @@
 //
-//  DIYMenu.m
-//  DIYMenu
+//  WAMenu.m
 //
+//  Based on DIYMenu,
 //  Created by Jonathan Beilin on 8/13/12.
+//
+//  Copyright (c) 2014 Mitchell Cooper.
 //  Copyright (c) 2012 DIY. All rights reserved.
 //
 
-#import "DIYMenu.h"
+#import "WAMenu.h"
+#import "WAMenuItem.h"
 
-#import "DIYMenuOptions.h"
-#import "DIYMenuItem.h"
+@interface WAMenu ()
 
-#import <QuartzCore/QuartzCore.h>
-
-@interface DIYMenu ()
-@property                       BOOL                        isActivated;
-@property                       BOOL                        isLandscape;
-@property                       UIView                      *shadingView;
+@property BOOL      isActivated;
+@property UIView    *shadingView;
 
 @end
 
-@implementation DIYMenu
+@implementation WAMenu
 
 #pragma mark - Init
 
-- (void)setup
-{
+- (void)setup {
     CGRect frame = [UIScreen mainScreen].bounds;
-    //frame.origin.x -= ITEMHEIGHT;
     self.frame = frame;
     _menuItems = [NSMutableArray array];
     self.clipsToBounds = true;
@@ -42,8 +38,7 @@
     [self.shadingView addGestureRecognizer:tap];
 }
 
-- (id)initWithFrame:(CGRect)frame
-{
+- (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         [self setup];
@@ -51,66 +46,15 @@
     return self;
 }
 
-- (id)init
-{
+- (id)init {
     self = [super init];
-    if (self) {
-        [self setup];
-    }
+    if (self) [self setup];
     return self;
-}
-
-#pragma mark - Class methods
-
-+ (DIYMenu *)sharedView
-{
-    static dispatch_once_t once;
-    static DIYMenu *sharedView;
-    dispatch_once(&once, ^{
-        sharedView = [DIYMenu new];
-    });
-    return sharedView;
-}
-
-+ (void)show
-{
-    [[DIYMenu sharedView] showMenu];
-}
-
-+ (void)dismiss
-{
-    [[DIYMenu sharedView] dismissMenu];
-}
-
-+ (BOOL)isActivated
-{
-    return [DIYMenu sharedView].isActivated;
-}
-
-+ (void)setDelegate:(NSObject<DIYMenuDelegate> *)delegate
-{
-    [DIYMenu sharedView].delegate = delegate;
-}
-
-+ (void)addMenuItem:(NSString *)name withIcon:(UIImage *)image withColor:(UIColor *)color withFont:(UIFont *)font
-{
-    [[DIYMenu sharedView] addItem:name withIcon:image withColor:color withFont:font];
-}
-
-+ (void)addMenuItem:(NSString *)name withGlyph:(NSString *)glyph withColor:(UIColor *)color withFont:(UIFont *)font withGlyphFont:(UIFont *)glyphFont
-{
-    [[DIYMenu sharedView] addItem:name withGlyph:glyph withColor:color withFont:font withGlyphFont:glyphFont];
-}
-
-+ (void)clearMenu
-{
-    [[DIYMenu sharedView] clearMenu];
 }
 
 #pragma mark - Show and Dismiss methods
 
-- (void)showMenu
-{
+- (void)showMenu {
     NSEnumerator *frontToBackWindows = [[[UIApplication sharedApplication]windows]reverseObjectEnumerator];
     for (UIWindow *window in frontToBackWindows) {
         if (window.windowLevel == UIWindowLevelNormal) {
@@ -123,18 +67,16 @@
     // Animate in items & darken background
     //
     
-    [self.menuItems enumerateObjectsUsingBlock:^(DIYMenuItem *item, NSUInteger idx, BOOL *stop) {
+    [self.menuItems enumerateObjectsUsingBlock:^(WAMenuItem *item, NSUInteger idx, BOOL *stop) {
         item.transform = CGAffineTransformMakeTranslation(0, -ITEMHEIGHT * (idx + 2));
     }];
     
     [UIView animateWithDuration:0.22f delay:0.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        [self.menuItems enumerateObjectsUsingBlock:^(DIYMenuItem *item, NSUInteger idx, BOOL *stop) {
+        [self.menuItems enumerateObjectsUsingBlock:^(WAMenuItem *item, NSUInteger idx, BOOL *stop) {
             item.transform = CGAffineTransformMakeTranslation(0, 0);
         }];
         self.shadingView.alpha = 0.75f;
-    } completion:^(BOOL finished) {
-        //
-    }];
+    } completion:nil];
     
     self.isActivated = true;
     
@@ -144,16 +86,13 @@
     }
 }
 
-- (void)dismissMenu
-{
+- (void)dismissMenu {
     // Animate out the items
     [UIView animateWithDuration:0.22f delay:0.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-        [self.menuItems enumerateObjectsUsingBlock:^(DIYMenuItem *item, NSUInteger idx, BOOL *stop) {
+        [self.menuItems enumerateObjectsUsingBlock:^(WAMenuItem *item, NSUInteger idx, BOOL *stop) {
             item.transform = CGAffineTransformMakeTranslation(0, (CGFloat) -ITEMHEIGHT * (idx + 2));
         }];
-    } completion:^(BOOL finished) {
-        //
-    }];
+    } completion:nil];
     
     // Fade out the overlay window and remove self from it
     [UIView animateWithDuration:0.22 delay:0.0f options:UIViewAnimationOptionCurveLinear animations:^{
@@ -167,38 +106,31 @@
 
 #pragma mark - UI
 
-- (void)tappedBackground
-{
+- (void)tappedBackground {
     [self dismissMenu];
     if ([self.delegate respondsToSelector:@selector(menuCancelled)]) {
         [self.delegate performSelectorOnMainThread:@selector(menuCancelled) withObject:nil waitUntilDone:false];
     }
 }
 
-- (void)diyMenuAction:(NSString *)action
-{
+- (void)menuAction:(NSString *)action {
     [self.delegate menuItemSelected:action];
     [self dismissMenu];
 }
 
 #pragma mark - Item management
 
-- (CGRect)newItemFrame
-{
+- (CGRect)newItemFrame {
     UIApplication *application = [UIApplication sharedApplication];
-    
     float padding = application.statusBarHidden ? 0 :
         MIN(application.statusBarFrame.size.height, application.statusBarFrame.size.width);
-    
     NSUInteger itemCount = [self.menuItems count];
-    
     return CGRectMake(0, padding + itemCount*ITEMHEIGHT, self.frame.size.height, ITEMHEIGHT);
 }
 
-- (void)addItem:(NSString *)name withIcon:(UIImage *)image withColor:(UIColor *)color withFont:(UIFont *)font
-{
-    DIYMenuItem *item = [[DIYMenuItem alloc] initWithFrame:[self newItemFrame]];
-    [item setName:name withIcon:image withColor:color withFont:font];
+- (void)addItem:(NSString *)name icon:(UIImage *)image color:(UIColor *)color font:(UIFont *)font {
+    WAMenuItem *item = [[WAMenuItem alloc] initWithFrame:[self newItemFrame]];
+    [item setName:name icon:image color:color font:font];
     item.layer.shouldRasterize = true;
     item.layer.rasterizationScale = [[UIScreen mainScreen] scale];
     item.delegate = self;
@@ -207,19 +139,8 @@
     [self addSubview:item];
 }
 
-- (void)addItem:(NSString *)name withGlyph:(NSString *)glyph withColor:(UIColor *)color withFont:(UIFont *)font withGlyphFont:(UIFont *)glyphFont
-{
-    DIYMenuItem *item = [[DIYMenuItem alloc] initWithFrame:[self newItemFrame]];
-    [item setName:name withGlyph:glyph withColor:color withFont:font withGlyphFont:glyphFont];
-    item.delegate = self;
-    
-    [self.menuItems addObject:item];
-    [self addSubview:item];
-}
-
-- (void)clearMenu
-{
-    [self.menuItems enumerateObjectsUsingBlock:^(DIYMenuItem *item, NSUInteger idx, BOOL *stop) {
+- (void)clearMenu {
+    [self.menuItems enumerateObjectsUsingBlock:^(WAMenuItem *item, NSUInteger idx, BOOL *stop) {
         [item removeFromSuperview];
     }];
     

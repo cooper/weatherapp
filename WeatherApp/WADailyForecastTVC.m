@@ -186,6 +186,7 @@
 
     // fetch most recent data.
     [self.location fetchForecast];
+    [self.location commitRequest];
 
     // loading and refresh button is visible.
     if (self.location.loading) [self showIndicator];

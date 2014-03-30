@@ -22,7 +22,6 @@
 //  THE SOFTWARE.
 
 #import "BVReorderTableView.h"
-#import <QuartzCore/QuartzCore.h>
 
 @interface BVReorderTableView ()
 

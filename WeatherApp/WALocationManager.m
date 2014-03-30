@@ -69,7 +69,7 @@
         if (location.isCurrentLocation) continue;
         
         [location fetchCurrentConditions];
-        
+        [location commitRequest];
     }
 }
 

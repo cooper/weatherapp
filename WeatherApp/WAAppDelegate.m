@@ -83,7 +83,7 @@ WAAppDelegate *appDelegate = nil;
     
     WALocation *location = self.currentLocation;
     
-    onFetchedConditions = ^{
+    onFetchedConditions = ^(NSURLResponse *res, NSDictionary *data){
 
         BOOL rain = [location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound;
         
@@ -157,7 +157,8 @@ WAAppDelegate *appDelegate = nil;
 
     // initial condition check.
     NSLog(@"Checking current conditions");
-    [self.currentLocation fetchCurrentConditionsThen:onFetchedConditions];
+    [self.currentLocation fetchCurrentConditions];
+    [self.currentLocation commitRequestThen:onFetchedConditions];
     
     // reset these for the next update.
     onFetchedConditions = nil;
@@ -206,8 +207,7 @@ WAAppDelegate *appDelegate = nil;
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     NSLog(@"Location error: %@", error);
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Location services error" message:[error localizedDescription] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
-    [alert show];
+    [self displayAlert:@"Location services error" message:error.localizedDescription];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
@@ -281,7 +281,12 @@ WAAppDelegate *appDelegate = nil;
     
 }
 
-#pragma mark - Convenience functions
+#pragma mark - Convenience
+
+- (void)displayAlert:(NSString *)title message:(NSString *)message {
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
+    [alert show];
+}
 
 float temp_safe(id temp) {
     float floatValue = [temp floatValue];

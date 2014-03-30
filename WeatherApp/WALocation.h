@@ -6,22 +6,24 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-
-typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSError *err);
-
 @interface WALocation : NSObject <NSURLConnectionDataDelegate> {
 
+    // features for requests.
+    BOOL willFetchConditions;
+    BOOL willFetchDaily10Day;
+    BOOL willFetchHourly;
+    BOOL willFetchHourly10Day;
+    
     // backgrounds.
-    NSString        *currentBackgroundName;              // name of the current background
-    NSString        *currentBackgroundIcon;              // icon name from current background
-    NSString        *currentBackgroundConditions;        // conditions from current background
-    BOOL            currentBackgroundTimeOfDay;          // time of day from current background
+    NSString        *currentBackgroundName;             // name of the current background
+    NSString        *currentBackgroundIcon;             // icon name from current background
+    NSString        *currentBackgroundConditions;       // conditions from current background
+    BOOL            currentBackgroundTimeOfDay;         // time of day from current background
 
     // daily forecast.
     NSMutableArray  *fakeLocations;                     // fake location objects for forecast cells
 
     // hourly forecast.
-    NSMutableArray  *daysAdded;                         // track which days added to say "next" weekday
     NSUInteger      lastDay;                            // the day in the month of the last hour checked
     NSUInteger      currentDayIndex;                    // the index of the current day, starting at 0
 
@@ -142,9 +144,10 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data, NSErro
 #pragma mark - Fetching data
 
 - (void)fetchCurrentConditions;                         // fetch the current conditions
-- (void)fetchCurrentConditionsThen:(WACallback)then;    // fetch conditions with callback
 - (void)fetchForecast;                                  // fetch daily (10 day) forecast
 - (void)fetchHourlyForecast:(BOOL)tenDay;               // fetch hourly forecast (3 or 10 days)
+- (void)commitRequest;                                  // make the HTTP request
+- (void)commitRequestThen:(WALocationCallback)callback; // make the HTTP request with callback
 - (void)fetchIcon;                                      // resolve icon and fetch if needed
 
 @end

@@ -6,15 +6,14 @@
 //  Copyright (c) 2013-14 Mitchell Cooper. All rights reserved.
 //
 
-#import "DIYMenu/DIYMenu/DIYMenu.h"
-#import "DIYMenu/DIYMenu/DIYMenuItem.h"
+#import "WAMenu/WAMenu.h"
 
-@interface WAPageViewController : UIPageViewController <UIPageViewControllerDelegate, UIScrollViewDelegate, DIYMenuDelegate> {
+@interface WAPageViewController : UIPageViewController <UIPageViewControllerDelegate, UIScrollViewDelegate, WAMenuDelegate> {
     UIBarButtonItem     *refreshButton;                 // refresh button in navbar
     UIImageView         *background;                    // the background in the front
     UIImageView         *backBackground;                // the background in the back
     BOOL                goingDown;                      // user is swiping down currently
-    DIYMenu             *menu;                          // our locatoin menu object
+    WAMenu              *menu;                          // our locatoin menu object
 }
 
 @property (weak) WALocation *location;                  // currently visible location

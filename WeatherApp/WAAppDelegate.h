@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
+#import <QuartzCore/QuartzCore.h>
+
 #import "WASettingsConstants.h"
 
 #pragma mark - Macros
@@ -21,6 +23,14 @@
 
 #define WU_API_KEY          @"ffd9e1544413efef"
 #define TEMP_NONE           -999
+
+// Drop down menu settings.
+#define ITEMHEIGHT          55.
+#define ITEMPADDING         12.
+#define ICONPADDING         12.
+#define ICONSIZE            30.
+#define MENUFONT_SIZE       25.
+#define MENUFONT_FAMILY     @"Helvetica-Neue"
 
 // Colors.
 #define DARK_BLUE_COLOR     [UIColor colorWithRed:  0       green:0 blue:100./255. alpha:1]
@@ -42,9 +52,10 @@
 
 // Types.
 
-typedef void(^WACallback)(void);    // WALocation's callback type
+typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data);
 
 // Predeclare class names for use throughout all headers.
+
 @class
     WALocationManager,
     WALocation,
@@ -65,7 +76,7 @@ typedef void(^WACallback)(void);    // WALocation's callback type
     CLLocationManager       *coreLocationManager;       // Core Location API manager
     NSUInteger              activityCount;              // reference count for activity indicator
     BOOL                    gotLocation;                // device has been located initially
-    WACallback              onFetchedConditions;        // callback for after fetch.
+    WALocationCallback      onFetchedConditions;        // callback for after fetch.
 }
 
 @property (strong, nonatomic) UIWindow *window;         // the application window
@@ -75,6 +86,7 @@ typedef void(^WACallback)(void);    // WALocation's callback type
 @property (readonly) WALocation  *currentLocation;      // the current location object
 @property NSDate                 *lastSettingsChange;   // time of last settings change
 
+- (void)displayAlert:(NSString *)title message:(NSString *)message; // alert convenience
 - (void)saveLocationsInDatabase;                        // updates user defaults database
 - (void)beginActivity;                                  // increase activity counter
 - (void)endActivity;                                    // decrease activity counter

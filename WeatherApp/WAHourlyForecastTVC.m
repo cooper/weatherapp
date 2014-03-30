@@ -11,7 +11,6 @@
 #import "WALocationListTVC.h"
 #import "UITableView+Reload.h"
 #import "WAPageViewController.h"
-#import <QuartzCore/QuartzCore.h>
 
 @implementation WAHourlyForecastTVC
 
@@ -29,8 +28,10 @@
     [super viewDidLoad];
     
     // forecast not yet obtained.
-    if (!self.location.hourlyForecastResponse)
+    if (!self.location.hourlyForecastResponse) {
         [self.location fetchHourlyForecast:NO];
+        [self.location commitRequest];
+    }
     
     self.navigationItem.titleView = [appDelegate.pageViewController menuLabelWithTitle:@"Hourly forecast"];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -183,6 +184,7 @@
     if (indexPath.section != [self.location.hourlyForecast count]) return;
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [self.location fetchHourlyForecast:YES];
+    [self.location commitRequest];
     tenDay = YES; // remember for refresh
 }
 
@@ -243,6 +245,7 @@
 
     // fetch most recent data.
     [self.location fetchHourlyForecast:tenDay];
+    [self.location commitRequest];
 
     // loading and refresh button is visible.
     if (self.location.loading) [self showIndicator];

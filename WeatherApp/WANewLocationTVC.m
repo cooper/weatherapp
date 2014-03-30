@@ -21,7 +21,7 @@
     results = [NSMutableArray array];
     
     // keyboard notifications.
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:)     name:UIKeyboardDidShowNotification  object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
     
     self.navigationItem.title = @"New favorite";
@@ -108,6 +108,7 @@
     
     // fetch the conditions; then, return to the location list.
     [location fetchCurrentConditions];
+    [location commitRequest];
     [self.navigationController popToRootViewControllerAnimated:YES];
     
 }

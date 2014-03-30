@@ -48,128 +48,44 @@
 
 #pragma mark - Fetching data
 
+// add conditions to queue.
 - (void)fetchCurrentConditions {
-    [self fetchCurrentConditionsThen:nil];
+    willFetchConditions = YES;
 }
 
-// fetches and updates the current weather conditions of the location.
-- (void)fetchCurrentConditionsThen:(WACallback)then {
-    NSString *q = [self bestLookupMethod:@"conditions"];
-    
-    // fetch the conditions.
-    [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        
-        NSDictionary *ob  = data[@"current_observation"];
-        NSDictionary *loc = ob[@"display_location"];
-
-        NSLog(@"Got conditions for %@", loc[@"city"]);
-        
-        // force the view to load if it hasn't already.
-        [self.overviewVC view];
-        
-        // note: the setters ignore any lengthless value.
-        // the setters call the interface methods to make changes.
-        
-        // fallback to ISO 3166 country code if city == state.
-        // we'll make a special exception for PRC through --
-        // this is because wunderground says major cities of China are states.
-        // I have no way to determine the actual name of the country in this scenario.
-        BOOL same = [loc[@"state_name"] isEqualToString:loc[@"city"]];
-        NSString *possibleCountryName = [self.country3166 isEqualToString:@"CN"] ? @"China" : self.country3166;
-        
-        // set our city/region information.
-        self.city         = loc[@"city"];
-        self.countryCode  = loc[@"country"];
-        self.country3166  = loc[@"country_iso3166"];
-        self.region       = same ? possibleCountryName : loc[@"state_name"];
-        
-        // time zone.
-        self.timeZone = [NSTimeZone timeZoneWithName:ob[@"local_tz_long"]];
-        if (!self.timeZone)
-            self.timeZone = [NSTimeZone timeZoneWithAbbreviation:ob[@"local_tz_short"]];
-        if (!self.timeZone)
-            self.timeZone = [NSTimeZone localTimeZone];
-        
-        // don't use wunderground's coordinates if this is the current location,
-        // because those reported by location services are far more accurate.
-        if (!self.isCurrentLocation) {
-            self.latitude     = [loc[@"latitude"]  floatValue];
-            self.longitude    = [loc[@"longitude"] floatValue];
-        }
-        
-        // reset temperatures.
-        self.degreesC   = self.degreesF   =
-        self.dewPointC  = self.dewPointF  =
-        self.feelsLikeC = self.feelsLikeF =
-        self.heatIndexC = self.heatIndexF =
-        self.windchillC = self.windchillF =
-        self.highC      = self.highF      = TEMP_NONE;
-        
-        // temperatures.
-        // no longer round temperatures to the nearest whole degree here.
-        
-        self.degreesC   = temp_safe(ob[@"temp_c"]);
-        self.degreesF   = temp_safe(ob[@"temp_f"]);
-        self.feelsLikeC = temp_safe(ob[@"feelslike_c"]);
-        self.feelsLikeF = temp_safe(ob[@"feelslike_f"]);
-        
-        // dew point.
-        if (temp_safe(ob[@"dewpoint_c"]) != TEMP_NONE) {
-            self.dewPointC  = temp_safe(ob[@"dewpoint_c"]);
-            self.dewPointF  = temp_safe(ob[@"dewpoint_f"]);
-        }
-        
-        // heat index.
-        if (temp_safe(ob[@"heat_index_c"]) != TEMP_NONE) {
-            self.heatIndexC = temp_safe(ob[@"heat_index_c"]);
-            self.heatIndexF = temp_safe(ob[@"heat_index_f"]);
-        }
-        
-        // windchill.
-        if (temp_safe(ob[@"windchill_c"]) != TEMP_NONE) {
-            self.windchillC = temp_safe(ob[@"windchill_c"]);
-            self.windchillF = temp_safe(ob[@"windchill_f"]);
-        }
-        
-        // conditions.
-        self.response   = ob;
-        self.conditions = ob[@"weather"];
-        
-        // icon.
-        [self fetchIcon];
-        
-        // update as of time, and finish loading process.
-        self.conditionsAsOf   = [NSDate date];
-        self.observationsAsOf = [NSDate dateWithTimeIntervalSince1970:[ob[@"observation_epoch"] doubleValue]];
-        self.observationTimeString = [ob[@"observation_time"] stringByReplacingOccurrencesOfString:@"Last Updated on " withString:@""];
-        
-        // execute callback.
-        if (then) then();
-        
-    }];
-    
-}
-
-// ten-day forecast. TODO: handle errors.
+// add daily forecast to queue.
 - (void)fetchForecast {
-    NSString *q = [self bestLookupMethod:@"forecast10day"];
-    [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        self.forecastResponse = data[@"forecast"][@"simpleforecast"][@"forecastday"];
-        // make sure forecast10day is true
-        [self updateDailyForecast];
-        self.dailyForecastAsOf = [NSDate date];
-    }];
+    willFetchDaily10Day = YES;
 }
 
-// hourly forecast. TODO: handle errors.
+// add hourly forecast to queue.
 - (void)fetchHourlyForecast:(BOOL)tenDay {
-    NSString *q = [self bestLookupMethod:tenDay ? @"hourly10day" : @"hourly"];
-    [self fetch:q then:^(NSURLResponse *res, NSDictionary *data, NSError *err) {
-        // make sure hourly10day is true
-        self.hourlyForecastResponse = data[@"hourly_forecast"];
-        [self updateHourlyForecast];
-        self.hourlyForecastAsOf = [NSDate date];
-    }];
+    if (tenDay) willFetchHourly10Day = YES;
+    else        willFetchHourly      = YES;
+}
+
+// make an HTTP request.
+- (void)commitRequest {
+    [self commitRequestThen:nil];
+}
+
+// make an HTTP request with a callback.
+- (void)commitRequestThen:(WALocationCallback)callback {
+    NSMutableArray *features = [NSMutableArray arrayWithCapacity:4];
+    if (willFetchConditions)  [features addObject:@"conditions"];
+    if (willFetchDaily10Day)  [features addObject:@"forecast10day"];
+    if (willFetchHourly10Day) [features addObject:@"hourly10day"];
+    if (willFetchHourly)      [features addObject:@"hourly"];
+    
+    NSString *page = [features componentsJoinedByString:@"/"];
+    [self fetch:page then:callback];
+    
+    // reset these values.
+    willFetchConditions  =
+    willFetchDaily10Day  =
+    willFetchHourly10Day =
+    willFetchHourly      = NO;
+    
 }
 
 // determine icon and download if necessary.
@@ -217,6 +133,67 @@
     
 }
 
+// send a request to the API. runs asynchronously, decodes JSON,
+// and then executes the callback with an dictionary argument in main queue.
+- (void)fetch:(NSString *)page then:(WALocationCallback)callback {
+    [self beginLoading];
+    NSString *query = [self bestLookupMethod:page];
+    NSLog(@"Request for %@: %@", OR(self.city, @"unknown location"), page);
+    
+    // create a request for the weather underground API.
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:FMT(@"http://api.wunderground.com/api/" WU_API_KEY @"/%@", query)]];
+    
+    // send a request asyncrhonously.
+    [NSURLConnection sendAsynchronousRequest:request queue:self.manager.queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    
+        // an error occurred.
+        if (connectionError || !data) {
+            [self handleError:connectionError.localizedDescription];
+            return;
+        }
+        
+        NSError *error;
+        id jsonData = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        NSLog(@"%@", jsonData);
+
+        // an error occurred.
+        if (error) {
+            [self handleError:@"Error decoding JSON response: %@"];
+            return;
+        }
+        
+        // ensure that the data is a dictionary (JSON object).
+        if (![jsonData isKindOfClass:[NSDictionary class]]) {
+            [self handleError:@"JSON response is not of object type."];
+            return;
+        }
+        
+        // everything looks well; go ahead and fire the callback in main queue.
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
+            // create the view controller if we haven't already.
+            if (!self.initialLoadingComplete) {
+                self.overviewVC = [[WAWeatherVC alloc] initWithLocation:self];
+                self.initialLoadingComplete = YES;
+            }
+        
+            // pass on to the appropriate handler.
+            NSDictionary *features = [[jsonData objectForKey:@"response"] objectForKey:@"features"];
+            [self handleJSON:jsonData features:features];
+
+            [self endLoading];
+        
+            // callback if necessary.
+            if (callback) callback(response, jsonData);
+            
+            // update the database.
+            [appDelegate saveLocationsInDatabase];
+        
+        }];
+    
+    }];
+}
+
 // determine the URL based on available information.
 - (NSString *)bestLookupMethod:(NSString *)type {
 
@@ -244,53 +221,124 @@
     return q;
 }
 
-// send a request to the API. runs asynchronously, decodes JSON,
-// and then executes the callback with an dictionary argument in main queue.
-- (void)fetch:(NSString *)page then:(WALocationCallback)callback {
-    [self beginLoading];
-    
-    // create a request for the weather underground API.
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:FMT(@"http://api.wunderground.com/api/" WU_API_KEY @"/%@", page)]];
-    
-    // send a request asyncrhonously.
-    [NSURLConnection sendAsynchronousRequest:request queue:self.manager.queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+#pragma mark - Handling data
 
-        // an error occurred.
-        if (connectionError || !data) {
-            NSLog(@"Fetch error: %@", connectionError ? connectionError : @"unknown");
-            [self handleError:connectionError.localizedDescription];
-            return;
-        }
-        
-        NSError *error;
-        id jsonData = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        
-        // an error occurred.
-        if (error) {
-            NSLog(@"Error decoding JSON response: %@", error);
-            [self handleError:@"Error decoding JSON response: %@"];
-            return;
-        }
-        
-        // ensure that the data is a dictionary (JSON object).
-        if (![jsonData isKindOfClass:[NSDictionary class]]) {
-            NSLog(@"JSON response is not of object type.");
-            [self handleError:@"JSON response is not of object type."];
-            return;
-        }
-        
-        // everything looks well; go ahead and fire the callback in main queue.
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            callback(response, jsonData, connectionError);
-            
-            [self endLoading];
-        
-            // update the database.
-            [appDelegate saveLocationsInDatabase];
-        
-        }];
+- (void)handleJSON:(NSDictionary *)data features:(NSDictionary *)features {
+
+    // force the view to load if it hasn't already.
+    [self.overviewVC view];
+
+    // current conditions.
+    if (features[@"conditions"])
+        [self handleCurrentConditions:data[@"current_observation"]];
     
-    }];
+    // hourly.
+    if (features[@"hourly"] || features[@"hourly10day"])
+        [self handleHourlyForecast:data[@"hourly_forecast"]];
+    
+    // daily.
+    if (features[@"forecast"] || features[@"forecast10day"])
+        [self handleForecast:data[@"forecast"][@"simpleforecast"][@"forecastday"]];
+    
+}
+
+// fetches and updates the current weather conditions of the location.
+- (void)handleCurrentConditions:(NSDictionary *)ob {
+    NSDictionary *loc = ob[@"display_location"];
+    NSLog(@"Got conditions for %@", loc[@"city"]);
+    
+    // note: the setters ignore any lengthless value.
+    // the setters call the interface methods to make changes.
+    
+    // fallback to ISO 3166 country code if city == state.
+    // we'll make a special exception for PRC through --
+    // this is because wunderground says major cities of China are states.
+    // I have no way to determine the actual name of the country in this scenario.
+    BOOL same = [loc[@"state_name"] isEqualToString:loc[@"city"]];
+    NSString *possibleCountryName = [self.country3166 isEqualToString:@"CN"] ? @"China" : self.country3166;
+    
+    // set our city/region information.
+    self.city         = loc[@"city"];
+    self.countryCode  = loc[@"country"];
+    self.country3166  = loc[@"country_iso3166"];
+    self.region       = same ? possibleCountryName : loc[@"state_name"];
+    
+    // time zone.
+    self.timeZone = [NSTimeZone timeZoneWithName:ob[@"local_tz_long"]];
+    if (!self.timeZone)
+        self.timeZone = [NSTimeZone timeZoneWithAbbreviation:ob[@"local_tz_short"]];
+    if (!self.timeZone)
+        self.timeZone = [NSTimeZone localTimeZone];
+    
+    // don't use wunderground's coordinates if this is the current location,
+    // because those reported by location services are far more accurate.
+    if (!self.isCurrentLocation) {
+        self.latitude     = [loc[@"latitude"]  floatValue];
+        self.longitude    = [loc[@"longitude"] floatValue];
+    }
+    
+    // reset temperatures.
+    self.degreesC   = self.degreesF   =
+    self.dewPointC  = self.dewPointF  =
+    self.feelsLikeC = self.feelsLikeF =
+    self.heatIndexC = self.heatIndexF =
+    self.windchillC = self.windchillF =
+    self.highC      = self.highF      = TEMP_NONE;
+    
+    // temperatures.
+    // no longer round temperatures to the nearest whole degree here.
+    
+    self.degreesC   = temp_safe(ob[@"temp_c"]);
+    self.degreesF   = temp_safe(ob[@"temp_f"]);
+    self.feelsLikeC = temp_safe(ob[@"feelslike_c"]);
+    self.feelsLikeF = temp_safe(ob[@"feelslike_f"]);
+    
+    // dew point.
+    if (temp_safe(ob[@"dewpoint_c"]) != TEMP_NONE) {
+        self.dewPointC  = temp_safe(ob[@"dewpoint_c"]);
+        self.dewPointF  = temp_safe(ob[@"dewpoint_f"]);
+    }
+    
+    // heat index.
+    if (temp_safe(ob[@"heat_index_c"]) != TEMP_NONE) {
+        self.heatIndexC = temp_safe(ob[@"heat_index_c"]);
+        self.heatIndexF = temp_safe(ob[@"heat_index_f"]);
+    }
+    
+    // windchill.
+    if (temp_safe(ob[@"windchill_c"]) != TEMP_NONE) {
+        self.windchillC = temp_safe(ob[@"windchill_c"]);
+        self.windchillF = temp_safe(ob[@"windchill_f"]);
+    }
+    
+    // conditions.
+    self.response   = ob;
+    self.conditions = ob[@"weather"];
+    
+    // icon.
+    [self fetchIcon];
+    
+    // update as of time, and finish loading process.
+    self.conditionsAsOf   = [NSDate date];
+    self.observationsAsOf = [NSDate dateWithTimeIntervalSince1970:[ob[@"observation_epoch"] doubleValue]];
+    self.observationTimeString = [ob[@"observation_time"] stringByReplacingOccurrencesOfString:@"Last Updated on " withString:@""];
+    
+}
+
+// ten-day forecast.
+- (void)handleForecast:(NSArray *)forecast {
+NSLog(@"handle daily: %@", forecast);
+    self.forecastResponse = forecast;
+    [self updateDailyForecast];
+    self.dailyForecastAsOf = [NSDate date];
+}
+
+// hourly forecast.
+- (void)handleHourlyForecast:(NSArray *)forecast {
+    NSLog(@"handle hourly %@", forecast);
+    self.hourlyForecastResponse = forecast;
+    [self updateHourlyForecast];
+    self.hourlyForecastAsOf = [NSDate date];
 }
 
 #pragma mark - Automatic properties
@@ -385,12 +433,6 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 - (void)endLoading {
     self.loading = NO;
     
-    // create the view controller.
-    if (!self.initialLoadingComplete) {
-        self.overviewVC = [[WAWeatherVC alloc] initWithLocation:self];
-        self.initialLoadingComplete = YES;
-    }
-    
     // stop the status bar indicator.
     [appDelegate endActivity];
     
@@ -416,8 +458,8 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 // handle an error.
 - (void)handleError:(NSString *)errstr {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:FMT(@"%@ error", OR(self.city, @"Location")) message:errstr delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
-    [alert show];
+    NSLog(@"Error for %@: %@", OR(self.city, @"unknown location"), errstr);
+    [appDelegate displayAlert:FMT(@"%@ error", OR(self.city, @"Location")) message:errstr];
     [self endLoading];
 }
 
@@ -703,7 +745,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     
     // is this today?
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]];
+    NSDateComponents *dateComponents = [gregorian components:NSCalendarUnitDay fromDate:[NSDate date]];
     BOOL today = dateComponents.day == [f[@"date"][@"day"] integerValue];
     
     // conditions.
@@ -828,8 +870,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 // recompile hourly forecast data.
 - (void)updateHourlyForecast {
     self.hourlyForecast = [NSMutableArray array];
-    daysAdded = [NSMutableArray array];
-    lastDay   = currentDayIndex = -1;
+    lastDay = currentDayIndex = -1;
     for (unsigned int i = 0; i < [self.hourlyForecastResponse count]; i++)
         [self addHourlyForecastForHour:self.hourlyForecastResponse[i] index:i];
 }
@@ -848,7 +889,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         [gregorian setTimeZone:self.timeZone];
     
     // fetch the information we need.
-    NSDateComponents *dateComponents = [gregorian components:NSDayCalendarUnit | NSHourCalendarUnit fromDate:date];
+    NSDateComponents *dateComponents = [gregorian components:NSCalendarUnitDay | NSCalendarUnitHour fromDate:date];
     
     // adjust hour to AM/PM.
     NSUInteger adjustedHour = dateComponents.hour;
@@ -879,20 +920,12 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         // determine day of week.
         formatter.dateFormat = @"EEEE";
         dayName = [formatter stringFromDate:date];
-        
-        // add to list.
-        // if it's there already, say "next" weekday,
-        // such as "Next Tuesday"
-        if ([daysAdded containsObject:dayName])
-            dayName = FMT(@"Next %@", dayName);
-        else
-            [daysAdded addObject:dayName];
-        
+
         // this is today in our local timezone.
         // in other words, the day in the month is equal in both locations,
         // so we will say "Today."
         [gregorian setTimeZone:[NSTimeZone localTimeZone]];
-        NSUInteger today = [gregorian components:NSDayCalendarUnit fromDate:[NSDate date]].day;
+        NSUInteger today = [gregorian components:NSCalendarUnitDay fromDate:[NSDate date]].day;
         if (today == dateComponents.day)
             dayName = @"Today";
 
@@ -924,14 +957,14 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     
     // information we care about.
     [day addObject:@{
-        @"date":            date,
-        @"dateComponents":  dateComponents,
-        @"adjustedHour":    @(adjustedHour),
-        @"pm":              @(pm),
         @"prettyHour":      prettyHour,
         @"iconImage":       [UIImage imageNamed:FMT(@"icons/30/%@", location.conditionsImageName)],
         @"temperature":     location.temperature,
         @"condition":       f[@"condition"]
+        //@"date":            date,
+        //@"dateComponents":  dateComponents,
+        //@"adjustedHour":    @(adjustedHour),
+        //@"pm":              @(pm),
         //@"hourString":      hourString,
         //@"iconName":        location.conditionsImageName,
         //@"icon":            f[@"icon"],
