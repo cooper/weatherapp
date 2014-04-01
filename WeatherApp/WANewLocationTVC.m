@@ -58,21 +58,20 @@
 
     // input section.
     if (indexPath.section == 0) {
-        
-        // this will not be reused.
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
         
-        if (!textField)
+        // text field not yet created.
+        if (!textField) {
             textField = [[UITextField alloc] initWithFrame:CGRectMake(15, 10, 280, 30)];
-        
-        textField.placeholder               = @"Search locations...";
-        textField.backgroundColor           = [UIColor clearColor];
-        textField.autocorrectionType        = UITextAutocorrectionTypeNo;
-        textField.autocapitalizationType    = UITextAutocapitalizationTypeNone;
-        textField.adjustsFontSizeToFitWidth = YES;
-        textField.delegate                  = self;
+            textField.placeholder               = @"Search locations...";
+            textField.backgroundColor           = [UIColor clearColor];
+            textField.autocorrectionType        = UITextAutocorrectionTypeNo;
+            textField.autocapitalizationType    = UITextAutocapitalizationTypeNone;
+            textField.adjustsFontSizeToFitWidth = YES;
+            textField.delegate                  = self;
+        }
+    
         [cell.contentView addSubview:textField];
-        
         cell.backgroundColor = TABLE_COLOR;
         return cell;
     }
@@ -152,9 +151,11 @@
     // send the request asynchronously.
     NSDate *date = [NSDate date];
     [appDelegate beginActivity];
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    [self showIndicator];
+    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         [appDelegate endActivity];
-
+        [self hideIndicator];
+        
         // the user already selected something, so just forget about this request.
         // or if the user has typed since this request started, forget it.
         if (selectedOne || [lastTypeDate laterDate:date] == lastTypeDate) return;
@@ -223,7 +224,7 @@
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
     lastTypeDate = [NSDate date];
     [self.tableView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:YES];
-    [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:0.5];
+    [self performSelector:@selector(checkIfTypedSince:) withObject:[NSDate date] afterDelay:0.3];
     return YES;
 }
 
@@ -286,5 +287,27 @@
     );
     
 }
+
+#pragma mark - Indicator
+
+// show the loading indicators.
+- (void)showIndicator {
+    if (indicator) return;
+    
+    // big indicator.
+    indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [self.tableView addSubview:indicator];
+    indicator.center = [self.tableView convertPoint:self.tableView.center fromView:self.tableView.superview];
+    [indicator startAnimating];
+
+}
+
+// hide the loading indicators.
+- (void)hideIndicator {
+    if (!indicator) return;
+    [indicator removeFromSuperview];
+    indicator = nil;
+}
+
 
 @end

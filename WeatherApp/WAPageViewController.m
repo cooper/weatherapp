@@ -45,11 +45,11 @@
     menu.delegate = self;
     
     // many different shades of blue.
-    UIColor *c_0 = [UIColor colorWithRed:       0  green: 70./255. blue:200./255. alpha:1];
-    UIColor *c_1 = [UIColor colorWithRed: 43./255. green:101./255. blue:236./255. alpha:1];
-    UIColor *c_2 = [UIColor colorWithRed: 21./255. green:137./255. blue:       1  alpha:1];
-    UIColor *c_3 = [UIColor colorWithRed: 56./255. green:172./255. blue:236./255. alpha:1];
-    UIColor *c_4 = [UIColor colorWithRed:130./255. green:202./255. blue:       1  alpha:1];
+    UIColor *c_0 = RGBA(  0.,  70., 200., 1);
+    UIColor *c_1 = RGBA( 43., 101., 236., 1);
+    UIColor *c_2 = RGBA( 21., 137., 255., 1);
+    UIColor *c_3 = RGBA( 56., 172., 236., 1);
+    UIColor *c_4 = RGBA(130., 202., 255., 1);
     
     // add the menu items.
     UIFont *font   = [UIFont systemFontOfSize:25];

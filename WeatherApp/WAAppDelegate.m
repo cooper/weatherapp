@@ -19,7 +19,7 @@ WAAppDelegate *appDelegate = nil;
 
 #pragma mark - Application delegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+- (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     appDelegate = self;
     self.lastSettingsChange = [NSDate date];
 
@@ -29,6 +29,14 @@ WAAppDelegate *appDelegate = nil;
     // set default options if we haven't already.
     [self setDefaults];
     
+        // create location manager.
+        // load locations from user defaults.
+        // fetch current conditions for favorite locations.
+        self.locationManager = [WALocationManager new];
+        [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
+        [self.locationManager fetchLocations];
+    
+    
     // create the navigation controller.
     self.window.rootViewController = self.navigationController = [[WANavigationController alloc] initWithMyRootController];
     
@@ -36,9 +44,7 @@ WAAppDelegate *appDelegate = nil;
     self.pageViewController = [[WAPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:@{ UIPageViewControllerOptionSpineLocationKey: @(UIPageViewControllerSpineLocationMid) }];
     
     // load locations from settings.
-    self.pageViewController.dataSource = self.locationManager = [WALocationManager new];
-    [self.locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
-    [self.locationManager fetchLocations];
+    self.pageViewController.dataSource = self.locationManager;
     
     // start locating.
     [self startLocating];
@@ -49,7 +55,6 @@ WAAppDelegate *appDelegate = nil;
         1800 : UIApplicationBackgroundFetchIntervalNever;
     
     [self.window makeKeyAndVisible];
-
     return YES;
 }
 
@@ -288,6 +293,7 @@ WAAppDelegate *appDelegate = nil;
     [alert show];
 }
 
+// safely returns a float of an objective temperature value.
 float temp_safe(id temp) {
     float floatValue = [temp floatValue];
     

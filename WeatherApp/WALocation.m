@@ -154,7 +154,6 @@
         
         NSError *error;
         id jsonData = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        NSLog(@"%@", jsonData);
 
         // an error occurred.
         if (error) {
@@ -255,13 +254,13 @@
     // this is because wunderground says major cities of China are states.
     // I have no way to determine the actual name of the country in this scenario.
     BOOL same = [loc[@"state_name"] isEqualToString:loc[@"city"]];
-    NSString *possibleCountryName = [self.country3166 isEqualToString:@"CN"] ? @"China" : self.country3166;
     
     // set our city/region information.
     self.city         = loc[@"city"];
     self.countryCode  = loc[@"country"];
     self.country3166  = loc[@"country_iso3166"];
-    self.region       = same ? possibleCountryName : loc[@"state_name"];
+    NSString *pRegion = [self.country3166 isEqualToString:@"CN"] ? @"China" : loc[@"state_name"];
+    self.region       = same ? pRegion : OR(loc[@"state_name"], self.country3166);
     
     // time zone.
     self.timeZone = [NSTimeZone timeZoneWithName:ob[@"local_tz_long"]];
@@ -698,6 +697,8 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         @"Time at location",    FMT(@"%@ %@", [rfmt stringFromDate:[NSDate date]], self.timeZone.abbreviation),
         @"Last observation",    [fmt stringFromDate:self.observationsAsOf],
         @"Last fetch",          [fmt stringFromDate:self.conditionsAsOf],
+        @"Region",              OR(self.region,      self.regionCode),
+        @"Country",             OR(self.country3166, self.countryCode),
         @"Elevation",           r[@"display_location"][@"elevation"] ?
                 FMT(@"%.f m", [r[@"display_location"][@"elevation"] floatValue]) : @"NA",
         @"Latitude",            FMT(@"%f", self.latitude),

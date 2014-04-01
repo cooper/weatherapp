@@ -19,10 +19,10 @@
 
 - (void)setup {
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
-    
+
     // background view.
     UIImageView *cellBg = [UIImageView new];
-    cellBg.frame        = self.bounds;
+    cellBg.frame        = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
     self.backgroundView = cellBg;
 
     // icon view.
@@ -44,7 +44,7 @@
     
     // selected translucent blue tint.
     self.selectedBackgroundView = [UIView new];
-    self.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
+    self.selectedBackgroundView.backgroundColor = CELL_SEL_COLOR;
     self.backgroundColor = [UIColor clearColor];
     
     // text shadows.
@@ -98,30 +98,26 @@
         city   = location.conditions;
         region = @"";
     }
-    NSString *both = FMT(@"%@ %@", city, region);
 
-    // make the city name bold.
+    // make the city name bold and region name smaller.
+    NSString *both = FMT(@"%@ %@", city, region);
     NSMutableAttributedString *name = [[NSMutableAttributedString alloc] initWithString:both attributes:nil];
     [name addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:30] range:NSMakeRange(0, [city length])];
+    [name addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:15] range:NSMakeRange([city length] + 1, [region length])];
     
-    // make the region name smaller.
-    [name setAttributes:@{
-        NSFontAttributeName:            [UIFont systemFontOfSize:15],
-        //NSForegroundColorAttributeName: [UIColor grayColor]
-    } range:NSMakeRange([city length] + 1, [region length])];
-    
+    // city and region, icon, and cell background.
     self.locationLabel.attributedText = name;
     self.iconView.image  = OR(location.conditionsImage, [UIImage imageNamed:@"icons/dummy"]);
     backgroundView.image = location.cellBackground;
 
-
+    // high and low temps or just a single temp.
     if (location.highC != TEMP_NONE)
         self.temperatureLabel.text = FMT(@"▲ %@ ▼ %@", location.highTemp, location.temperature);
     else if (location.degreesC != TEMP_NONE)
         self.temperatureLabel.text = FMT(@"%@%@", location.temperature, location.tempUnit);
-    
     [self.temperatureLabel sizeToFit];
     
+    // move the conditions out of the way of the temperature.
     CGFloat offset = self.temperatureLabel.frame.origin.x + self.temperatureLabel.frame.size.width + 10;
     self.conditionsLabel.frame = CGRectMake(
         offset,
@@ -129,9 +125,7 @@
         [UIScreen mainScreen].bounds.size.width - offset,
         self.conditionsLabel.frame.size.height
     );
-    
     self.conditionsLabel.text = self.isFakeLocation ? @"" : location.conditions;
-
 
 }
 

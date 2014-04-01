@@ -93,22 +93,35 @@
     UITableViewCell *cell;
 
     // show the location cell for this location.
-    // there will only be one, so it will not be reused.
     if (!indexPath.row) {
-        WALocationCell *lcell = [[WALocationCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-        lcell.location = self.location;
-        lcell.backgroundView = nil;
+        WALocationCell *lcell = [tableView dequeueReusableCellWithIdentifier:@"location"];
+        if (!lcell) lcell     = [[WALocationCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"location"];
+        lcell.location        = self.location;
+        lcell.backgroundView  = nil;
         return lcell;
     }
     
     // open in maps button.
-    // also only one of these; it will not be reused.
     if (indexPath.row == [self.location.extensiveDetails count] + 1) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        cell = [tableView dequeueReusableCellWithIdentifier:@"maps"];
+        if (!cell)
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"maps"];
+        
+        // bold label.
+        cell.textLabel.text         = FMT(@"Open %@ in Maps", self.location.city);
+        cell.textLabel.font         = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+        cell.textLabel.textColor    = [UIColor whiteColor];
+        
+        // white tint when select.
+        cell.backgroundColor        = BLUE_COLOR;
         cell.selectedBackgroundView = [UIView new];
-        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
-        cell.textLabel.text       = FMT(@"Open %@ in Maps", self.location.city);
-        cell.detailTextLabel.text = @"🌎";
+        cell.selectedBackgroundView.backgroundColor = L_CELL_SEL_COLOR;
+        
+        // globe menu icon.
+        UIImageView *icon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icons/menu/list"]];
+        icon.frame        = CGRectMake(cell.contentView.bounds.size.width - 40, 10, 30, 30);
+        [cell.contentView addSubview:icon];
+        
     }
     
     // detail cell.
@@ -116,17 +129,45 @@
         cell = [tableView dequeueReusableCellWithIdentifier:@"detail"];
         if (!cell) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"detail"];
-            cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+            cell.textLabel.font  = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+            cell.backgroundColor = TABLE_COLOR_T;
+            cell.detailTextLabel.textColor = DARK_BLUE_COLOR;
         }
         
+        NSArray *row = self.location.extensiveDetails[indexPath.row - 1];
+        
         // detail for current conditions.
-        cell.textLabel.text       = self.location.extensiveDetails[indexPath.row - 1][0];
-        cell.detailTextLabel.text = self.location.extensiveDetails[indexPath.row - 1][1];
-    }
+        cell.textLabel.text       = row[0];
+        cell.detailTextLabel.text = row[1];
+        
+        // country flag.
+        UIImageView *imageView = (UIImageView *)[cell.contentView viewWithTag:2];
+        if ([row[0] isEqualToString:@"Country"]) {
+            
+            // not yet created.
+            if (!imageView) {
+                imageView     = [UIImageView new];
+                imageView.tag = 2;
+            }
 
-    // for all non-location cells.
-    cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
-    cell.detailTextLabel.textColor = DARK_BLUE_COLOR;
+            // find the image.
+            UIImage *image    = [UIImage imageNamed:FMT(@"flags/%@", [row[1] lowercaseString])];
+            if (!image) image = [UIImage imageNamed:@"flags/unknown"];
+            imageView.image = image;
+            
+            // update frame accordingly.
+            imageView.frame = CGRectMake(
+                250,
+                (cell.contentView.frame.size.height - image.size.height) / 2,
+                image.size.width,
+                image.size.height
+            );
+            [cell.contentView addSubview:imageView];
+            
+        }
+        else imageView.image = nil;
+        
+    }
     
     return cell;
 }

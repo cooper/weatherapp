@@ -115,7 +115,7 @@
     // generic base cell.
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (!cell) cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"cell"];
-    cell.backgroundColor  = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.6];
+    cell.backgroundColor  = TABLE_COLOR_T;
     cell.detailTextLabel.textColor = DARK_BLUE_COLOR;
 
     // detail label on a forecast.
@@ -151,7 +151,7 @@
             http://stackoverflow.com/questions/15604900/ios-uitableviewheaderfooterview-unable-to-change-background-color
         */
         view.backgroundView = [[UIView alloc] initWithFrame:view.frame];
-        view.backgroundView.backgroundColor = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.95];
+        view.backgroundView.backgroundColor = TABLE_HEADER_COLOR;
 
         // day, e.g. Friday
         dayNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, 200, 40)];

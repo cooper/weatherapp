@@ -11,6 +11,7 @@
     NSDate *lastTypeDate;       // time of last typing event (key press)
     UITextField *textField;     // the search text field in the first row
     BOOL selectedOne;           // true if the user selected a location result
+    UIActivityIndicatorView *indicator; // large activity indicator
 }
 
 @end

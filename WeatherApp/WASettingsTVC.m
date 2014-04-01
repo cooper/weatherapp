@@ -55,6 +55,7 @@
             @[@"Icons",                 @"Mitchell Cooper"      ],
             @[@"Other images",          @"Public domain"        ],
             @[@"Weather data",          @"WeatherUnderground"   ],
+            @[@"Flag icons",            @"www.icondrawer.com"   ],
             @""
         ]
         
@@ -84,7 +85,7 @@
 }
 
 // we don't reuse any cells here. they are so basic, and there are so few
-// that there would be no actual advantage to reusal.
+// that there would honestly be no actual advantage to reusal.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     
@@ -100,7 +101,7 @@
             cell.accessoryType  = UITableViewCellAccessoryCheckmark;
         
         cell.selectedBackgroundView = [UIView new];
-        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.3];
+        cell.selectedBackgroundView.backgroundColor = CELL_SEL_COLOR;
     }
     
     // boolean option.

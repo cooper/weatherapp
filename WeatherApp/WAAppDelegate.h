@@ -15,6 +15,15 @@
 
 #pragma mark - Macros
 
+// Convenience macro functions.
+
+#define FMT(str, ...)       [NSString stringWithFormat:str, ##__VA_ARGS__]
+#define URL_ESC(str)        [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+#define OR(this, otherwise) (this ? this : otherwise)
+#define SETTING(setting)    [DEFAULTS boolForKey:setting]
+#define SETTING_IS(setting, value) [[DEFAULTS objectForKey:setting] isEqualToString:value]
+#define STR_OR_NIL(str)     (str && [str length] ? str : nil)
+
 // Commonly-accessed properties.
 
 #define DEFAULTS [NSUserDefaults standardUserDefaults]
@@ -33,22 +42,18 @@
 #define MENUFONT_FAMILY     @"Helvetica-Neue"
 
 // Colors.
-#define DARK_BLUE_COLOR     [UIColor colorWithRed:  0       green:0 blue:100./255. alpha:1]
-#define LLLL_BLUE_COLOR     [UIColor colorWithRed: 20./255. green:200./255. blue:1 alpha:1]
-#define  LLL_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:180./255. blue:1 alpha:1]
-#define   LL_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:170./255. blue:1 alpha:1]
-#define    L_BLUE_COLOR     [UIColor colorWithRed:  0./255. green:160./255. blue:1 alpha:1]
-#define      BLUE_COLOR     [UIColor colorWithRed:  0./255. green:150./255. blue:1 alpha:1]
-#define TABLE_COLOR         [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:1]
-
-// Convenience macro functions.
-
-#define FMT(str, ...)       [NSString stringWithFormat:str, ##__VA_ARGS__]
-#define URL_ESC(str)        [str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-#define OR(this, otherwise) (this ? this : otherwise)
-#define SETTING(setting)    [DEFAULTS boolForKey:setting]
-#define SETTING_IS(setting, value) [[DEFAULTS objectForKey:setting] isEqualToString:value]
-#define STR_OR_NIL(str)     (str && [str length] ? str : nil)
+#define RGBA(R, G, B, A)    [UIColor colorWithRed:R/255. green:G/255. blue:B/255. alpha:A]
+#define LLLL_BLUE_COLOR     RGBA( 20., 200., 255.,  1 )     // lightest blue
+#define  LLL_BLUE_COLOR     RGBA(  0., 180., 255.,  1 )     // very light blue
+#define   LL_BLUE_COLOR     RGBA(  0., 170., 255.,  1 )     // lighter blue
+#define    L_BLUE_COLOR     RGBA(  0., 160., 255.,  1 )     // light blue
+#define      BLUE_COLOR     RGBA(  0., 150., 255.,  1 )     // base blue
+#define DARK_BLUE_COLOR     RGBA(  0.,   0., 100.,  1 )     // darkest blue
+#define TABLE_COLOR         RGBA(235., 240., 255.,  1 )     // solid table color
+#define TABLE_COLOR_T       RGBA(235., 240., 255., .7 )     // translucent table color
+#define TABLE_HEADER_COLOR  RGBA( 21., 137., 255., .95)     // table header color
+#define CELL_SEL_COLOR      RGBA(  0., 150., 255., .3 )     // selected cell blue
+#define L_CELL_SEL_COLOR    RGBA(235., 240., 255., .5 )     // selected cell white
 
 // Types.
 

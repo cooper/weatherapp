@@ -26,7 +26,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     // forecast not yet obtained.
     if (!self.location.hourlyForecastResponse) {
         [self.location fetchHourlyForecast:NO];
@@ -99,22 +99,56 @@
 
     // more button.
     if (indexPath.section == [self.location.hourlyForecast count]) {
-        UITableViewCell *cell       = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"more"];
+        UIActivityIndicatorView *ind;
+        UIImageView *icon;
+
+        // reuse cell.
+        if (cell) {
+            icon = (UIImageView *)             [cell.contentView viewWithTag:1];
+            ind  = (UIActivityIndicatorView *) [cell.contentView viewWithTag:2];
+        }
         
-        // bold label.
-        cell.textLabel.text         = @"See further into the future";
-        cell.textLabel.font         = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
-        cell.textLabel.textColor    = [UIColor whiteColor];
+        // create cell.
+        else {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"more"];
+            
+            // bold label.
+            cell.textLabel.text         = @"See further into the future";
+            cell.textLabel.font         = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
+            cell.textLabel.textColor    = [UIColor whiteColor];
+            
+            // white tint when select.
+            cell.backgroundColor        = BLUE_COLOR;
+            cell.selectedBackgroundView = [UIView new];
+            cell.selectedBackgroundView.backgroundColor = L_CELL_SEL_COLOR;
+            
+            // hourly menu icon.
+            icon       = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icons/menu/hourly"]];
+            icon.frame = CGRectMake(cell.contentView.bounds.size.width - 40, 10, 30, 30);
+            icon.tag   = 1;
+            [cell.contentView addSubview:icon];
+            
+            // indicator.
+            ind     = [[UIActivityIndicatorView alloc] initWithFrame:icon.frame];
+            ind.tag = 2;
+            [cell.contentView addSubview:ind];
+            
+        }
         
-        // white tint when select.
-        cell.backgroundColor        = [UIColor colorWithRed:0 green:150./255. blue:1 alpha:0.95];
-        cell.selectedBackgroundView = [UIView new];
-        cell.selectedBackgroundView.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.5];
+        // if location is loading, show indicator.
+        if (self.location.loading) {
+            icon.hidden = YES;
+            ind.hidden  = NO;
+            [ind startAnimating];
+        }
         
-        // hourly menu icon.
-        UIImageView *icon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icons/menu/hourly"]];
-        icon.frame        = CGRectMake(cell.contentView.bounds.size.width - 40, 10, 30, 30);
-        [cell.contentView addSubview:icon];
+        // not loading.
+        else {
+            [ind stopAnimating];
+            ind.hidden  = YES;
+            icon.hidden = NO;
+        }
         
         return cell;
     }
@@ -139,7 +173,7 @@
         timeLabel.textAlignment = NSTextAlignmentRight;
         [cell.contentView addSubview:timeLabel];
         
-        cell.backgroundColor = [UIColor colorWithRed:235./255. green:240./255. blue:1 alpha:0.7];
+        cell.backgroundColor = TABLE_COLOR_T;
         cell.detailTextLabel.textColor = [UIColor blackColor];
         
         // shadow on icon.
@@ -182,10 +216,21 @@
 // more button selected.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section != [self.location.hourlyForecast count]) return;
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [self.location fetchHourlyForecast:YES];
-    [self.location commitRequest];
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+
+    // fetch the forecast.
     tenDay = YES; // remember for refresh
+    [self.location fetchHourlyForecast:YES];
+    [self.location commitRequestThen:^(NSURLResponse *res, NSDictionary *data) {
+        if (self.view.window) [self hideIndicator];
+    }];
+
+    // call this to show indicator on the cell.
+    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    
+    // show other loading indicators.
+    [self showIndicator];
+    
 }
 
 // header views. these are reused.
@@ -207,7 +252,7 @@
             http://stackoverflow.com/questions/15604900/ios-uitableviewheaderfooterview-unable-to-change-background-color
         */
         view.backgroundView = [[UIView alloc] initWithFrame:view.frame];
-        view.backgroundView.backgroundColor = [UIColor colorWithRed:21./255. green:137./255. blue:1 alpha:0.95];
+        view.backgroundView.backgroundColor = TABLE_HEADER_COLOR;
 
         // day, e.g. Friday
         dayNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(15, 0, 200, 40)];
