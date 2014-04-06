@@ -80,14 +80,21 @@
     UIImageView *imageView;
     cell = [self.tableView dequeueReusableCellWithIdentifier:@"result"];
     if (!cell) {
+    
+        // new cell.
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"result"];
-        cell.backgroundColor     = [UIColor clearColor];
-        cell.textLabel.textColor =
+        cell.backgroundColor           = [UIColor clearColor];
+        cell.textLabel.textColor       =
         cell.detailTextLabel.textColor = [UIColor whiteColor];
-        cell.textLabel.adjustsFontSizeToFitWidth = YES;
+        cell.selectedBackgroundView    = [UIView new];
+        cell.selectedBackgroundView.backgroundColor = L_CELL_SEL_COLOR;
+        cell.textLabel.adjustsFontSizeToFitWidth    = YES;
+        
+        // image for flag.
         imageView     = [UIImageView new];
         imageView.tag = 1;
         [cell.contentView addSubview:imageView];
+        
     } else imageView = (UIImageView *)[cell.contentView viewWithTag:1];
     
     // location name.
@@ -163,6 +170,7 @@
         // a connection error occurred.
         if (connectionError) {
             NSLog(@"Location lookup connection error: %@", connectionError);
+            [appDelegate displayAlert:@"Lookup error" message:[connectionError localizedDescription]];
             return;
         }
         
@@ -170,7 +178,7 @@
         // decode the JSON.
         NSError *jsonError;
         NSDictionary *obj = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-        NSLog(@"json: %@", obj);
+
         // a JSON error occured.
         if (jsonError) {
             NSLog(@"JSON error: %@", jsonError);
@@ -234,7 +242,7 @@
     // user has typed since.
     if ([date laterDate:lastTypeDate] == lastTypeDate) return;
     
-    NSLog(@"User hasn't typed for 0.5 seconds; looking up %@", textField.text);
+    NSLog(@"User hasn't typed for 0.3 seconds; looking up %@", textField.text);
     [self lookupSuggestion:textField.text];
 }
 
@@ -292,21 +300,28 @@
 
 // show the loading indicators.
 - (void)showIndicator {
-    if (indicator) return;
+    if ([indicator isAnimating]) return;
+    if (!indicator) {
+        indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        indicator.alpha = 0;
+        [self.tableView addSubview:indicator];
+        indicator.center = [self.tableView convertPoint:self.tableView.center fromView:self.tableView.superview];
+    }
     
-    // big indicator.
-    indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    [self.tableView addSubview:indicator];
-    indicator.center = [self.tableView convertPoint:self.tableView.center fromView:self.tableView.superview];
     [indicator startAnimating];
-
+    [UIView animateWithDuration:0.3 animations:^{
+        indicator.alpha = 1;
+    }];
 }
 
 // hide the loading indicators.
 - (void)hideIndicator {
     if (!indicator) return;
-    [indicator removeFromSuperview];
-    indicator = nil;
+    [UIView animateWithDuration:0.3 animations:^{
+        indicator.alpha = 0;
+    } completion:^(BOOL finished) {
+        if (finished) [indicator stopAnimating];
+    }];
 }
 
 

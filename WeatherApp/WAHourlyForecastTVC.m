@@ -100,17 +100,9 @@
     // more button.
     if (indexPath.section == [self.location.hourlyForecast count]) {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"more"];
-        UIActivityIndicatorView *ind;
-        UIImageView *icon;
 
-        // reuse cell.
-        if (cell) {
-            icon = (UIImageView *)             [cell.contentView viewWithTag:1];
-            ind  = (UIActivityIndicatorView *) [cell.contentView viewWithTag:2];
-        }
-        
         // create cell.
-        else {
+        if (!cell) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"more"];
             
             // bold label.
@@ -124,30 +116,12 @@
             cell.selectedBackgroundView.backgroundColor = L_CELL_SEL_COLOR;
             
             // hourly menu icon.
-            icon       = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icons/menu/hourly"]];
+            
+            UIImageView *icon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icons/menu/hourly"]];
             icon.frame = CGRectMake(cell.contentView.bounds.size.width - 40, 10, 30, 30);
             icon.tag   = 1;
             [cell.contentView addSubview:icon];
             
-            // indicator.
-            ind     = [[UIActivityIndicatorView alloc] initWithFrame:icon.frame];
-            ind.tag = 2;
-            [cell.contentView addSubview:ind];
-            
-        }
-        
-        // if location is loading, show indicator.
-        if (self.location.loading) {
-            icon.hidden = YES;
-            ind.hidden  = NO;
-            [ind startAnimating];
-        }
-        
-        // not loading.
-        else {
-            [ind stopAnimating];
-            ind.hidden  = YES;
-            icon.hidden = NO;
         }
         
         return cell;
@@ -216,8 +190,9 @@
 // more button selected.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section != [self.location.hourlyForecast count]) return;
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    //[tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    
     // fetch the forecast.
     tenDay = YES; // remember for refresh
     [self.location fetchHourlyForecast:YES];
@@ -225,9 +200,6 @@
         if (self.view.window) [self hideIndicator];
     }];
 
-    // call this to show indicator on the cell.
-    [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    
     // show other loading indicators.
     [self showIndicator];
     

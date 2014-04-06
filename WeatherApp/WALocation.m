@@ -76,6 +76,7 @@
     if (willFetchDaily10Day)  [features addObject:@"forecast10day"];
     if (willFetchHourly10Day) [features addObject:@"hourly10day"];
     if (willFetchHourly)      [features addObject:@"hourly"];
+    if (![features count]) return;
     
     NSString *page = [features componentsJoinedByString:@"/"];
     [self fetch:page then:callback];
@@ -334,7 +335,6 @@ NSLog(@"handle daily: %@", forecast);
 
 // hourly forecast.
 - (void)handleHourlyForecast:(NSArray *)forecast {
-    NSLog(@"handle hourly %@", forecast);
     self.hourlyForecastResponse = forecast;
     [self updateHourlyForecast];
     self.hourlyForecastAsOf = [NSDate date];
@@ -393,7 +393,7 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 - (NSDictionary *)userDefaultsDict {
     if (self.dummy) return @{};
     NSArray * const keys = @[
-        @"city",                @"longName", @"l",
+        @"city",                @"longName",        @"l",
         @"countryCode",         @"country3166",
         @"regionCode",          @"region",
         @"isCurrentLocation",   @"locationAsOf",
@@ -435,9 +435,8 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     // stop the status bar indicator.
     [appDelegate endActivity];
     
-    // update the weather view controller's info.
+    // update the view controllers' info.
     [self updateBackground];
-    
     if (self.overviewVC) [self.overviewVC update];
     if (self.detailVC)   [self.detailVC   update];
     if (self.hourlyVC)   [self.hourlyVC   update];
@@ -457,9 +456,11 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
 
 // handle an error.
 - (void)handleError:(NSString *)errstr {
-    NSLog(@"Error for %@: %@", OR(self.city, @"unknown location"), errstr);
-    [appDelegate displayAlert:FMT(@"%@ error", OR(self.city, @"Location")) message:errstr];
-    [self endLoading];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        NSLog(@"Error for %@: %@", OR(self.city, @"unknown location"), errstr);
+        [appDelegate displayAlert:FMT(@"%@ error", OR(self.city, @"Location")) message:errstr];
+        [self endLoading];
+    }];
 }
 
 #pragma mark - Backgrounds
@@ -974,6 +975,23 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         //@"temp_f":          f[@"temp"][@"english"],
     }];
     
+}
+
+#pragma mark - Expired data
+
+- (BOOL)conditionsExpired {
+    if (self.loading) return NO;
+    return abs([self.conditionsAsOf timeIntervalSinceNow]) >= 1800;
+}
+
+- (BOOL)dailyForecastExpired {
+    if (self.loading) return NO;
+    return abs([self.dailyForecastAsOf timeIntervalSinceNow]) >= 1800;
+}
+
+- (BOOL)hourlyForecastExpired {
+    if (self.loading) return NO;
+    return abs([self.hourlyForecastAsOf timeIntervalSinceNow]) >= 1800;
 }
 
 @end

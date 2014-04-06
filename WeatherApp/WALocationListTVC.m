@@ -93,10 +93,6 @@
 
 // prevent highlighting of current location cells.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-
-    WALocation *location = appDelegate.locationManager.locations[indexPath.row];
-    if (!location.initialLoadingComplete) return NO;
-    
     return YES;
 }
 
@@ -134,6 +130,16 @@
     
     // initial load not complete.
     WALocation *location = appDelegate.locationManager.locations[indexPath.row];
+
+    // previous loading failed?
+    if (!location.response && !location.loading) {
+        [location fetchCurrentConditions];
+        [location commitRequest];
+        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        return;
+    }
+
+    // first load hasn't completed.
     if (!location.initialLoadingComplete) return;
 
     // set current page to this location, and dismiss the nc.

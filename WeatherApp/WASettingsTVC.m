@@ -7,6 +7,7 @@
 //
 
 #import "WASettingsTVC.h"
+#import "WALicenseVC.h"
 
 @implementation WASettingsTVC
 
@@ -52,11 +53,13 @@
         // credit cells.
         
         @[
-            @[@"Icons",                 @"Mitchell Cooper"      ],
-            @[@"Other images",          @"Public domain"        ],
-            @[@"Weather data",          @"WeatherUnderground"   ],
-            @[@"Flag icons",            @"www.icondrawer.com"   ],
-            @""
+            @[@"Icons",                 @"Mitchell Cooper"           ],
+            @[@"Backgrounds",           @"Public domain"             ],
+            @[@"Data",                  @"WeatherUnderground", @"wu" ],
+            @[@"Flag icons",            @"Icon Drawer",     @"icons" ],
+            @[@"Drop down menu",        @"Free license",     @"menu" ],
+            @[@"Drag and drop",         @"Free license",     @"drag" ],
+            @[@"", /* wunderground */   @"",                   @"wu" ]
         ]
         
     ];
@@ -67,6 +70,10 @@
 // update the time of last potential settings change.
 - (void)viewWillAppear:(BOOL)animated {
     appDelegate.lastSettingsChange = [NSDate date];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [DEFAULTS synchronize];
 }
 
 #pragma mark - Table view data source
@@ -127,8 +134,17 @@
         
         // other credit.
         else {
-            rowName = settings[indexPath.section][indexPath.row][0];
-            cell.detailTextLabel.text = settings[indexPath.section][indexPath.row][1];
+            NSArray *credit = settings[indexPath.section][indexPath.row];
+            rowName = credit[0];
+            cell.detailTextLabel.text = credit[1];
+            
+            // this has a license.
+            if ([credit count] == 3) {
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                cell.selectedBackgroundView = [UIView new];
+                cell.selectedBackgroundView.backgroundColor = CELL_SEL_COLOR;
+            }
+            
         }
         
     }
@@ -139,12 +155,23 @@
 
 // only highlight the selection options.
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section < [settings count] - 2) return YES;
+    if (indexPath.section <  [settings count] - 2) return YES;
+    if (indexPath.section == [settings count] - 1) return [settings[indexPath.section][indexPath.row] count] == 3;
     return NO;
 }
 
-// selected a selection option.
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    // credit license.
+    if (indexPath.section == [settings count] - 1) {
+        NSArray *credit = settings[indexPath.section][indexPath.row];
+        WALicenseVC *licenseVC = [[WALicenseVC alloc] initWithLicense:credit[2]];
+        [self.navigationController pushViewController:licenseVC animated:YES];
+        return;
+    }
+
+    // selected a selection option.
     NSString *sectionName = settings[indexPath.section][0];
     NSString *rowName     = settings[indexPath.section][1][indexPath.row];
     UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
@@ -160,10 +187,6 @@
     
     // save changes.
     [DEFAULTS setObject:rowName forKey:sectionName];
-    
-    // unhighlight row.
-    // this fixes the issue where it would stick after scrolling back to it.
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
 }
 

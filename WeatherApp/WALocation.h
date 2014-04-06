@@ -64,18 +64,16 @@
 @property NSDate *locationAsOf;                         // date of last location check
 @property float  latitude;                              // set automatically when coordinate set
 @property float  longitude;                             // set automatically when coordinate set
+@property NSTimeZone *timeZone;                         // time zone in this location
 
 #pragma mark - Weather conditions
 
 @property NSString     *conditions;                     // recent conditions; i.e. "Cloudy"
 @property NSDictionary *response;                       // recent conditions response
-
-#pragma mark - Time
-
-@property NSDate     *conditionsAsOf;                   // date of last condition check
-@property NSDate     *observationsAsOf;                 // observation unix time
-@property NSString   *observationTimeString;            // observation time string
-@property NSTimeZone *timeZone;                         // time zone in this location
+@property NSDate       *observationsAsOf;               // observation unix time
+@property NSString     *observationTimeString;          // observation time string
+@property NSDate       *conditionsAsOf;                 // date of last condition check
+@property (readonly) BOOL conditionsExpired;            // this data is really old
 
 #pragma mark - Icons
 
@@ -121,11 +119,13 @@
 @property NSArray        *forecastResponse;             // recent forecast response
 @property NSMutableArray *dailyForecast;                // generated daily forecast info
 @property NSDate         *dailyForecastAsOf;            // time last daily forecast fetched
+@property (readonly)     BOOL dailyForecastExpired;     // this data is really old
 
 // hourly.
 @property NSArray        *hourlyForecastResponse;       // recent hourly forecast response
 @property NSMutableArray *hourlyForecast;               // generated hourly forecast info
 @property NSDate         *hourlyForecastAsOf;           // time last hourly forecast fetched
+@property (readonly)     BOOL hourlyForecastExpired;    // this data is really old
 
 // details.
 @property NSMutableArray *extensiveDetails;             // generated details for cells

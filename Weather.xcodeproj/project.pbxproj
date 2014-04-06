@@ -21,6 +21,8 @@
 		A73976B718E642570092538B /* WAMenuItem.m in Sources */ = {isa = PBXBuildFile; fileRef = A73976B518E642570092538B /* WAMenuItem.m */; };
 		A73976BA18E64A6B0092538B /* UINavigationController+Fade.m in Sources */ = {isa = PBXBuildFile; fileRef = A73976B918E64A6B0092538B /* UINavigationController+Fade.m */; };
 		A73976BC18E8CCA40092538B /* flags in Resources */ = {isa = PBXBuildFile; fileRef = A73976BB18E8CCA40092538B /* flags */; };
+		A73976BE18EB99790092538B /* Licenses.plist in Resources */ = {isa = PBXBuildFile; fileRef = A73976BD18EB99780092538B /* Licenses.plist */; };
+		A73976C118EB9DA10092538B /* WALicenseVC.m in Sources */ = {isa = PBXBuildFile; fileRef = A73976C018EB9DA10092538B /* WALicenseVC.m */; };
 		A739BFA71866A5220003D323 /* navbar.png in Resources */ = {isa = PBXBuildFile; fileRef = A739BFA61866A5220003D323 /* navbar.png */; };
 		A747819C1864EF00003DCA60 /* backgrounds in Resources */ = {isa = PBXBuildFile; fileRef = A747819B1864EF00003DCA60 /* backgrounds */; };
 		A747819E18661209003DCA60 /* backgrounds.plist in Resources */ = {isa = PBXBuildFile; fileRef = A747819D18661209003DCA60 /* backgrounds.plist */; };
@@ -70,6 +72,9 @@
 		A73976B818E64A6B0092538B /* UINavigationController+Fade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+Fade.h"; sourceTree = "<group>"; };
 		A73976B918E64A6B0092538B /* UINavigationController+Fade.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+Fade.m"; sourceTree = "<group>"; };
 		A73976BB18E8CCA40092538B /* flags */ = {isa = PBXFileReference; lastKnownFileType = folder; path = flags; sourceTree = "<group>"; };
+		A73976BD18EB99780092538B /* Licenses.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Licenses.plist; sourceTree = "<group>"; };
+		A73976BF18EB9DA10092538B /* WALicenseVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WALicenseVC.h; sourceTree = "<group>"; };
+		A73976C018EB9DA10092538B /* WALicenseVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WALicenseVC.m; sourceTree = "<group>"; };
 		A739BFA61866A5220003D323 /* navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbar.png; sourceTree = "<group>"; };
 		A747819B1864EF00003DCA60 /* backgrounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = backgrounds; sourceTree = "<group>"; };
 		A747819D18661209003DCA60 /* backgrounds.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = backgrounds.plist; sourceTree = "<group>"; };
@@ -133,15 +138,16 @@
 			name = "New location table";
 			sourceTree = "<group>";
 		};
-		A70EE9D21826C1D100F317A9 /* Settings table view controller */ = {
+		A70EE9D21826C1D100F317A9 /* Settings table */ = {
 			isa = PBXGroup;
 			children = (
 				BC7CA05F184E63BA00AAF520 /* WASettingsConstants.h */,
 				BC7CA060184E63BA00AAF520 /* WASettingsConstants.m */,
 				A70EE9CF1826C1CD00F317A9 /* WASettingsTVC.h */,
 				A70EE9D01826C1CD00F317A9 /* WASettingsTVC.m */,
+				A73976C218EBA0410092538B /* License view */,
 			);
-			name = "Settings table view controller";
+			name = "Settings table";
 			sourceTree = "<group>";
 		};
 		A7164982189078F300205E07 /* Condition detail table */ = {
@@ -192,8 +198,8 @@
 				BC136803182167D90090CAC5 /* Navigation controller */,
 				BC64C8C81822CF2800C59F00 /* Location list table */,
 				A70EE9C11823623100F317A9 /* New location table */,
-				A70EE9D21826C1D100F317A9 /* Settings table view controller */,
-				BCA93CD3181EEB2F00516E7E /* Location view controller */,
+				A70EE9D21826C1D100F317A9 /* Settings table */,
+				BCA93CD3181EEB2F00516E7E /* Location views */,
 				A7D84FEF18DE47E4005F30E2 /* Extensions and categories */,
 				A71C08E3181ED1B6003488ED /* Supporting Files */,
 				A70EE9D71827142E00F317A9 /* icons */,
@@ -215,8 +221,28 @@
 				A76A07BD18A0789400C813B5 /* wunderground@2x.png */,
 				A747819D18661209003DCA60 /* backgrounds.plist */,
 				BC1367FA182162920090CAC5 /* UserDefaults.txt */,
+				A73976BD18EB99780092538B /* Licenses.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A73976C218EBA0410092538B /* License view */ = {
+			isa = PBXGroup;
+			children = (
+				A73976BF18EB9DA10092538B /* WALicenseVC.h */,
+				A73976C018EB9DA10092538B /* WALicenseVC.m */,
+			);
+			name = "License view";
+			sourceTree = "<group>";
+		};
+		A73976C318EBA3680092538B /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				BCA93CCE181EEB2B00516E7E /* WAWeatherVC.h */,
+				BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */,
+				BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */,
+			);
+			name = Overview;
 			sourceTree = "<group>";
 		};
 		A75636D218DE0DE000273EAE /* Daily forecast table */ = {
@@ -354,17 +380,15 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
-		BCA93CD3181EEB2F00516E7E /* Location view controller */ = {
+		BCA93CD3181EEB2F00516E7E /* Location views */ = {
 			isa = PBXGroup;
 			children = (
-				BCA93CCE181EEB2B00516E7E /* WAWeatherVC.h */,
-				BCA93CCF181EEB2B00516E7E /* WAWeatherVC.m */,
-				BCA93CD0181EEB2B00516E7E /* WAWeatherVC.xib */,
+				A73976C318EBA3680092538B /* Overview */,
 				A7164982189078F300205E07 /* Condition detail table */,
 				A75636D218DE0DE000273EAE /* Daily forecast table */,
 				A75636D918DE0EE100273EAE /* Hourly forecast table */,
 			);
-			name = "Location view controller";
+			name = "Location views";
 			sourceTree = "<group>";
 		};
 		BCA93CDD181F048D00516E7E /* Location manager */ = {
@@ -456,6 +480,7 @@
 				A747819C1864EF00003DCA60 /* backgrounds in Resources */,
 				A747819E18661209003DCA60 /* backgrounds.plist in Resources */,
 				BC1367FB182162920090CAC5 /* UserDefaults.txt in Resources */,
+				A73976BE18EB99790092538B /* Licenses.plist in Resources */,
 				A76A07BC18A0767900C813B5 /* wunderground.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -478,6 +503,7 @@
 				A7E9779818288432004189B0 /* WALocationListTVC.m in Sources */,
 				BCA93CDC181F048400516E7E /* WALocationManager.m in Sources */,
 				BCA93CE0181F0A9100516E7E /* WALocation.m in Sources */,
+				A73976C118EB9DA10092538B /* WALicenseVC.m in Sources */,
 				A73976B718E642570092538B /* WAMenuItem.m in Sources */,
 				BCA93CD1181EEB2B00516E7E /* WAWeatherVC.m in Sources */,
 				A786135B1863DA1C0052FCC5 /* WAPageViewController.m in Sources */,

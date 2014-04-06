@@ -38,6 +38,13 @@
 
 // update if settings have been changed.
 - (void)viewWillAppear:(BOOL)animated {
+
+    // update data if it's old.
+    if (self.location.conditionsExpired) {
+        [self.location fetchCurrentConditions];
+        [self.location commitRequest];
+    }
+
     [self update:NO];
 }
 

@@ -55,6 +55,10 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self update];
+    
+    // if there are items in hourly preview, make sure it's showing.
+    if ([self.hourlyContainer.subviews count]) self.hourlyContainer.alpha = 1;
+    
 }
 
 // update hourly preview.
@@ -62,13 +66,18 @@
     [super viewDidAppear:animated];
     if (!SETTING(kEnableHourlyPreviewSetting)) return;
     
-    // fetch hourly forecast if that's enabled and we haven't already.
-    if (!self.location.hourlyForecastResponse) {
+    // fetch current conditions if that data is too old.
+    if (self.location.conditionsExpired)
+        [self.location fetchCurrentConditions];
+    
+    // fetch hourly forecast if that's enabled and we haven't already,
+    // or fetch it if that data is too old.
+    if (!self.location.hourlyForecastResponse || self.location.hourlyForecastExpired)
         [self.location fetchHourlyForecast:NO];
-        [self.location commitRequest];
-    }
-
+    
+    [self.location commitRequest];
     [self updateHourlyPreview];
+    [self replaceHourlyWithSnapshot];
 }
 
 // update the height constraint.
