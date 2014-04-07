@@ -34,6 +34,7 @@
 #define TEMP_NONE           -999
 
 // Drop down menu settings.
+
 #define ITEMHEIGHT          55.
 #define ITEMPADDING         12.
 #define ICONPADDING         12.
@@ -42,6 +43,7 @@
 #define MENUFONT_FAMILY     @"Helvetica-Neue"
 
 // Colors.
+
 #define RGBA(R, G, B, A)    [UIColor colorWithRed:R/255. green:G/255. blue:B/255. alpha:A]
 #define LLLL_BLUE_COLOR     RGBA( 20., 200., 255.,  1 )     // lightest blue
 #define  LLL_BLUE_COLOR     RGBA(  0., 180., 255.,  1 )     // very light blue
@@ -59,7 +61,7 @@
 
 typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data);
 
-// Predeclare class names for use throughout all headers.
+// Predeclare class names for easy use throughout all headers.
 
 @class
     WALocationManager,
@@ -77,18 +79,23 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data);
 
 #pragma mark - Application delegate
 
+// These instance variables are used only within the application delegate.
+
 @interface WAAppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
     CLLocationManager       *coreLocationManager;       // Core Location API manager
     NSUInteger              activityCount;              // reference count for activity indicator
     BOOL                    gotLocation;                // device has been located initially
-    WALocationCallback      onFetchedConditions;        // callback for after fetch.
+    WALocationCallback      onFetchedConditions;        // callback for after fetch
 }
+
+// These properties are accessed throughout the app.
 
 @property (strong, nonatomic) UIWindow *window;         // the application window
 @property WANavigationController *navigationController; // the main navigation controller
 @property WAPageViewController   *pageViewController;   // the location page view controller (swipe up/down)
-@property (readonly) WALocation  *currentLocation;      // the current location object
 @property NSDate                 *lastSettingsChange;   // time of last settings change
+
+// These methods are used throughout the app.
 
 - (void)displayAlert:(NSString *)title message:(NSString *)message; // alert convenience
 - (void)saveLocationsInDatabase;                        // updates user defaults database
@@ -96,6 +103,8 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data);
 - (void)endActivity;                                    // decrease activity counter
 
 @end
+
+// These things are used very frequently throughout almost all files.
 
 FOUNDATION_EXPORT WAAppDelegate     *appDelegate;       // app delegate object
 FOUNDATION_EXPORT WALocationManager *locationManager;   // location manager object

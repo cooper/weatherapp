@@ -20,33 +20,30 @@ WALocationManager *locationManager = nil;
 
 #pragma mark - Application delegate
 
+// app is almost done launching. this was first available in iOS 6.
 - (BOOL)application:(UIApplication *)application willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     appDelegate = self;
     self.lastSettingsChange = [NSDate date];
-
-    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.window.backgroundColor = TABLE_COLOR;
-
-    // set default options if we haven't already.
+    
+    // set default options.
     [self setDefaults];
     
-    // create location manager.
-    // load locations from user defaults.
+    // create location manager and load locations from user defaults.
     // fetch current conditions for favorite locations.
     locationManager = [WALocationManager new];
     [locationManager loadLocations:[DEFAULTS objectForKey:@"locations"]];
     [locationManager fetchLocations];
     
-    // create the navigation controller.
+    // create the window and navigation controller.
+    self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.window.backgroundColor = TABLE_COLOR;
     self.window.rootViewController = self.navigationController = [[WANavigationController alloc] initWithMyRootController];
     
-    // create the page view controller.
+    // create the page view controller (used to scroll between overviews).
     self.pageViewController = [[WAPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationVertical options:@{ UIPageViewControllerOptionSpineLocationKey: @(UIPageViewControllerSpineLocationMid) }];
-    
-    // load locations from settings.
     self.pageViewController.dataSource = locationManager;
     
-    // start locating.
+    // start iOS location services.
     [self startLocating];
 
     // rain notification background check (every thirty minutes or so).
@@ -58,11 +55,12 @@ WALocationManager *locationManager = nil;
     return YES;
 }
 
+// this is called for the background app fetch functionality.
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     NSLog(@"Background fetch!");
     
     // hasn't been 30 minutes since last fetch.
-    if (abs([self.currentLocation.conditionsAsOf timeIntervalSinceNow]) < 1800) {
+    if (abs([locationManager.currentLocation.conditionsAsOf timeIntervalSinceNow]) < 1800) {
         completionHandler(UIBackgroundFetchResultNoData);
         return;
     }
@@ -74,21 +72,15 @@ WALocationManager *locationManager = nil;
         return;
     }
     
-    // here's how this works:
-    /*
-    
+    /*  here's how this works:
+
         let's say wunderground says chancerain
         show the notification with (as of) and set a bool that it's chancerain
-        
         next time we update, if that bool is true, just ignore it.
-     
-        next time we update and it says it's not chancerain, set bool false.
+        next time we update and it says it's not chancerain, set bool false.    */
     
-    */
-    
-    WALocation *location = self.currentLocation;
-    
-    onFetchedConditions = ^(NSURLResponse *res, NSDictionary *data){
+    WALocation *location = locationManager.currentLocation;
+    onFetchedConditions  = ^(NSURLResponse *res, NSDictionary *data) {
 
         BOOL rain = [location.conditionsImageName rangeOfString:@"rain"].location != NSNotFound;
         
@@ -120,23 +112,22 @@ WALocationManager *locationManager = nil;
         completionHandler(UIBackgroundFetchResultNewData);
         
     };
+    
     gotLocation = NO;
     [self startLocating];
 }
 
+// application no longer active. update database.
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     [self saveLocationsInDatabase];
 }
 
+// application closing. update database.
 - (void)applicationWillTerminate:(UIApplication *)application {
     [self saveLocationsInDatabase];
 }
 
 #pragma mark - Location service management
-
-- (WALocation *)currentLocation {
-    return locationManager.currentLocation;
-}
 
 // starts our location service.
 - (void)startLocating {
@@ -153,6 +144,7 @@ WALocationManager *locationManager = nil;
     
 }
 
+// stop location services and fetch conditions.
 - (void)stopLocating {
 
     // stop locating.
@@ -162,8 +154,8 @@ WALocationManager *locationManager = nil;
 
     // initial condition check.
     NSLog(@"Checking current conditions");
-    [self.currentLocation fetchCurrentConditions];
-    [self.currentLocation commitRequestThen:onFetchedConditions];
+    [locationManager.currentLocation fetchCurrentConditions];
+    [locationManager.currentLocation commitRequestThen:onFetchedConditions];
     
     // reset these for the next update.
     onFetchedConditions = nil;
@@ -200,21 +192,20 @@ WALocationManager *locationManager = nil;
     NSLog(@"Updating location: %f,%f", recentLocation.coordinate.latitude, recentLocation.coordinate.longitude);
     
     // set our current location.
-    self.currentLocation.latitude     = recentLocation.coordinate.latitude;
-    self.currentLocation.longitude    = recentLocation.coordinate.longitude;
-    self.currentLocation.locationAsOf = [NSDate date];
+    WALocation *loc  = locationManager.currentLocation;
+    loc.latitude     = recentLocation.coordinate.latitude;
+    loc.longitude    = recentLocation.coordinate.longitude;
+    loc.locationAsOf = [NSDate date];
 
 }
 
-- (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
-    NSLog(@"Resumed location updates");
-}
-
+// core location error.
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
     NSLog(@"Location error: %@", error);
     [self displayAlert:@"Location services error" message:error.localizedDescription];
 }
 
+// this is called when permissions to use core location change.
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
     if (status != kCLAuthorizationStatusAuthorized) return;
     
@@ -228,11 +219,13 @@ WALocationManager *locationManager = nil;
 
 #pragma mark - User defaults
 
+// update the locations dictionary in database.
 - (void)saveLocationsInDatabase {
     [DEFAULTS setObject:[locationManager locationsArrayForSaving] forKey:@"locations"];
     [DEFAULTS synchronize];
 }
 
+// set default options if we have not already done so.
 - (void)setDefaults {
     
     // we already did this.
@@ -288,6 +281,7 @@ WALocationManager *locationManager = nil;
 
 #pragma mark - Convenience
 
+// display a UIAlert without a delegate.
 - (void)displayAlert:(NSString *)title message:(NSString *)message {
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:nil cancelButtonTitle:nil otherButtonTitles:@"OK", nil];
     [alert show];

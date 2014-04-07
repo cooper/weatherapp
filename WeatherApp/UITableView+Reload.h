@@ -6,8 +6,6 @@
 //  Copyright (c) 2014 Mitchell Cooper. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-
 @interface UITableView (Reload)
 
 - (void)reloadData:(BOOL)animated;

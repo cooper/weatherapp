@@ -22,6 +22,7 @@
 
 @implementation WALocation
 
+// initialize with TEMP_NONE for all temperatures.
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -40,6 +41,7 @@
 }
 
 // create a new dummy location.
+// dummies are used in the reorder table view for a blank cell.
 + (id)newDummy {
     WALocation *location = [self new];
     location.dummy = YES;
@@ -223,6 +225,7 @@
 
 #pragma mark - Handling data
 
+// handle JSON data from a request response.
 - (void)handleJSON:(NSDictionary *)data features:(NSDictionary *)features {
 
     // force the view to load if it hasn't already.
@@ -342,15 +345,18 @@ NSLog(@"handle daily: %@", forecast);
 
 #pragma mark - Automatic properties
 
+// city, region/country.
 - (NSString *)fullName {
     if (!self.city || !self.region) return nil;
     return FMT(@"%@, %@", self.city, self.region);
 }
 
+// index in the location manager.
 - (NSUInteger)index {
     return [self.manager.locations indexOfObject:self];
 }
 
+// unit (degrees or kelvin) but no scale (F or C)
 - (NSString *)tempUnit {
     if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin))
         return @"K";
@@ -361,24 +367,25 @@ NSLog(@"handle daily: %@", forecast);
     I decided to use a macro to define these methods and property getters.
 */
 
-#define tempFunction(NAME, CPROP, FPROP)                                        \
-    - (NSString *)NAME {                                                        \
-        return [self NAME:0];                                                   \
-    }                                                                           \
-    - (NSString *)NAME:(UInt8)decimalPlaces {                                   \
-        float t;                                                                \
-        if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))  \
-            t = self.FPROP;                                                     \
-        else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin)) \
-            t = self.CPROP + 273.15;                                            \
-        else                                                                    \
-            t = self.CPROP;                                                     \
-        NSString *result = FMT(FMT(@"%%.%df", decimalPlaces), t);               \
-        NSRange range    = NSMakeRange([result length] - 2, 2);                 \
-        if ([[result substringWithRange:range] isEqualToString:@".0"])          \
-            return FMT(@"%.f", t);                                              \
-        return result;                                                          \
-    }
+#define tempFunction(NAME, CPROP, FPROP)                                    \
+                                                                            \
+- (NSString *)NAME {                                                        \
+    return [self NAME:0];                                                   \
+}                                                                           \
+- (NSString *)NAME:(UInt8)decimalPlaces {                                   \
+    float t;                                                                \
+    if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleFahrenheit))  \
+        t = self.FPROP;                                                     \
+    else if (SETTING_IS(kTemperatureScaleSetting, kTemperatureScaleKelvin)) \
+        t = self.CPROP + 273.15;                                            \
+    else                                                                    \
+        t = self.CPROP;                                                     \
+    NSString *result = FMT(FMT(@"%%.%df", decimalPlaces), t);               \
+    NSRange range    = NSMakeRange([result length] - 2, 2);                 \
+    if ([[result substringWithRange:range] isEqualToString:@".0"])          \
+        return FMT(@"%.f", t);                                              \
+    return result;                                                          \
+}
 
 tempFunction(temperature, degreesC,   degreesF)
 tempFunction(windchill,   windchillC, windchillF)
@@ -452,7 +459,6 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
         [appDelegate.pageViewController updateNavigationBar];
     
 }
-
 
 // handle an error.
 - (void)handleError:(NSString *)errstr {

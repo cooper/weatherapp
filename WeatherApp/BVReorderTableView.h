@@ -22,8 +22,6 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-
 @protocol ReorderTableViewDelegate <UITableViewDelegate>
 
 // This method is called when starting the re-ording process. You insert a blank row object into your

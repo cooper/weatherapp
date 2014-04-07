@@ -30,7 +30,7 @@
     self = [super initWithTransitionStyle:style navigationOrientation:navigationOrientation options:options];
     
     // this is a looping reference - I am aware.
-    // However, this object will never be destroyed from start to exit of the application,
+    // however, this object will never be destroyed from start to exit of the application,
     // so the hanging refcount does not actually matter at all.
     if (self) self.delegate = self;
     
