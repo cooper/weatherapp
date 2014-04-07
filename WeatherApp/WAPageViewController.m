@@ -112,7 +112,7 @@
     NSUInteger i      = goingDown ? toVC.location.index - 1 : toVC.location.index + 1;
     
     // set the forebackground to the location we were on already.
-    WALocation *locationBefore = appDelegate.locationManager.locations[i];
+    WALocation *locationBefore = locationManager.locations[i];
     background.image = locationBefore.background;
     background.frame = self.view.bounds;
     

@@ -128,7 +128,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 
     // create a location using the data we generated in lookupSuggestion:
-    WALocation *location = [appDelegate.locationManager createLocationFromDictionary:results[indexPath.row]];
+    WALocation *location = [locationManager createLocationFromDictionary:results[indexPath.row]];
     
     // fetch the conditions; then, return to the location list.
     [location fetchCurrentConditions];

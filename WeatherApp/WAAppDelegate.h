@@ -87,7 +87,6 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data);
 @property (strong, nonatomic) UIWindow *window;         // the application window
 @property WANavigationController *navigationController; // the main navigation controller
 @property WAPageViewController   *pageViewController;   // the location page view controller (swipe up/down)
-@property WALocationManager      *locationManager;      // our location manager
 @property (readonly) WALocation  *currentLocation;      // the current location object
 @property NSDate                 *lastSettingsChange;   // time of last settings change
 
@@ -98,5 +97,6 @@ typedef void(^WALocationCallback)(NSURLResponse *res, NSDictionary *data);
 
 @end
 
-FOUNDATION_EXPORT WAAppDelegate *appDelegate;           // app delegate object
+FOUNDATION_EXPORT WAAppDelegate     *appDelegate;       // app delegate object
+FOUNDATION_EXPORT WALocationManager *locationManager;   // location manager object
 FOUNDATION_EXPORT float temp_safe(id);                  // temperature value check function
