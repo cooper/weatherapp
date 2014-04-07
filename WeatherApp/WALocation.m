@@ -330,7 +330,6 @@
 
 // ten-day forecast.
 - (void)handleForecast:(NSArray *)forecast {
-NSLog(@"handle daily: %@", forecast);
     self.forecastResponse = forecast;
     [self updateDailyForecast];
     self.dailyForecastAsOf = [NSDate date];
