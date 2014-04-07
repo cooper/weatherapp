@@ -627,14 +627,14 @@ tempFunction(feelsLike,   feelsLikeC, feelsLikeF)
     
     // in millimeters.
     else {
-        if (isT) precipT = FMT(@"%@ in", r[@"precip_today_metric"]);
-        if (isH) precipH = FMT(@"%@ in", r[@"precip_1hr_metric"]);
+        if (isT) precipT = FMT(@"%@ mm", r[@"precip_today_metric"]);
+        if (isH) precipH = FMT(@"%@ mm", r[@"precip_1hr_metric"]);
     }
     
     // pressure.
     pressure = SETTING_IS(kPressureMeasureSetting, kPressureMeasureInchHg) ?
         FMT(@"%@ inHg", r[@"pressure_in"])                                 :
-        FMT(@"%@ inHg", r[@"pressure_mb"]);
+        FMT(@"%@ mb",   r[@"pressure_mb"]);
 
     // UV index.
     float safeUV = temp_safe(r[@"UV"]);
