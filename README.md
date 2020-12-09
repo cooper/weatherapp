@@ -23,4 +23,14 @@ MVC
 * [WANewLocationTVC](./WeatherApp/WANewLocationTVC.m) - table view controller for searching/adding locations
 * [WASettingsTVC](./WeatherApp/WASettingsTVC.m) - table view controller for app settings
 
+## Screenshots
+
 [![Screenshots](https://i.imgur.com/6UsMTC4.png) Screenshot gallery](https://mitchellcooper.me/screenshots/weatherapp)
+
+## License
+
+[BSD 2-Clause "Simplified" License](LICENSE)
+
+## Author
+
+[Mitchell Cooper](https://mitchellcooper.me), <mitchell@mitchellcooper.me>
